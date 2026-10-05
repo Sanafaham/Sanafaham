@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>OPEN WHEN… For My Daughter</title>
-<meta name="theme-color" content="#9b6a76" />
+<meta name="theme-color" id="themeColor" content="#9b6a76" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="OPEN WHEN" />
@@ -47,7 +47,8 @@
   body.son-edition .preview-note span{color:#eef3f7}
   body.son-edition .keep-card{background:linear-gradient(180deg,#fffdf7 0%,#eef2f5 100%)}
   body.son-edition .open-last{background:linear-gradient(180deg,#dfe7ed 0%,#cfdbe4 100%);border-color:#b6c4d1}
-  body.son-edition .letter-sheet{border-color:rgba(116,135,154,.34);border-top-color:#9b8a63}
+  body.son-edition .letter-panel.show{background:#f3f0e8;border-color:#b9c6d3}
+  body.son-edition .letter-sheet{background:#fffdf7;border-color:rgba(116,135,154,.34);border-top-color:#9b8a63}
   body.son-edition .letter-divider path:first-child{stroke:#9b8a63}
   body.son-edition .sprig path,
   body.son-edition .card-sprig path,
@@ -482,6 +483,8 @@ function editionPronoun(){
 function applyEditionUI(){
   const isSon = edition === 'son';
   document.body.classList.toggle('son-edition', isSon);
+  const themeColor = document.getElementById('themeColor');
+  if(themeColor) themeColor.setAttribute('content', isSon ? '#243b5a' : '#9b6a76');
   editionDaughter.classList.toggle('active', !isSon);
   editionSon.classList.toggle('active', isSon);
   editionDaughter.setAttribute('aria-pressed', isSon ? 'false' : 'true');
