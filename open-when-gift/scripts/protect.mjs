@@ -48,6 +48,12 @@ const htmlRules = [
 
   // Creator / receiver separation
   ['creator setup exists', 'id="setup"'],
+  ['Daughter edition selector', 'id="editionDaughter"'],
+  ['Son edition selector', 'id="editionSon"'],
+  ['edition switcher', "function switchEdition(nextEdition)"],
+  ['Daughter edition remains available', "nextEdition !== 'daughter' && nextEdition !== 'son'"],
+  ['Son edition changes recipient label', '"Son\'s" : "Daughter\'s"'],
+  ['saved gift restores edition', "edition = gift.edition === 'son' ? 'son' : 'daughter'"],
   ['receiver hides creator controls', "setup.style.display = 'none'"],
   ['receiver shows finished gift', "giftExperience.style.display = 'block'"],
   ['sender preview exists', 'Sender preview'],
@@ -87,7 +93,8 @@ const apiRules = [
   ['private Blob write', "access: 'private'"],
   ['private Blob read', "get('gifts/' + id + '.json'"],
   ['gift payload versioned', 'version: 1'],
-  ['daughter edition retained', "edition: 'daughter'"],
+  ['edition validated server-side', "body.edition === 'son' ? 'son' : (body.edition === 'daughter' ? 'daughter' : '')"],
+  ['edition persisted server-side', 'edition,'],
   ['recipient required', 'const recipient = safeText(body.recipient'],
   ['sender required', 'const sender = safeText(body.sender'],
   ['exactly 24 saved messages', 'messages.length !== 24'],
@@ -97,19 +104,26 @@ const apiRules = [
 
 for (const [name, marker] of apiRules) requireIn(api, marker, name);
 
-// Protect the exact number of built-in cards.
-const lettersStart = html.indexOf('const letters = [');
-const lettersEnd = html.indexOf('];', lettersStart);
-if (lettersStart < 0 || lettersEnd < 0) {
-  failures.push('letters array exists');
-} else {
-  const block = html.slice(lettersStart, lettersEnd);
-  const count = (block.match(/^\["/gm) || []).length;
-  if (count !== 24) failures.push('exactly 24 built-in letters (found ' + count + ')');
+// Protect the exact number of built-in cards in both launch editions.
+for (const [label, startMarker, endMarker] of [
+  ['Daughter', 'const daughterLetters = [', 'const sonLetters = ['],
+  ['Son', 'const sonLetters = [', 'const qs = new URLSearchParams']
+]) {
+  const start = html.indexOf(startMarker);
+  const end = html.indexOf(endMarker, start + startMarker.length);
+  if (start < 0 || end < 0) {
+    failures.push(label + ' letters array exists');
+  } else {
+    const block = html.slice(start, end);
+    const count = (block.match(/^\["/gm) || []).length;
+    if (count !== 24) failures.push(label + ' edition has exactly 24 built-in letters (found ' + count + ')');
+  }
 }
 
-// Protect the approved first letter, which is used as a visual/content canary.
-requireIn(html, 'Some days are simply awful.\\n\\nYou do not have to find the lesson in it tonight. You do not have to pretend you are fine.\\n\\nGet through today.\\n\\nTomorrow gets a fresh chance.\\n\\nAnd remember, one bad day has never changed who you are.', 'approved first-letter original copy');
+// Protect approved content canaries in both editions.
+requireIn(html, 'Some days are simply awful.\\n\\nYou do not have to find the lesson in it tonight. You do not have to pretend you are fine.\\n\\nGet through today.\\n\\nTomorrow gets a fresh chance.\\n\\nAnd remember, one bad day has never changed who you are.', 'approved shared first-letter copy');
+requireIn(html, 'You do not have to be strong every minute.', 'approved Son edition strength letter');
+requireIn(html, 'You are my \' + edition + \'.', 'edition-specific final keepsake relationship');
 
 // Protect against accidentally bringing back the old manifest/query-loss risk.
 if (html.includes('<link rel="manifest"')) failures.push('manifest must remain absent until gift-token-safe start_url exists');
