@@ -78,8 +78,6 @@
   .keep-steps{display:grid;gap:8px}
   .keep-step{padding:10px 12px;background:rgba(255,250,244,.8);border:1px solid rgba(219,200,205,.9);border-radius:14px;font-size:13px;line-height:1.45;color:var(--ink)}
   .card-sprig{width:42px;height:32px;display:block;margin:8px 0 0 auto;opacity:.95}
-  .saved-toast{display:none;margin-top:12px;padding:12px 14px;background:#f3e7ea;border:1px solid var(--line);border-radius:14px;color:var(--rose-dark);font-size:14px;line-height:1.45}
-  .saved-toast.show{display:block}
   .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:22px 2px 12px}
   .section-head h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:500;color:var(--ink)}
   .section-head span{font-size:13px;color:var(--ink-soft)}
@@ -196,8 +194,7 @@
       </svg>
       <div class="from-line" id="fromLine">A little reminder for you</div>
       <div class="letter-actions">
-        <button class="btn" id="closeLetter">Keep this with me</button>
-        <div class="saved-toast" id="savedToast">Kept with your gift. For easy access anytime, save OPEN WHEN to your Home Screen using the instructions above.</div>
+        <button class="btn" id="closeLetter">Back to my cards</button>
       </div>
     </section>
 
@@ -270,7 +267,6 @@ const letterPanel = document.getElementById('letterPanel');
 const lastPanel = document.getElementById('lastPanel');
 const giftExperience = document.getElementById('giftExperience');
 const previewNote = document.getElementById('previewNote');
-const savedToast = document.getElementById('savedToast');
 const previewCopy = document.getElementById('previewCopy');
 
 function applyNames(){
@@ -325,11 +321,8 @@ function openLetter(i){
 }
 
 document.getElementById('closeLetter').onclick = () => {
-  savedToast.classList.add('show');
-  setTimeout(() => {
-    letterPanel.classList.remove('show');
-    savedToast.classList.remove('show');
-  }, 1800);
+  letterPanel.classList.remove('show');
+  document.querySelector('.section-head').scrollIntoView({behavior:'smooth', block:'start'});
 };
 document.getElementById('openLast').onclick = () => {
   letterPanel.classList.remove('show');
