@@ -506,6 +506,259 @@
   .letter-divider,
   .letter-floral{color:var(--green)}
 
+
+  /* OWNER FINAL VISUAL PASS — reference contrast, raw organic paper, real envelopes */
+  :root{
+    --bg:#eee9df;
+    --paper:#f3eadb;
+    --paper-light:#f8f1e6;
+    --raw:#cdb79a;
+    --raw-light:#d8c6ad;
+    --green:#4f625a;
+    --green-dark:#394a43;
+    --green-soft:#dce5df;
+    --ink:#29231f;
+    --ink-soft:#564b43;
+    --line:#c9b9a5;
+  }
+
+  html,body{
+    background:#eee9df!important;
+    color:var(--ink)!important;
+  }
+
+  /* raw organic paper texture */
+  .hero-sleeve,
+  .gift-maker,
+  .keep-card,
+  .share,
+  .letter-sheet,
+  .edit-letter,
+  .edit-letter textarea,
+  input,
+  .personalize{
+    background-color:var(--paper-light)!important;
+    background-image:
+      radial-gradient(circle at 12% 18%,rgba(88,66,48,.055) 0 .7px,transparent .8px),
+      radial-gradient(circle at 74% 63%,rgba(96,73,52,.045) 0 .65px,transparent .75px),
+      radial-gradient(circle at 38% 81%,rgba(255,255,255,.52) 0 .8px,transparent .9px);
+    background-size:13px 15px,17px 19px,23px 21px;
+  }
+
+  /* crisp ink everywhere */
+  h1,.subhead,.hero-copy,.eyebrow,
+  .gift-maker h2,.maker-sub,.edition-label,label,
+  .personalize summary,.edit-letter-title,.edit-letter-status,
+  .section-head h3,.section-head span,.keep-summary-text strong,
+  .keep-summary-text span,.share-title,.share-sub,.share-foot,
+  .letter-open-mark,.letter-meta,.letter-title,.letter-body,.from-line,
+  .open-card .title,.open-card .hint,.footer-note,
+  input,textarea{
+    opacity:1!important;
+    filter:none!important;
+  }
+  h1,.gift-maker h2,.section-head h3,.open-card .title,.letter-title,.letter-body{
+    color:var(--ink)!important;
+  }
+  .hero-copy,.eyebrow,.keep-summary-text span,.share-sub,.share-foot,
+  .open-card .hint,.footer-note,.from-line{
+    color:var(--ink-soft)!important;
+  }
+  .letter-body{
+    font-weight:500!important;
+    color:#2f2925!important;
+  }
+  .letter-title{
+    font-weight:600!important;
+    color:#2b2522!important;
+  }
+  .letter-open-mark,.letter-meta{
+    color:#51463f!important;
+  }
+
+  /* same muted green accent everywhere */
+  .edition-btn.active,.btn,.done-personalizing,.share-link.primary,.open-last{
+    background:var(--green)!important;
+    border-color:var(--green)!important;
+    color:#fff!important;
+  }
+  .maker-sub,.edition-label,label,.personalize summary span,
+  .edit-letter-status,.edit-letter-chevron,.reset-letter,
+  .keep-chevron,.share-title,.share-link,.share-native,.back-cards{
+    color:var(--green)!important;
+  }
+  .edit-letter-status.personalized{
+    background:var(--green)!important;
+    color:#fff!important;
+  }
+  .preview-note{
+    background:var(--green)!important;
+    color:#fff!important;
+  }
+  .preview-note strong,.preview-note span,.preview-kicker{color:#fff!important}
+
+  /* hero: real raw-paper envelope behind a raw-paper card */
+  .hero-box{
+    padding:46px 10px 14px!important;
+    position:relative!important;
+    overflow:visible!important;
+    background:none!important;
+    box-shadow:none!important;
+  }
+  .hero-box:before{
+    content:""!important;
+    position:absolute!important;
+    z-index:0!important;
+    left:7%!important;
+    top:15px!important;
+    width:86%!important;
+    height:72%!important;
+    border-radius:8px!important;
+    border:1px solid rgba(78,61,47,.18)!important;
+    background-color:var(--raw)!important;
+    background-image:
+      radial-gradient(circle at 18% 24%,rgba(76,57,43,.08) 0 .8px,transparent .9px),
+      radial-gradient(circle at 78% 66%,rgba(255,255,255,.18) 0 .7px,transparent .8px)!important;
+    background-size:14px 16px,19px 21px!important;
+    transform:rotate(-1.4deg)!important;
+    box-shadow:0 10px 22px rgba(63,46,34,.13)!important;
+  }
+  .hero-box:after{
+    content:""!important;
+    position:absolute!important;
+    z-index:0!important;
+    left:7%!important;
+    top:15px!important;
+    width:86%!important;
+    height:48%!important;
+    border:0!important;
+    border-radius:8px 8px 0 0!important;
+    background:rgba(255,255,255,.10)!important;
+    clip-path:polygon(0 0,100% 0,50% 84%)!important;
+    transform:rotate(-1.4deg)!important;
+    box-shadow:inset 0 -1px rgba(76,57,43,.22)!important;
+  }
+  .hero-sleeve{
+    position:relative!important;
+    z-index:1!important;
+    border-radius:14px!important;
+    border:1px solid #d2c4b2!important;
+    box-shadow:0 12px 24px rgba(61,45,33,.10)!important;
+  }
+
+  /* mini cards: unmistakable envelopes, not boxes with diagonal scratches */
+  .open-card{
+    --env:#f3eadb;
+    min-height:152px!important;
+    padding:61px 13px 13px!important;
+    border-radius:9px!important;
+    border:1px solid #cdbda9!important;
+    background-color:var(--env)!important;
+    background-image:
+      radial-gradient(circle at 18% 22%,rgba(82,63,47,.055) 0 .7px,transparent .8px),
+      radial-gradient(circle at 72% 70%,rgba(255,255,255,.42) 0 .7px,transparent .8px)!important;
+    background-size:13px 15px,19px 21px!important;
+    box-shadow:0 8px 15px rgba(70,51,37,.10)!important;
+    overflow:hidden!important;
+    position:relative!important;
+    text-align:center!important;
+  }
+  .open-card:nth-child(4n+2),
+  .open-card:nth-child(4n+5){
+    --env:#d8c5aa;
+    border-color:#c5ae90!important;
+  }
+  .open-card.opened{--env:#e8dfd2}
+  .open-card:nth-child(4n+2).opened,
+  .open-card:nth-child(4n+5).opened{--env:#ccb697}
+
+  /* top envelope flap */
+  .open-card:before{
+    content:""!important;
+    position:absolute!important;
+    inset:-1px -1px auto -1px!important;
+    height:70px!important;
+    width:auto!important;
+    background:rgba(255,255,255,.12)!important;
+    border:0!important;
+    border-radius:8px 8px 0 0!important;
+    clip-path:polygon(0 0,100% 0,50% 88%)!important;
+    box-shadow:inset 0 -1px rgba(78,61,47,.20)!important;
+    transform:none!important;
+    z-index:1!important;
+    pointer-events:none!important;
+  }
+
+  /* lower folded envelope body */
+  .open-card:after{
+    content:""!important;
+    position:absolute!important;
+    inset:auto 0 0 0!important;
+    width:auto!important;
+    height:70px!important;
+    background:rgba(255,255,255,.07)!important;
+    border:0!important;
+    clip-path:polygon(0 100%,0 0,50% 70%,100% 0,100% 100%)!important;
+    transform:none!important;
+    z-index:1!important;
+    pointer-events:none!important;
+  }
+  .open-card .title,
+  .open-card .hint,
+  .card-sprig{
+    position:relative!important;
+    z-index:3!important;
+  }
+  .card-sprig{
+    position:absolute!important;
+    top:18px!important;
+    left:50%!important;
+    width:52px!important;
+    height:31px!important;
+    transform:translateX(-50%)!important;
+    margin:0!important;
+  }
+  .open-card .title{
+    margin-top:0!important;
+    font-size:19px!important;
+    line-height:1.12!important;
+  }
+  .open-card .hint{
+    margin-top:12px!important;
+    font-size:13px!important;
+    color:#5e5148!important;
+  }
+
+  /* opened letters: organic raw paper, strong readable ink */
+  .letter-panel.show{
+    background:#eee9df!important;
+  }
+  .letter-sheet{
+    background-color:#f1e7d7!important;
+    background-image:
+      radial-gradient(circle at 12% 16%,rgba(76,58,43,.075) 0 .75px,transparent .85px),
+      radial-gradient(circle at 68% 48%,rgba(94,71,51,.05) 0 .65px,transparent .75px),
+      radial-gradient(circle at 34% 82%,rgba(255,255,255,.38) 0 .8px,transparent .9px)!important;
+    background-size:11px 13px,17px 19px,23px 21px!important;
+    border:1px solid #c7b69f!important;
+    border-top:1px solid #8e7e68!important;
+    box-shadow:0 12px 28px rgba(61,45,33,.10)!important;
+  }
+  .letter-body{
+    font-size:19px!important;
+    line-height:1.58!important;
+    text-shadow:none!important;
+  }
+  .letter-title{font-size:29px!important}
+  .from-line{font-weight:600!important}
+  .back-cards{font-weight:600!important;color:var(--green)!important}
+
+  @media(max-width:540px){
+    .open-card{min-height:150px!important;padding-top:59px!important}
+    .open-card .title{font-size:18px!important}
+    .letter-body{font-size:18.5px!important}
+  }
+
 </style>
 </head>
 <body>
