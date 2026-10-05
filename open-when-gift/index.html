@@ -97,6 +97,7 @@
     overflow-y:auto;
     background:var(--bg);
     padding:calc(env(safe-area-inset-top) + 20px) 14px calc(env(safe-area-inset-bottom) + 28px);
+    perspective:1400px;
   }
   .letter-sheet{
     max-width:680px;
@@ -111,11 +112,27 @@
     display:flex;
     flex-direction:column;
     justify-content:flex-start;
+    transform-origin:left center;
+    backface-visibility:hidden;
+    will-change:transform,opacity;
+  }
+  .letter-panel.show .letter-sheet{
+    animation:openKeepsake .55s cubic-bezier(.22,.75,.28,1) both;
+  }
+  @keyframes openKeepsake{
+    0%{transform:rotateY(-82deg) translateX(-10px);opacity:.35}
+    62%{transform:rotateY(7deg) translateX(0);opacity:1}
+    100%{transform:rotateY(0deg) translateX(0);opacity:1}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .letter-panel.show .letter-sheet{animation:none}
+    html{scroll-behavior:auto}
   }
   body.letter-open{overflow:hidden}
   .letter-meta{font-size:13px;letter-spacing:.26em;color:var(--rose);margin-bottom:16px}
   .letter-title{margin:0 0 18px;font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:28px;line-height:1.15;color:var(--rose-dark)}
   .letter-body{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.9;white-space:pre-line;color:var(--ink)}
+  .letter-open-mark{font-family:Georgia,"Times New Roman",serif;text-align:center;letter-spacing:.18em;color:var(--rose-dark);font-size:12px;margin:0 0 18px;opacity:.7}
   .letter-floral{width:64px;margin:18px auto 6px;display:block}
   .from-line{margin-top:12px;font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--ink-soft);text-align:center}
   .letter-actions{margin-top:18px}
@@ -208,6 +225,7 @@
 
       <section class="letter-panel" id="letterPanel">
       <div class="letter-sheet">
+      <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
       <div class="letter-meta" id="letterMeta">LETTER 01</div>
       <h2 class="letter-title" id="letterTitle"></h2>
       <div class="letter-body" id="letterBody"></div>
@@ -227,6 +245,7 @@
 
       <section class="letter-panel" id="lastPanel">
       <div class="letter-sheet">
+      <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
       <div class="letter-meta">ONE LAST THING</div>
       <h2 class="letter-title">You never had to earn this.</h2>
       <div class="letter-body">There is nothing you could achieve that would make me love you more.
@@ -289,6 +308,7 @@ const storageKey = 'openwhen:' + (recipient || 'daughter') + ':' + sender;
 let storedOpened = [];
 try { storedOpened = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 const opened = new Set(Array.isArray(storedOpened) ? storedOpened : []);
+let cardsScrollY = 0;
 const grid = document.getElementById('grid');
 const count = document.getElementById('count');
 const setup = document.getElementById('setup');
@@ -339,6 +359,7 @@ function render(){
 }
 
 function openLetter(i){
+  cardsScrollY = window.scrollY;
   opened.add(i);
   try { localStorage.setItem(storageKey, JSON.stringify(Array.from(opened))); } catch(e) {}
   render();
@@ -354,8 +375,10 @@ function openLetter(i){
 document.getElementById('closeLetter').onclick = () => {
   letterPanel.classList.remove('show');
   document.body.classList.remove('letter-open');
+  requestAnimationFrame(() => window.scrollTo({top:cardsScrollY, behavior:'auto'}));
 };
 document.getElementById('openLast').onclick = () => {
+  cardsScrollY = window.scrollY;
   letterPanel.classList.remove('show');
   lastPanel.classList.add('show');
   document.body.classList.add('letter-open');
@@ -364,6 +387,7 @@ document.getElementById('openLast').onclick = () => {
 document.getElementById('closeLast').onclick = () => {
   lastPanel.classList.remove('show');
   document.body.classList.remove('letter-open');
+  requestAnimationFrame(() => window.scrollTo({top:cardsScrollY, behavior:'auto'}));
 };
 
 document.getElementById('makeLink').onclick = () => {
