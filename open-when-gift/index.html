@@ -1825,6 +1825,184 @@
     .open-card{min-height:154px!important}
   }
 
+
+  /* RESTORE APPROVED MAIN APP LOOK — preserve opened-letter fixes */
+  :root{
+    --approved-bg:#cfc3b4;
+    --approved-paper:#c9b9a2;
+    --approved-paper-light:#d2c2aa;
+    --approved-kraft:#b99a76;
+    --approved-green:#33483f;
+    --approved-ink:#2a231f;
+    --approved-soft:#52473e;
+    --approved-line:#a99175;
+  }
+
+  /* MAIN APP ONLY — match owner's approved second image */
+  body:not(.letter-open){
+    background:
+      radial-gradient(circle at 17% 19%,rgba(104,78,54,.07) 0 .7px,transparent .85px),
+      radial-gradient(circle at 73% 67%,rgba(255,255,255,.08) 0 .65px,transparent .8px),
+      linear-gradient(115deg,rgba(105,77,54,.035),transparent 30%,rgba(255,255,255,.055) 62%,transparent 86%),
+      var(--approved-bg)!important;
+    background-size:18px 20px,23px 21px,100% 100%,auto!important;
+  }
+
+  body:not(.letter-open) .hero-sleeve,
+  body:not(.letter-open) .gift-maker,
+  body:not(.letter-open) .keep-card,
+  body:not(.letter-open) .personalize,
+  body:not(.letter-open) .edit-letter,
+  body:not(.letter-open) .edit-letter textarea,
+  body:not(.letter-open) input,
+  body:not(.letter-open) .share{
+    background:
+      radial-gradient(circle at 16% 21%,rgba(91,67,47,.075) 0 .65px,transparent .82px),
+      radial-gradient(circle at 76% 72%,rgba(255,255,255,.09) 0 .7px,transparent .85px),
+      linear-gradient(118deg,rgba(99,72,50,.04),transparent 36%,rgba(255,255,255,.055) 70%,transparent 88%),
+      var(--approved-paper)!important;
+    background-size:17px 19px,23px 21px,100% 100%,auto!important;
+    border-color:var(--approved-line)!important;
+  }
+
+  body:not(.letter-open) .hero-box:before{
+    background:
+      radial-gradient(circle at 21% 26%,rgba(76,54,37,.075) 0 .7px,transparent .85px),
+      linear-gradient(122deg,rgba(73,50,34,.055),transparent 43%,rgba(255,255,255,.045) 72%),
+      var(--approved-kraft)!important;
+    background-size:19px 21px,100% 100%,auto!important;
+    border-color:#957657!important;
+  }
+
+  body:not(.letter-open) .hero-box:after{
+    background:rgba(255,255,255,.045)!important;
+    box-shadow:inset 0 -1px rgba(62,44,31,.36)!important;
+  }
+
+  body:not(.letter-open) .hero-sleeve{
+    box-shadow:0 13px 26px rgba(48,34,24,.18)!important;
+  }
+
+  body:not(.letter-open) h1,
+  body:not(.letter-open) .subhead,
+  body:not(.letter-open) .hero-copy,
+  body:not(.letter-open) .gift-maker h2,
+  body:not(.letter-open) .personalize summary,
+  body:not(.letter-open) .edit-letter-title,
+  body:not(.letter-open) .open-card .title{
+    color:var(--approved-ink)!important;
+    opacity:1!important;
+  }
+
+  body:not(.letter-open) .maker-sub,
+  body:not(.letter-open) .edition-label,
+  body:not(.letter-open) label,
+  body:not(.letter-open) .personalize summary span,
+  body:not(.letter-open) .edit-letter-status,
+  body:not(.letter-open) .edit-letter-chevron,
+  body:not(.letter-open) .reset-letter,
+  body:not(.letter-open) .keep-chevron,
+  body:not(.letter-open) .share-title,
+  body:not(.letter-open) .share-link,
+  body:not(.letter-open) .share-native{
+    color:var(--approved-green)!important;
+  }
+
+  body:not(.letter-open) .edition-btn{
+    background:#d8ccbc!important;
+    border-color:#aa9277!important;
+    color:#322a25!important;
+  }
+  body:not(.letter-open) .edition-btn.active,
+  body:not(.letter-open) .btn,
+  body:not(.letter-open) .done-personalizing,
+  body:not(.letter-open) .share-link.primary,
+  body:not(.letter-open) .preview-note{
+    background:var(--approved-green)!important;
+    border-color:var(--approved-green)!important;
+    color:#fff!important;
+  }
+
+  body:not(.letter-open) input,
+  body:not(.letter-open) textarea{
+    background:#cdbda7!important;
+    color:#332a24!important;
+    border-color:#a99175!important;
+  }
+  body:not(.letter-open) input::placeholder,
+  body:not(.letter-open) textarea::placeholder{
+    color:#77695d!important;
+    opacity:.92!important;
+  }
+
+  /* hero dragonfly stays clean, but visually richer like approved version */
+  body:not(.letter-open) .dragonfly-mark-raster{
+    width:150px!important;
+    height:84px!important;
+    filter:contrast(1.18) saturate(.85)!important;
+  }
+
+  /* MINI CARDS — richer approved look + unmistakable envelope form */
+  body:not(.letter-open) .open-card{
+    --env:#d5c5af;
+    min-height:158px!important;
+    background:
+      radial-gradient(circle at 19% 23%,rgba(86,62,44,.065) 0 .65px,transparent .82px),
+      linear-gradient(118deg,rgba(88,62,43,.035),transparent 38%,rgba(255,255,255,.045) 70%),
+      var(--env)!important;
+    background-size:18px 20px,100% 100%,auto!important;
+    border:1px solid #a99175!important;
+    box-shadow:0 8px 16px rgba(50,35,25,.15)!important;
+    padding:58px 14px 14px!important;
+  }
+  body:not(.letter-open) .open-card:nth-child(4n+2),
+  body:not(.letter-open) .open-card:nth-child(4n+5){
+    --env:#bfa17e;
+  }
+  body:not(.letter-open) .open-card.opened{--env:#cabaa6}
+  body:not(.letter-open) .open-card:nth-child(4n+2).opened,
+  body:not(.letter-open) .open-card:nth-child(4n+5).opened{--env:#ad8f6d}
+
+  body:not(.letter-open) .open-card:before{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    z-index:2!important;
+    left:0!important; right:0!important; top:0!important;
+    height:76px!important;
+    background:rgba(255,255,255,.08)!important;
+    clip-path:polygon(0 0,100% 0,50% 90%)!important;
+    filter:drop-shadow(0 1.2px 0 rgba(70,51,37,.45))!important;
+  }
+
+  body:not(.letter-open) .open-card:after{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    z-index:1!important;
+    inset:auto 0 0 0!important;
+    height:74px!important;
+    background:
+      linear-gradient(34deg,transparent 49%,rgba(77,56,40,.30) 50%,transparent 51%) left bottom/50% 100% no-repeat,
+      linear-gradient(-34deg,transparent 49%,rgba(77,56,40,.30) 50%,transparent 51%) right bottom/50% 100% no-repeat,
+      rgba(255,255,255,.018)!important;
+  }
+
+  body:not(.letter-open) .dragonfly-img{
+    width:70px!important;
+    height:38px!important;
+    top:13px!important;
+    filter:contrast(1.15)!important;
+  }
+
+  body:not(.letter-open) .open-card .title{
+    color:var(--approved-ink)!important;
+    margin-top:12px!important;
+  }
+  body:not(.letter-open) .open-card .hint{
+    color:var(--approved-soft)!important;
+  }
+
 </style>
 </head>
 <body>
