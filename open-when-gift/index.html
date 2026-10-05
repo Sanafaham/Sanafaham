@@ -1,82 +1,147 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Open When… For My Daughter</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>OPEN WHEN… For My Daughter</title>
+<meta name="theme-color" content="#9b6a76" />
 <style>
-:root{--ivory:#f7f2ea;--paper:#fffdf8;--rose:#a65d6e;--rose-deep:#7d3f50;--mauve:#b77a87;--ink:#2b2426;--line:#dfcdd1;--soft:#f1e3e6}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--ivory);color:var(--ink)}
-main{max-width:760px;margin:auto;padding:18px}
-.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#a96878 0%,#985667 100%);padding:34px 22px 30px;border-radius:24px;text-align:center;color:#fffaf5;box-shadow:0 10px 30px rgba(82,45,54,.12)}
-.hero:before,.hero:after{content:"";position:absolute;width:120px;height:120px;border:1px solid rgba(255,245,239,.22);border-radius:60% 40% 55% 45%}
-.hero:before{left:-50px;top:-55px;transform:rotate(24deg)}
-.hero:after{right:-55px;bottom:-65px;transform:rotate(-22deg)}
-.hero .sprig{font-family:Georgia,serif;font-size:24px;letter-spacing:.18em;margin:10px 0 4px;color:#f4dfe4}
-h1{font-family:Georgia,"Times New Roman",serif;font-size:40px;letter-spacing:.06em;margin:8px 0 4px;font-weight:500}
-.sub{font-family:Georgia,"Times New Roman",serif;font-style:italic;color:#f7e5e9;font-size:22px}
-.hero p{max-width:520px;margin:16px auto 0;line-height:1.55;color:#fff7f2}
-.setup,.letter{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-label{display:block;font-size:12px;margin-bottom:6px;color:#775962}
-input{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fffdf8;color:var(--ink)}
-button{cursor:pointer;color:var(--ink)}
-.btn{padding:11px 16px;border-radius:999px;border:1px solid var(--line);background:#fffaf6;margin-top:12px}
-.btn.primary{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
-.card{min-height:138px;border:1px solid var(--line);border-radius:16px;padding:15px;background:var(--paper);text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 14px rgba(85,49,58,.04)}
-.card.opened{background:var(--soft);border-color:#d3b2ba}
-.num{font-size:10px;letter-spacing:.15em;color:var(--rose)}
-.title{font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--rose-deep)}
-.state{font-size:11px;color:#9b737f}
-.letter{display:none;border-top:4px solid var(--rose)}
-.letter.show{display:block}
-.letter h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;color:var(--rose-deep)}
-.letter p{font-family:Georgia,"Times New Roman",serif;line-height:1.72;white-space:pre-line;color:#3f3437}
-.last{margin-top:16px;background:linear-gradient(180deg,#ead2d8 0%,#dfbcc5 100%);border:1px solid #cfabb4;border-radius:18px;padding:14px;text-align:center}
-.last button{border:0;background:transparent;font-family:Georgia,"Times New Roman",serif;font-size:20px;padding:18px;width:100%;color:var(--rose-deep)}
-.share{display:none;margin-top:12px;padding:12px;background:var(--soft);border-radius:12px;overflow-wrap:anywhere}
-.share.show{display:block}
-@media(max-width:620px){.grid{grid-template-columns:repeat(2,1fr)}.fields{grid-template-columns:1fr}}
+  :root{
+    --bg:#f6f1ea;
+    --paper:#fffaf4;
+    --paper-2:#fdf8f1;
+    --rose:#9b6a76;
+    --rose-dark:#7d4a59;
+    --rose-soft:#ead7dc;
+    --rose-soft-2:#f2e6e9;
+    --ink:#433238;
+    --ink-soft:#6b565e;
+    --line:#dbc8cd;
+    --shadow:0 12px 30px rgba(93,63,73,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif}
+  body{padding:16px}
+  .app{max-width:760px;margin:0 auto}
+  .hero-box{background:linear-gradient(180deg,#a46b78 0%, #95606d 100%);border-radius:28px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero-box:before,.hero-box:after{content:"";position:absolute;border:1px solid rgba(255,247,240,.25);border-radius:999px;pointer-events:none}
+  .hero-box:before{width:180px;height:180px;right:-85px;bottom:-95px}
+  .hero-box:after{width:120px;height:120px;left:-55px;top:-65px}
+  .hero-sleeve{background:var(--paper);border-radius:22px;padding:26px 20px 22px;text-align:center;border:1px solid rgba(124,84,95,.10);position:relative}
+  .eyebrow{font-size:14px;color:var(--ink-soft);margin-bottom:8px;letter-spacing:.02em}
+  h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:34px;font-weight:500;line-height:1.05;letter-spacing:.08em;color:var(--ink)}
+  .rule{width:48px;height:1px;background:#b28a94;margin:10px auto 14px}
+  .subhead{margin:0;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;font-weight:400;color:var(--rose-dark)}
+  .sprig-wrap{margin:18px auto 14px;display:flex;justify-content:center}
+  .sprig{width:76px;height:auto;display:block}
+  .hero-copy{max-width:350px;margin:0 auto;color:var(--ink-soft);line-height:1.45;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+  .section-card,.letter-panel,.gift-maker{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:0 6px 18px rgba(88,57,65,.04)}
+  .gift-maker{padding:22px 18px;margin-top:18px}
+  .gift-maker h2,.letter-panel h2{margin:0 0 14px;font-size:16px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--rose-dark)}
+  .gift-maker .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  label{display:block;margin:0 0 6px;font-size:12px;color:var(--ink-soft)}
+  input{width:100%;min-height:48px;border:1px solid var(--line);background:var(--paper-2);border-radius:14px;padding:12px 14px;color:var(--ink);font-size:16px}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button{border:none;cursor:pointer}
+  .btn{min-height:48px;padding:12px 20px;border-radius:999px;background:var(--rose-dark);color:#fff;font-size:16px;box-shadow:0 6px 12px rgba(110,66,79,.14)}
+  .btn.secondary{background:#fff5f7;color:var(--rose-dark);border:1px solid var(--line);box-shadow:none}
+  .share{display:none;margin-top:14px;padding:14px;border:1px solid var(--line);background:var(--rose-soft-2);border-radius:16px;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
+  .share.show{display:block}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:22px 2px 12px}
+  .section-head h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:500;color:var(--ink)}
+  .section-head span{font-size:13px;color:var(--ink-soft)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .open-card{min-height:170px;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 6px 18px rgba(90,58,67,.04)}
+  .open-card.opened{background:var(--rose-soft-2)}
+  .open-card .no{font-size:12px;letter-spacing:.24em;color:var(--rose);margin-bottom:8px}
+  .open-card .title{font-family:Georgia,"Times New Roman",serif;font-size:20px;line-height:1.15;color:var(--rose-dark)}
+  .open-card .hint{margin-top:16px;font-size:13px;color:#9a7882}
+  .letter-panel{display:none;margin-top:18px;padding:22px 20px}
+  .letter-panel.show{display:block}
+  .letter-meta{font-size:13px;letter-spacing:.26em;color:var(--rose);margin-bottom:16px}
+  .letter-title{margin:0 0 18px;font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:28px;line-height:1.15;color:var(--rose-dark)}
+  .letter-body{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.9;white-space:pre-line;color:var(--ink)}
+  .from-line{margin-top:18px;font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--ink-soft)}
+  .letter-actions{margin-top:18px}
+  .open-last{margin-top:18px;width:100%;background:linear-gradient(180deg,#ecd9de 0%, #e4c8d0 100%);border:1px solid #d5b4be;border-radius:24px;padding:24px 18px;font-family:Georgia,"Times New Roman",serif;font-size:22px;color:var(--rose-dark)}
+  .footer-note{text-align:center;color:#9a7d85;font-size:12px;margin:16px 0 4px}
+  @media (min-width:700px){h1{font-size:44px}.subhead{font-size:24px}.card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:540px){body{padding:12px}.gift-maker .grid2{grid-template-columns:1fr}h1{font-size:30px}.subhead{font-size:18px}.hero-copy{font-size:13px}.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.open-card{min-height:160px}.open-card .title{font-size:18px}.letter-title{font-size:24px}.letter-body{font-size:16px;line-height:1.85}}
 </style>
 </head>
 <body>
-<main>
-<section class="hero">
-<div id="kicker">A gift from Mum</div>
-<h1>OPEN WHEN…</h1>
-<div class="sub" id="forLine">For My Daughter</div>
-<div class="sprig">❀ ︱ ❀</div>
-<p>Twenty-four little reminders for the moments when I may not be right beside you.</p>
-</section>
+  <div class="app">
+    <section class="hero-box">
+      <div class="hero-sleeve">
+        <div class="eyebrow" id="kicker">A gift from Mama</div>
+        <h1>OPEN WHEN…</h1>
+        <div class="rule"></div>
+        <p class="subhead" id="forLine">For My Daughter</p>
+        <div class="sprig-wrap">
+          <svg class="sprig" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M20 75C42 58 58 39 76 10" stroke="#74565F" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M42 52C36 48 31 47 25 48" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M56 39C50 35 45 34 39 35" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M66 28C61 24 56 22 50 23" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M58 52C64 47 70 45 77 46" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M70 39C75 34 81 31 88 31" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M81 24C86 20 91 18 97 18" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
+            <g fill="#D8A2AE" stroke="#74565F" stroke-width="1.6">
+              <circle cx="26" cy="48" r="5.4"/><circle cx="20.2" cy="44.2" r="5.1"/><circle cx="21.8" cy="51.8" r="5"/><circle cx="29.4" cy="42.8" r="5"/><circle cx="31.4" cy="50.8" r="4.9"/>
+              <circle cx="39" cy="35" r="5.2"/><circle cx="33.5" cy="31.8" r="4.8"/><circle cx="35" cy="38.4" r="4.8"/><circle cx="42.9" cy="30" r="4.8"/><circle cx="45" cy="37.5" r="4.8"/>
+              <circle cx="50" cy="23" r="5"/><circle cx="45.5" cy="19.8" r="4.6"/><circle cx="46.8" cy="26" r="4.6"/><circle cx="53.8" cy="18.8" r="4.6"/><circle cx="55.6" cy="25.4" r="4.5"/>
+              <circle cx="77" cy="46" r="5.4"/><circle cx="71.2" cy="42.2" r="5.1"/><circle cx="72.8" cy="49.8" r="5"/><circle cx="80.4" cy="40.8" r="5"/><circle cx="82.4" cy="48.8" r="4.9"/>
+              <circle cx="88" cy="31" r="5.2"/><circle cx="82.5" cy="27.8" r="4.8"/><circle cx="84" cy="34.4" r="4.8"/><circle cx="91.9" cy="26" r="4.8"/><circle cx="94" cy="33.5" r="4.8"/>
+              <circle cx="97" cy="18" r="5"/><circle cx="92.5" cy="14.8" r="4.6"/><circle cx="93.8" cy="21" r="4.6"/><circle cx="100.8" cy="13.8" r="4.6"/><circle cx="102.6" cy="20.4" r="4.5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="hero-copy">24 little reminders for the moments when I may not be right beside you.</div>
+      </div>
+    </section>
 
-<section class="setup" id="setup">
-<h2>Create the gift link</h2>
-<div class="fields">
-<div><label>Daughter's first name</label><input id="recipient" placeholder="Layla"></div>
-<div><label>From</label><input id="sender" placeholder="Mum"></div>
-</div>
-<button class="btn primary" id="makeLink">Create gift link</button>
-<div class="share" id="share"></div>
-</section>
+    <section class="gift-maker" id="setup">
+      <h2>Create the gift link</h2>
+      <div class="grid2">
+        <div>
+          <label for="recipient">Daughter's first name</label>
+          <input id="recipient" placeholder="Layla" maxlength="40" />
+        </div>
+        <div>
+          <label for="sender">From</label>
+          <input id="sender" placeholder="Mama" maxlength="40" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="makeLink">Create gift link</button>
+        <button class="btn secondary" id="previewGift">Preview</button>
+      </div>
+      <div class="share" id="share"></div>
+    </section>
 
-<section>
-<div class="grid" id="grid"></div>
+    <div class="section-head">
+      <h3>Choose what you need today</h3>
+      <span id="count">0 of 24 opened</span>
+    </div>
 
-<div class="letter" id="letter">
-<div class="num" id="letterNum"></div>
-<h2 id="letterTitle"></h2>
-<p id="letterText"></p>
-<p><small id="fromLine">A little reminder from Mum</small></p>
-<button class="btn primary" id="closeLetter">Keep this with me</button>
-</div>
+    <section class="card-grid" id="grid"></section>
 
-<div class="last"><button id="openLast">Open this one last</button></div>
-<div class="letter" id="lastLetter">
-<div class="num">ONE LAST THING</div>
-<h2>You never had to earn this.</h2>
-<p>There is nothing you could achieve that would make me love you more.
+    <section class="letter-panel" id="letterPanel">
+      <div class="letter-meta" id="letterMeta">LETTER 01</div>
+      <h2 class="letter-title" id="letterTitle"></h2>
+      <div class="letter-body" id="letterBody"></div>
+      <div class="from-line" id="fromLine">A little reminder from Mama</div>
+      <div class="letter-actions">
+        <button class="btn" id="closeLetter">Keep this with me</button>
+      </div>
+    </section>
+
+    <button class="open-last" id="openLast">Open this one last</button>
+
+    <section class="letter-panel" id="lastPanel">
+      <div class="letter-meta">ONE LAST THING</div>
+      <h2 class="letter-title">You never had to earn this.</h2>
+      <div class="letter-body">There is nothing you could achieve that would make me love you more.
 
 And there is nothing you could fail at that would make me love you less.
 
@@ -84,11 +149,12 @@ You were never required to earn that.
 
 You are my daughter.
 
-That was enough from the beginning.</p>
-<p><small id="lastFrom">Always with you. Mum.</small></p>
-</div>
-</section>
-</main>
+That was enough from the beginning.</div>
+      <div class="from-line" id="lastFrom">Always with you. Mama.</div>
+    </section>
+
+    <div class="footer-note">OPEN WHEN… digital keepsake</div>
+  </div>
 
 <script>
 const letters = [
@@ -118,56 +184,78 @@ const letters = [
 ["You need one more reminder","You do not have to have everything figured out.\n\nKeep becoming more yourself."]
 ];
 
-const qs=new URLSearchParams(location.search);
-let recipient=(qs.get("to")||"").trim();
-let sender=(qs.get("from")||"Mum").trim();
-const opened=new Set();
-const grid=document.getElementById("grid");
+const qs = new URLSearchParams(location.search);
+let recipient = (qs.get('to') || '').trim();
+let sender = (qs.get('from') || 'Mama').trim();
+const opened = new Set();
+const grid = document.getElementById('grid');
+const count = document.getElementById('count');
+const setup = document.getElementById('setup');
+const share = document.getElementById('share');
+const letterPanel = document.getElementById('letterPanel');
+const lastPanel = document.getElementById('lastPanel');
 
 function applyNames(){
- document.getElementById("kicker").textContent="A gift from "+sender;
- document.getElementById("forLine").textContent=recipient?("For "+recipient):"For My Daughter";
- document.getElementById("fromLine").textContent="A little reminder from "+sender;
- document.getElementById("lastFrom").textContent="Always with you. "+sender+".";
- if(qs.has("gift")) document.getElementById("setup").style.display="none";
+  document.getElementById('kicker').textContent = 'A gift from ' + sender;
+  document.getElementById('forLine').textContent = recipient ? ('For ' + recipient) : 'For My Daughter';
+  document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
+  document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
+  document.getElementById('sender').value = sender;
+  if(recipient) document.getElementById('recipient').value = recipient;
+  if(qs.has('gift')) setup.style.display = 'none';
 }
+
 function render(){
- grid.innerHTML="";
- letters.forEach((x,i)=>{
-   const b=document.createElement("button");
-   b.className="card"+(opened.has(i)?" opened":"");
-   b.innerHTML='<span class="num">'+String(i+1).padStart(2,"0")+'</span><span class="title">Open when '+x[0].toLowerCase()+'</span><span class="state">'+(opened.has(i)?"Opened":"Tap to open")+'</span>';
-   b.onclick=()=>openLetter(i);
-   grid.appendChild(b);
- });
+  grid.innerHTML = '';
+  letters.forEach((x,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'open-card' + (opened.has(i) ? ' opened' : '');
+    btn.innerHTML = '<div><div class="no">' + String(i+1).padStart(2,'0') + '</div><div class="title">Open when ' + x[0].toLowerCase() + '</div></div><div class="hint">' + (opened.has(i) ? 'Opened' : 'Tap to open') + '</div>';
+    btn.onclick = () => openLetter(i);
+    grid.appendChild(btn);
+  });
+  count.textContent = opened.size + ' of 24 opened';
 }
+
 function openLetter(i){
- opened.add(i); render();
- document.getElementById("letterNum").textContent="LETTER "+String(i+1).padStart(2,"0");
- document.getElementById("letterTitle").textContent="Open when "+letters[i][0].toLowerCase();
- document.getElementById("letterText").textContent=letters[i][1];
- document.getElementById("lastLetter").classList.remove("show");
- document.getElementById("letter").classList.add("show");
+  opened.add(i);
+  render();
+  lastPanel.classList.remove('show');
+  letterPanel.classList.add('show');
+  document.getElementById('letterMeta').textContent = 'LETTER ' + String(i+1).padStart(2,'0');
+  document.getElementById('letterTitle').textContent = 'Open when ' + letters[i][0].toLowerCase();
+  document.getElementById('letterBody').textContent = letters[i][1];
+  letterPanel.scrollIntoView({behavior:'smooth', block:'start'});
 }
-document.getElementById("closeLetter").onclick=()=>document.getElementById("letter").classList.remove("show");
-document.getElementById("openLast").onclick=()=>{
- document.getElementById("letter").classList.remove("show");
- document.getElementById("lastLetter").classList.add("show");
+
+document.getElementById('closeLetter').onclick = () => letterPanel.classList.remove('show');
+document.getElementById('openLast').onclick = () => {
+  letterPanel.classList.remove('show');
+  lastPanel.classList.add('show');
+  lastPanel.scrollIntoView({behavior:'smooth', block:'start'});
 };
-document.getElementById("makeLink").onclick=()=>{
- recipient=(document.getElementById("recipient").value||"My Daughter").trim();
- sender=(document.getElementById("sender").value||"Mum").trim();
- const u=new URL(location.href);
- u.search="";
- u.searchParams.set("gift","1");
- u.searchParams.set("to",recipient);
- u.searchParams.set("from",sender);
- const box=document.getElementById("share");
- box.classList.add("show");
- box.textContent=u.toString();
- applyNames();
+
+document.getElementById('previewGift').onclick = () => {
+  recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
+  sender = (document.getElementById('sender').value || 'Mama').trim();
+  applyNames();
 };
-applyNames(); render();
+
+document.getElementById('makeLink').onclick = () => {
+  recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
+  sender = (document.getElementById('sender').value || 'Mama').trim();
+  const url = new URL(location.href);
+  url.search = '';
+  url.searchParams.set('gift','1');
+  url.searchParams.set('to', recipient);
+  url.searchParams.set('from', sender);
+  share.classList.add('show');
+  share.textContent = url.toString();
+  applyNames();
+};
+
+applyNames();
+render();
 </script>
 </body>
 </html>
