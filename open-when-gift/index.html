@@ -46,6 +46,10 @@
   .gift-maker h2,.letter-panel h2{margin:0 0 8px;font-size:16px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--rose-dark)}
   .maker-sub{margin:0 0 18px;color:var(--ink-soft);font-size:14px;line-height:1.5}
   .gift-maker .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .edition-label{display:block;margin:0 0 8px;font-size:12px;color:var(--ink-soft)}
+  .edition-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .edition-btn{min-height:48px;border:1px solid var(--line);border-radius:14px;background:var(--paper-2);color:var(--rose-dark);font:16px Georgia,"Times New Roman",serif}
+  .edition-btn.active{background:var(--rose-dark);border-color:var(--rose-dark);color:#fff;box-shadow:0 6px 12px rgba(110,66,79,.12)}
   label{display:block;margin:0 0 6px;font-size:12px;color:var(--ink-soft)}
   input{width:100%;min-height:48px;border:1px solid var(--line);background:var(--paper-2);border-radius:14px;padding:12px 14px;color:var(--ink);font-size:16px}
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
@@ -211,9 +215,14 @@
     <section class="gift-maker" id="setup">
       <h2>Create your gift</h2>
       <p class="maker-sub">Personalize it, check it, then share it when you’re ready.</p>
+      <span class="edition-label">Who is this gift for?</span>
+      <div class="edition-choice" role="group" aria-label="Choose gift edition">
+        <button type="button" class="edition-btn active" id="editionDaughter" data-edition="daughter" aria-pressed="true">My Daughter</button>
+        <button type="button" class="edition-btn" id="editionSon" data-edition="son" aria-pressed="false">My Son</button>
+      </div>
       <div class="grid2">
         <div>
-          <label for="recipient">Daughter's first name</label>
+          <label for="recipient" id="recipientLabel">Daughter's first name</label>
           <input id="recipient" placeholder="Her first name" maxlength="40" autocomplete="off" autocapitalize="words" />
         </div>
         <div>
@@ -300,7 +309,7 @@
       </svg>
       <div class="letter-meta">ONE LAST THING</div>
       <h2 class="letter-title">You never had to earn this.</h2>
-      <div class="letter-body">There is nothing you could achieve that would make me love you more.
+      <div class="letter-body" id="lastBody">There is nothing you could achieve that would make me love you more.
 
 And there is nothing you could fail at that would make me love you less.
 
@@ -321,7 +330,7 @@ That was enough from the beginning.</div>
   </div>
 
 <script>
-const letters = [
+const daughterLetters = [
 ["You’ve had a bad day","Some days are simply awful.\n\nYou do not have to find the lesson in it tonight. You do not have to pretend you are fine.\n\nGet through today.\n\nTomorrow gets a fresh chance.\n\nAnd remember, one bad day has never changed who you are."],
 ["You doubt yourself","There will be moments when you wonder if you are good enough, capable enough, strong enough.\n\nYou are.\n\nDo the next thing anyway."],
 ["You miss me","I miss you too. Probably more than I tell you.\n\nYou know the voice. You know the look. You know I’m with you."],
@@ -348,6 +357,33 @@ const letters = [
 ["You need one more reminder","You do not have to have everything figured out.\n\nKeep becoming more yourself."]
 ];
 
+const sonLetters = [
+["You’ve had a bad day","Some days are simply awful.\n\nYou do not have to find the lesson in it tonight. You do not have to pretend you are fine.\n\nGet through today.\n\nTomorrow gets a fresh chance.\n\nAnd remember, one bad day has never changed who you are."],
+["You doubt yourself","There will be moments when you wonder if you are good enough, capable enough, strong enough.\n\nYou are.\n\nYou do not need to feel certain before you move forward. Do the next thing anyway.\n\nI have watched you become stronger in ways you probably never noticed."],
+["You miss me","I miss you too.\n\nProbably more than I tell you.\n\nClose your eyes for a second and imagine me saying exactly what I always say to you.\n\nYou know the voice. You know the look. You know I’m with you."],
+["You feel alone","Feeling alone and being alone are not the same thing.\n\nThere are people in this world whose lives would feel completely different without you in them.\n\nMine is one of them.\n\nNever forget that."],
+["You can’t sleep","Your brain does not need to solve your entire life at 2 a.m.\n\nWhatever feels enormous tonight will probably look different in daylight.\n\nPut it down for now. Sleep first.\n\nTomorrow can handle tomorrow."],
+["Someone hurts you","You are allowed to be hurt. You are allowed to be disappointed.\n\nBut do not let somebody else’s behavior make you question your value.\n\nYou do not become less because someone failed to see you properly."],
+["You’re angry with me","Yes, even then.\n\nYou are allowed to disagree with me. You are allowed to be angry with me. You are allowed to think I am completely wrong.\n\nNothing you say during an argument changes the fact that I love you.\n\nWe can be angry and still belong to each other."],
+["You need courage","Courage rarely feels like courage while you are doing it.\n\nUsually it feels like fear with one more step taken anyway.\n\nTake the step.\n\nYou can be scared and brave at the same time."],
+["Something wonderful happens","Stop.\n\nBefore you rush to the next thing, enjoy this. Really enjoy it.\n\nYou have a habit of moving the goalpost on yourself. Not today.\n\nYou did something worth celebrating. I hope you are proud. I am."],
+["Your heart gets broken","I wish I could protect you from this one. I can’t.\n\nBut I can remind you of something.\n\nThe loss of one relationship does not mean the loss of your future.\n\nYou will laugh again. You will trust again. You will love again.\n\nFor now, let your heart heal."],
+["You make a mistake","Good. It means you are living.\n\nFix what you can. Apologize when you should. Learn something.\n\nThen stop punishing yourself.\n\nYou were never supposed to get everything right."],
+["You need to laugh","Please remember that we have survived approximately 4,782 ridiculous situations already.\n\nAnd somehow we are both still here.\n\nWhatever is happening right now will eventually become another story we laugh about.\n\nProbably loudly. Probably at an inappropriate time."],
+["You feel behind","There is no official schedule for your life.\n\nYou are not late.\n\nYou are not failing because somebody else arrived somewhere before you.\n\nYour life is allowed to happen in your own order."],
+["You need to hear the truth","Here it is.\n\nYou are not always right. Neither am I.\n\nYou will sometimes choose the wrong person, make the wrong decision, spend money you shouldn’t, trust somebody you shouldn’t and ignore advice you probably should have listened to.\n\nWelcome to being human. Just keep learning."],
+["You’re proud of yourself","Good. Stay there for a minute.\n\nDo not immediately minimize it. Do not say, “It wasn’t a big deal.”\n\nIt was your effort. Your courage. Your work.\n\nYou are allowed to be proud of yourself."],
+["You feel like giving up","Before you quit, ask yourself one question.\n\nDo I truly want to stop, or am I just tired?\n\nIf you want to stop, stop. Changing direction is allowed.\n\nBut if you are simply tired, rest. Then decide."],
+["Life doesn’t go to plan","Some of the best things in your life will arrive because the original plan fell apart.\n\nYou cannot see the whole story from the middle of it.\n\nGive life a little room to surprise you."],
+["You need to remember who you are","You are not your job. You are not your relationship. You are not your mistakes. You are not what somebody thinks of you.\n\nYou are the man you are when nobody is watching.\n\nProtect him."],
+["You’re making a big decision","Do not make it from fear.\n\nDo not make it just to keep somebody else happy. Do not make it because you think you are running out of time.\n\nGet quiet. Ask yourself what you would choose if nobody else had an opinion.\n\nStart there."],
+["You need permission","You can change your mind. You can leave. You can begin again. You can say no.\n\nYou can want something different. You can outgrow people, places and plans.\n\nYou do not need anybody’s permission to build a life that feels like yours.\n\nIncluding mine."],
+["You don’t feel strong","You do not have to be strong every minute.\n\nYou are allowed to be tired, uncertain, hurt, or overwhelmed.\n\nStrength is not pretending nothing gets to you.\n\nSometimes strength is simply being honest about what you need."],
+["You need me","I’m here.\n\nYou do not need a good reason. You do not need to have the words ready. You do not need to know what you want me to say.\n\nCall me. Sit with me. Talk. Or say nothing.\n\nI’m still here."],
+["You need to remember how far you’ve come","Look back for a moment — not to stay there, but to see how much you have already carried, learned, survived, and built.\n\nYou are not starting from nothing.\n\nYou are starting from experience.\n\nKeep going.\n\nI hope you can see even a little of what I see when I look at you."],
+["You need one more reminder","You do not have to have everything figured out.\n\nKeep becoming more yourself."]
+];
+
 const qs = new URLSearchParams(location.search);
 if (qs.has('utm_source') || qs.has('utm_medium') || qs.has('utm_campaign') || qs.has('utm_content') || qs.has('utm_term')) {
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(k => qs.delete(k));
@@ -357,7 +393,13 @@ if (qs.has('utm_source') || qs.has('utm_medium') || qs.has('utm_campaign') || qs
 let recipient = (qs.get('to') || '').trim();
 let sender = (qs.get('from') || '').trim();
 let giftId = (qs.get('id') || '').trim();
-let customMessages = letters.map(x => x[1]);
+let edition = (qs.get('edition') === 'son') ? 'son' : 'daughter';
+let letters = edition === 'son' ? sonLetters : daughterLetters;
+const editionDrafts = {
+  daughter: daughterLetters.map(x => x[1]),
+  son: sonLetters.map(x => x[1])
+};
+let customMessages = editionDrafts[edition];
 let storageKey = giftId
   ? 'openwhen:gift:' + giftId
   : 'openwhen:legacy:' + (recipient || 'daughter') + ':' + sender;
@@ -379,6 +421,50 @@ const saveStatus = document.getElementById('saveStatus');
 const personalizeDetails = document.getElementById('personalize');
 const donePersonalizing = document.getElementById('donePersonalizing');
 const makeGiftButton = document.getElementById('makeLink');
+const editionDaughter = document.getElementById('editionDaughter');
+const editionSon = document.getElementById('editionSon');
+const recipientLabel = document.getElementById('recipientLabel');
+const recipientInput = document.getElementById('recipient');
+const lastBody = document.getElementById('lastBody');
+
+function editionName(){
+  return edition === 'son' ? 'Son' : 'Daughter';
+}
+
+function editionPronoun(){
+  return edition === 'son' ? 'he' : 'she';
+}
+
+function applyEditionUI(){
+  const isSon = edition === 'son';
+  editionDaughter.classList.toggle('active', !isSon);
+  editionSon.classList.toggle('active', isSon);
+  editionDaughter.setAttribute('aria-pressed', isSon ? 'false' : 'true');
+  editionSon.setAttribute('aria-pressed', isSon ? 'true' : 'false');
+  recipientLabel.textContent = (isSon ? "Son's" : "Daughter's") + ' first name';
+  recipientInput.placeholder = isSon ? 'His first name' : 'Her first name';
+  if(!qs.has('gift')){
+    document.getElementById('forLine').textContent = 'For My ' + editionName();
+  }
+  lastBody.textContent = 'There is nothing you could achieve that would make me love you more.\n\n'
+    + 'And there is nothing you could fail at that would make me love you less.\n\n'
+    + 'You were never required to earn that.\n\n'
+    + 'You are my ' + edition + '.\n\n'
+    + 'That was enough from the beginning.';
+}
+
+function switchEdition(nextEdition){
+  if(nextEdition !== 'daughter' && nextEdition !== 'son') return;
+  edition = nextEdition;
+  letters = edition === 'son' ? sonLetters : daughterLetters;
+  customMessages = editionDrafts[edition];
+  personalizeDetails.open = false;
+  applyEditionUI();
+  renderPersonalizer();
+}
+
+editionDaughter.onclick = () => switchEdition('daughter');
+editionSon.onclick = () => switchEdition('son');
 
 donePersonalizing.onclick = () => {
   personalizeDetails.open = false;
@@ -459,22 +545,26 @@ async function loadGiftFromServer(id){
   const gift = await response.json();
   recipient = (gift.recipient || '').trim();
   sender = (gift.sender || '').trim();
+  edition = gift.edition === 'son' ? 'son' : 'daughter';
+  letters = edition === 'son' ? sonLetters : daughterLetters;
   customMessages = Array.isArray(gift.messages) && gift.messages.length === 24
     ? gift.messages
     : letters.map(x => x[1]);
+  editionDrafts[edition] = customMessages;
   giftId = id;
   storageKey = 'openwhen:gift:' + giftId;
 }
 
 function applyNames(){
+  applyEditionUI();
   if(qs.has('gift')){
-    document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || 'My Daughter');
+    document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || ('My ' + editionName()));
     document.getElementById('forLine').textContent = 'A little gift to keep close';
     document.getElementById('fromLine').textContent = sender ? ('A little reminder from ' + sender) : 'A little reminder for you';
     document.getElementById('lastFrom').textContent = sender ? ('Always with you. ' + sender + '.') : 'Always with you.';
   } else {
     document.getElementById('kicker').textContent = '';
-    document.getElementById('forLine').textContent = 'For My Daughter';
+    document.getElementById('forLine').textContent = 'For My ' + editionName();
   }
   document.getElementById('sender').value = sender;
   if(recipient) document.getElementById('recipient').value = recipient;
@@ -550,7 +640,7 @@ document.getElementById('closeLast').onclick = () => {
 };
 
 document.getElementById('makeLink').onclick = async () => {
-  recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
+  recipient = (document.getElementById('recipient').value || ('My ' + editionName())).trim();
   sender = (document.getElementById('sender').value || '').trim();
   if(!sender){
     const senderInput = document.getElementById('sender');
@@ -581,7 +671,7 @@ document.getElementById('makeLink').onclick = async () => {
     const response = await fetch('/api/gifts', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({id:giftId, recipient, sender, messages:customMessages})
+      body:JSON.stringify({id:giftId, edition, recipient, sender, messages:customMessages})
     });
     if(!response.ok) throw new Error('save failed');
 
@@ -623,7 +713,7 @@ document.getElementById('makeLink').onclick = async () => {
     document.getElementById('forLine').textContent = 'A little gift to keep close';
     document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
     document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
-    previewCopy.textContent = 'Below is exactly what ' + recipient + ' will see when she opens her gift. You can open any card to check it before you send it.';
+    previewCopy.textContent = 'Below is exactly what ' + recipient + ' will see when ' + editionPronoun() + ' opens the gift. You can open any card to check it before you send it.';
     previewNote.classList.add('show');
     giftExperience.style.display = 'block';
     saveStatus.textContent = 'Saved privately. Your share link is ready.';
@@ -637,6 +727,7 @@ document.getElementById('makeLink').onclick = async () => {
 };
 
 async function boot(){
+  applyEditionUI();
   renderPersonalizer();
   const giftParam = (qs.get('gift') || '').trim();
   if(giftParam && giftParam !== '1'){
