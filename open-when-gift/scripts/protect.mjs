@@ -44,6 +44,13 @@ const htmlRules = [
   ['true dragonfly four-wing geometry', 'C69 18 46 9 17 14'],
   ['mini cards are envelope-shaped', '/* true envelope construction */'],
   ['muted green action system', '--green:#536b64'],
+  ['final reference contrast pass', '/* OWNER FINAL VISUAL PASS — reference contrast, raw organic paper, real envelopes */'],
+  ['raw organic opened-letter paper', 'background-color:#f1e7d7!important'],
+  ['opened-letter crisp dark ink', 'color:#2f2925!important'],
+  ['real envelope top flap', 'clip-path:polygon(0 0,100% 0,50% 88%)!important'],
+  ['real envelope lower folds', 'clip-path:polygon(0 100%,0 0,50% 70%,100% 0,100% 100%)!important'],
+  ['raw natural envelope paper', '--raw:#cdb79a'],
+  ['strong main ink', '--ink:#29231f'],
   ['dynamic sender reminder line', 'id="fromLine"'],
   ['back to cards control', 'id="closeLetter"'],
 
