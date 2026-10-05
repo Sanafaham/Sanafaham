@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="108" fill="#9b6a76"/>
+<rect x="76" y="76" width="360" height="360" rx="72" fill="#fffaf4"/>
+<text x="256" y="215" text-anchor="middle" font-family="Georgia, serif" font-size="58" fill="#433238" letter-spacing="5">OPEN</text>
+<text x="256" y="280" text-anchor="middle" font-family="Georgia, serif" font-size="58" fill="#433238" letter-spacing="5">WHEN</text>
+<path d="M205 351c30-20 49-42 68-75" fill="none" stroke="#74565F" stroke-width="8" stroke-linecap="round"/>
+<path d="M242 317c-14-10-25-11-37-7M260 300c14-12 27-15 40-12" fill="none" stroke="#74565F" stroke-width="6" stroke-linecap="round"/>
+<circle cx="205" cy="310" r="15" fill="#D8A2AE" stroke="#74565F" stroke-width="5"/>
+<circle cx="300" cy="288" r="15" fill="#D8A2AE" stroke="#74565F" stroke-width="5"/>
+</svg>
