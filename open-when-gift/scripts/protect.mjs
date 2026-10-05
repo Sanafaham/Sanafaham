@@ -74,7 +74,7 @@ const htmlRules = [
   ['Daughter edition selector', 'id="editionDaughter"'],
   ['Son edition selector', 'id="editionSon"'],
   ['shared neutral theme for all editions', '/* OWNER-APPROVED NEUTRAL STATIONERY SYSTEM — shared by every edition */'],
-  ['neutral green browser theme color', "themeColor.setAttribute('content', '#536b64')"],
+  ['neutral green browser theme color', "themeColor.setAttribute('content', '#34483f')"],
   ['hero envelope peeks behind card', '.hero-box:before{'],
   ['hero envelope raw paper asset', 'background-image:url("data:image/webp;base64,UklGRp4B'],
   ['hero envelope flap seam', '.hero-box:after{'],
