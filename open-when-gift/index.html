@@ -90,10 +90,10 @@
   <div class="app">
     <section class="hero-box">
       <div class="hero-sleeve">
-        <div class="eyebrow" id="kicker">A gift from Mama</div>
+        <div class="eyebrow" id="kicker">From Mama, for My Daughter</div>
         <h1>OPEN WHEN…</h1>
         <div class="rule"></div>
-        <p class="subhead" id="forLine">For My Daughter</p>
+        <p class="subhead" id="forLine">A little gift to keep close</p>
         <div class="sprig-wrap">
           <svg class="sprig" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M20 75C42 58 58 39 76 10" stroke="#74565F" stroke-width="2.2" stroke-linecap="round"/>
@@ -238,8 +238,8 @@ const savedToast = document.getElementById('savedToast');
 const previewCopy = document.getElementById('previewCopy');
 
 function applyNames(){
-  document.getElementById('kicker').textContent = 'A gift from ' + sender;
-  document.getElementById('forLine').textContent = recipient ? ('For ' + recipient) : 'For My Daughter';
+  document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || 'My Daughter');
+  document.getElementById('forLine').textContent = 'A little gift to keep close';
   document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
   document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
   document.getElementById('sender').value = sender;
@@ -329,8 +329,8 @@ document.getElementById('makeLink').onclick = () => {
       }
     };
   }
-  document.getElementById('kicker').textContent = 'A gift from ' + sender;
-  document.getElementById('forLine').textContent = recipient ? ('For ' + recipient) : 'For My Daughter';
+  document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || 'My Daughter');
+  document.getElementById('forLine').textContent = 'A little gift to keep close';
   document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
   document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
   previewCopy.textContent = 'Below is exactly what ' + recipient + ' will see when she opens her gift. You can open any card to check it before you send it.';
