@@ -76,6 +76,13 @@ const htmlRules = [
   ['approved richer kraft', '--approved-kraft:#b99a76'],
   ['approved main green', '--approved-green:#33483f'],
   ['mini envelope top flap protected', 'clip-path:polygon(0 0,100% 0,50% 90%)!important'],
+  ['all 24 cards use one approved ivory design', '/* OWNER LOCK — ALL 24 CARDS MATCH THE APPROVED IVORY HERO CARD */'],
+  ['all cards same ivory background', 'background-color:#f3eee5!important'],
+  ['no alternating card colors', '.open-card:nth-child(4n+2)'],
+  ['mini card open-when heading', 'class="card-mini-head"'],
+  ['mini card dragonfly', 'class="dragonfly-img"'],
+  ['mini card envelope geometry removed', 'no envelope geometry — these are miniature versions of the approved card'],
+
 
   ['opened-letter row gap', 'row-gap:4px!important'],
   ['footer reminder spacing', 'min-height:36px!important'],
