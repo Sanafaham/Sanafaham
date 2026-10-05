@@ -759,6 +759,126 @@
     .letter-body{font-size:18.5px!important}
   }
 
+
+  /* REFERENCE MATCH — richer organic paper colors + stronger contrast */
+  :root{
+    --bg:#d8d0c4;
+    --paper:#e5dccd;
+    --paper-light:#ebe2d4;
+    --raw:#bca07e;
+    --raw-light:#cdb596;
+    --green:#40534c;
+    --green-dark:#2f413a;
+    --green-soft:#d4ddd8;
+    --ink:#2a2521;
+    --ink-soft:#514840;
+    --line:#bcae9d;
+  }
+
+  html,body{
+    background:
+      linear-gradient(180deg,#d8d0c4 0%,#d3cabd 100%)!important;
+    color:var(--ink)!important;
+  }
+
+  /* warmer, richer paper — no pale AI-white */
+  .hero-sleeve,
+  .gift-maker,
+  .keep-card,
+  .share,
+  .personalize,
+  .edit-letter,
+  .edit-letter textarea,
+  input{
+    background-color:var(--paper-light)!important;
+    background-image:
+      linear-gradient(115deg,rgba(111,91,67,.035),transparent 28%,rgba(255,255,255,.12) 55%,transparent 78%),
+      linear-gradient(22deg,rgba(93,72,54,.025),transparent 44%)!important;
+  }
+  .hero-sleeve,
+  .gift-maker,
+  .keep-card,
+  .personalize{
+    border-color:#bfae9b!important;
+  }
+
+  h1,.subhead,.hero-copy,.gift-maker h2,.section-head h3,
+  .open-card .title,.letter-title,.letter-body,
+  .letter-open-mark,.letter-meta,.from-line,
+  .keep-summary-text strong,.personalize summary,.edit-letter-title{
+    color:var(--ink)!important;
+    opacity:1!important;
+  }
+  .hero-copy,.eyebrow,.open-card .hint,.keep-summary-text span,
+  .share-sub,.share-foot,.footer-note{
+    color:var(--ink-soft)!important;
+    opacity:1!important;
+  }
+
+  .letter-sheet{
+    background-color:#dfd5c4!important;
+    background-image:
+      linear-gradient(125deg,rgba(96,74,54,.05),transparent 30%,rgba(255,255,255,.13) 58%,transparent 82%),
+      linear-gradient(20deg,rgba(82,63,47,.03),transparent 48%)!important;
+    border:1px solid #b8a791!important;
+    border-top:1px solid #827463!important;
+    box-shadow:0 12px 28px rgba(49,38,30,.14)!important;
+  }
+  .letter-body{
+    color:#2a2521!important;
+    font-weight:500!important;
+  }
+  .letter-title{
+    color:#26211e!important;
+  }
+
+  .hero-box:before{
+    background-color:#bda17f!important;
+    background-image:
+      linear-gradient(115deg,rgba(79,59,43,.05),transparent 34%,rgba(255,255,255,.10) 63%,transparent 82%)!important;
+    border-color:#a99073!important;
+  }
+  .hero-box:after{
+    background:rgba(255,255,255,.06)!important;
+    box-shadow:inset 0 -1px rgba(72,54,41,.32)!important;
+  }
+
+  .open-card{
+    --env:#e4dacb;
+    background-color:var(--env)!important;
+    background-image:
+      linear-gradient(118deg,rgba(95,73,54,.035),transparent 36%,rgba(255,255,255,.12) 66%,transparent 85%)!important;
+    border-color:#bba994!important;
+  }
+  .open-card:nth-child(4n+2),
+  .open-card:nth-child(4n+5){--env:#c9b08f}
+  .open-card.opened{--env:#d7ccbd}
+  .open-card:nth-child(4n+2).opened,
+  .open-card:nth-child(4n+5).opened{--env:#bea480}
+
+  .open-card:before{
+    background:rgba(255,255,255,.08)!important;
+    box-shadow:inset 0 -1px rgba(73,55,42,.28)!important;
+  }
+  .open-card:after{
+    background:rgba(255,255,255,.045)!important;
+  }
+
+  .edition-btn.active,.btn,.done-personalizing,.share-link.primary,.open-last,
+  .preview-note{
+    background:var(--green)!important;
+    border-color:var(--green)!important;
+  }
+  .maker-sub,.edition-label,label,.personalize summary span,.edit-letter-status,
+  .edit-letter-chevron,.reset-letter,.keep-chevron,.share-title,.share-link,
+  .share-native,.back-cards{
+    color:var(--green)!important;
+  }
+
+  .dragonfly-mark{width:112px!important}
+  .card-sprig{width:58px!important;height:34px!important}
+  .letter-floral{width:64px!important}
+
 </style>
 </head>
 <body>
@@ -770,19 +890,23 @@
         <div class="rule"></div>
         <p class="subhead" id="forLine">For My Daughter</p>
         <div class="sprig-wrap">
-          <svg class="dragonfly-mark" viewBox="0 0 180 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <g stroke="#4b403a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M90 20V84"/>
-              <ellipse cx="90" cy="21" rx="4.5" ry="6"/>
-              <path d="M86 18L79 10M94 18L101 10"/>
-              <path d="M86 31C69 18 46 9 17 14C32 31 57 40 86 42"/>
-              <path d="M94 31C111 18 134 9 163 14C148 31 123 40 94 42"/>
-              <path d="M87 46C67 39 42 41 19 56C41 65 64 62 87 53"/>
-              <path d="M93 46C113 39 138 41 161 56C139 65 116 62 93 53"/>
-              <path d="M90 29L86 36M90 36L94 44M90 44L86 52M90 52L94 60M90 60L86 68M90 68L94 76"/>
-            </g>
-            <path d="M90 25V84" stroke="#536B64" stroke-width="2.4"/>
-          </svg>
+          <svg class="dragonfly-mark" viewBox="0 0 220 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <g stroke="#302b27" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="110" cy="24" rx="5.5" ry="7" fill="#4f665d" stroke-width="1.3"/>
+    <path d="M110 31V101" stroke-width="2"/>
+    <path d="M106 20L98 11M114 20L122 11" stroke-width="1.2"/>
+    <path d="M106 36C84 18 55 8 18 15C37 38 68 50 105 51Z" fill="rgba(255,255,255,.08)" stroke-width="1.25"/>
+    <path d="M114 36C136 18 165 8 202 15C183 38 152 50 115 51Z" fill="rgba(255,255,255,.08)" stroke-width="1.25"/>
+    <path d="M106 53C80 43 49 46 20 66C48 78 78 73 106 61Z" fill="rgba(255,255,255,.06)" stroke-width="1.25"/>
+    <path d="M114 53C140 43 171 46 200 66C172 78 142 73 114 61Z" fill="rgba(255,255,255,.06)" stroke-width="1.25"/>
+    <path d="M105 40L38 19M104 44L58 22M103 48L79 28M115 40L182 19M116 44L162 22M117 48L141 28" stroke-width=".65" opacity=".75"/>
+    <path d="M105 56L38 63M105 59L59 69M105 62L81 69M115 56L182 63M115 59L161 69M115 62L139 69" stroke-width=".65" opacity=".75"/>
+    <path d="M110 35L105 43M110 43L115 52M110 52L105 61M110 61L115 70M110 70L105 79M110 79L115 88M110 88L108 98" stroke-width=".9"/>
+  </g>
+  <path d="M110 32V101" stroke="#40534c" stroke-width="3"/>
+  <path d="M110 45V58" stroke="#536f79" stroke-width="3"/>
+  <path d="M110 60V72" stroke="#4f665d" stroke-width="3"/>
+</svg>
         </div>
         <div class="hero-copy">24 little reminders for the moments when I may not be right beside you.</div>
       </div>
@@ -855,24 +979,29 @@
       <section class="letter-panel" id="letterPanel">
       <div class="letter-sheet">
       <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
-      <svg class="letter-divider" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M2 12H24M56 12H78" stroke="#8F806C" stroke-width="1"/>
-        <g transform="translate(28 1)" stroke="#536B64" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 4V21"/>
-          <path d="M11 7C7 4 3 3 0 5C3 8 7 9 11 10M13 7C17 4 21 3 24 5C21 8 17 9 13 10"/>
-          <path d="M11 11C7 9 3 10 1 13C5 15 8 15 11 14M13 11C17 9 21 10 23 13C19 15 16 15 13 14"/>
-        </g>
-      </svg>
+      <svg class="letter-divider" viewBox="0 0 92 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M2 14H26M66 14H90" stroke="#7e705f" stroke-width="1"/>
+  <g transform="translate(30 1)" stroke="#34443e" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="16" cy="6" rx="1.7" ry="2.2" fill="#40534c" stroke-width=".7"/>
+    <path d="M16 8V26" stroke-width="1.2"/>
+    <path d="M15 9C10 5 5 4 0 6C4 11 9 12 15 12M17 9C22 5 27 4 32 6C28 11 23 12 17 12" stroke-width=".8"/>
+    <path d="M15 13C10 11 5 12 1 16C6 19 11 18 15 16M17 13C22 11 27 12 31 16C26 19 21 18 17 16" stroke-width=".8"/>
+    <path d="M15 10L5 7M17 10L27 7M15 14L6 16M17 14L26 16" stroke-width=".45" opacity=".8"/>
+  </g>
+</svg>
       <div class="letter-meta" id="letterMeta">01</div>
       <h2 class="letter-title" id="letterTitle"></h2>
       <div class="letter-body" id="letterBody"></div>
-      <svg class="letter-floral" viewBox="0 0 90 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <g transform="translate(20 4)" stroke="#536B64" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M25 5V40"/>
-          <path d="M23 10C16 5 8 4 0 8C7 14 15 17 23 17M27 10C34 5 42 4 50 8C43 14 35 17 27 17"/>
-          <path d="M23 19C16 15 9 17 3 23C11 28 18 27 24 25M27 19C34 15 41 17 47 23C39 28 32 27 26 25"/>
-        </g>
-      </svg>
+      <svg class="letter-floral" viewBox="0 0 110 58" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <g transform="translate(25 3)" stroke="#34443e" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="30" cy="8" rx="3" ry="4" fill="#40534c" stroke-width="1"/>
+    <path d="M30 12V51" stroke-width="1.5"/>
+    <path d="M27 15C18 8 8 6 0 10C8 20 18 22 27 22M33 15C42 8 52 6 60 10C52 20 42 22 33 22" stroke-width="1"/>
+    <path d="M27 24C18 19 9 21 2 28C12 34 21 32 28 29M33 24C42 19 51 21 58 28C48 34 39 32 32 29" stroke-width="1"/>
+    <path d="M27 18L8 11M33 18L52 11M27 26L10 29M33 26L50 29" stroke-width=".55" opacity=".8"/>
+    <path d="M30 17L27 23M30 23L33 30M30 30L27 37M30 37L33 44" stroke-width=".6"/>
+  </g>
+</svg>
       <div class="from-line" id="fromLine">A little reminder for you</div>
       <div class="letter-actions">
         <button class="back-cards" id="closeLetter">Back to my cards</button>
@@ -885,14 +1014,16 @@
       <section class="letter-panel" id="lastPanel">
       <div class="letter-sheet">
       <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
-      <svg class="letter-divider" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M2 12H24M56 12H78" stroke="#8F806C" stroke-width="1"/>
-        <g transform="translate(28 1)" stroke="#536B64" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 4V21"/>
-          <path d="M11 7C7 4 3 3 0 5C3 8 7 9 11 10M13 7C17 4 21 3 24 5C21 8 17 9 13 10"/>
-          <path d="M11 11C7 9 3 10 1 13C5 15 8 15 11 14M13 11C17 9 21 10 23 13C19 15 16 15 13 14"/>
-        </g>
-      </svg>
+      <svg class="letter-divider" viewBox="0 0 92 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M2 14H26M66 14H90" stroke="#7e705f" stroke-width="1"/>
+  <g transform="translate(30 1)" stroke="#34443e" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="16" cy="6" rx="1.7" ry="2.2" fill="#40534c" stroke-width=".7"/>
+    <path d="M16 8V26" stroke-width="1.2"/>
+    <path d="M15 9C10 5 5 4 0 6C4 11 9 12 15 12M17 9C22 5 27 4 32 6C28 11 23 12 17 12" stroke-width=".8"/>
+    <path d="M15 13C10 11 5 12 1 16C6 19 11 18 15 16M17 13C22 11 27 12 31 16C26 19 21 18 17 16" stroke-width=".8"/>
+    <path d="M15 10L5 7M17 10L27 7M15 14L6 16M17 14L26 16" stroke-width=".45" opacity=".8"/>
+  </g>
+</svg>
       <div class="letter-meta">ONE LAST THING</div>
       <h2 class="letter-title">You never had to earn this.</h2>
       <div class="letter-body" id="lastBody">There is nothing you could achieve that would make me love you more.
@@ -1173,8 +1304,8 @@ function render(){
     const btn = document.createElement('button');
     btn.className = 'open-card' + (opened.has(i) ? ' opened' : '');
     btn.innerHTML = '<div><div class="no">' + String(i+1).padStart(2,'0') + '</div><div class="title">Open when ' + x[0].toLowerCase() + '</div>'
-      + '<svg class="card-sprig" viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-      + '<g transform="translate(15 1)" stroke="#536B64" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M25 4V36"/><path d="M23 9C16 4 8 3 0 7C7 13 15 16 23 16M27 9C34 4 42 3 50 7C43 13 35 16 27 16"/><path d="M23 18C16 14 9 16 3 22C11 27 18 26 24 24M27 18C34 14 41 16 47 22C39 27 32 26 26 24"/></g>'
+      + '<svg class="card-sprig" viewBox="0 0 96 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      + '<g transform="translate(18 2)" stroke="#34443e" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="30" cy="7" rx="2.5" ry="3.2" fill="#40534c" stroke-width=".9"/><path d="M30 10V43" stroke-width="1.3"/><path d="M28 14C20 8 10 6 0 10C8 18 18 20 28 20M32 14C40 8 50 6 60 10C52 18 42 20 32 20" stroke-width=".9"/><path d="M28 22C20 18 11 19 3 26C12 31 21 30 28 27M32 22C40 18 49 19 57 26C48 31 39 30 32 27" stroke-width=".9"/><path d="M28 16L9 11M32 16L51 11M28 24L10 27M32 24L50 27" stroke-width=".5" opacity=".8"/></g>'
       + '</svg></div><div class="hint">' + (opened.has(i) ? 'Opened' : 'Tap to open') + '</div>';
     btn.onclick = () => openLetter(i);
     grid.appendChild(btn);
