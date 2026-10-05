@@ -1,16 +1,15 @@
 {
   "name": "OPEN WHEN…",
   "short_name": "OPEN WHEN",
-  "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f1ea",
-  "theme_color": "#9b6a76",
+  "background_color": "#EFECE4",
+  "theme_color": "#3F4745",
   "icons": [
     {
-      "src": "/open-when-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/open-when-icon.png?v=6",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
