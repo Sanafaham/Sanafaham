@@ -34,13 +34,13 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 
 ## Protected visual system
 
-- All relationship editions now share one **neutral stationery system**: raw organic ivory paper, light natural kraft paper, crisp dark charcoal ink, and a restrained muted green accent.
+- All relationship editions share the final approved stationery system: warm raw-organic ivory paper, natural kraft envelopes, strong dark ink, and restrained muted green accents.
 - No gender-coded pink Daughter skin or blue Son skin remains. Brown action/tag backgrounds are also retired; action/tag emphasis uses the approved muted green.
 - The hero card is complete and fully visible, with a clearly recognizable raw-paper envelope and flap seam visibly peeking behind it.
-- The **dragonfly** is the approved core motif and must read unmistakably as a four-wing dragonfly with a long body. Old floral/leaf motifs remain retired from the production UI.
-- The 24 recipient cards remain in the established two-column mobile grid and must visually read as **real little envelopes**, with a clear triangular top flap and lower folded panels — never diagonal scratch lines — using ivory and light raw-paper tones without decorative foliage clutter.
+- The **dragonfly** is the approved core motif and must use the detailed engraved/scientific treatment with visible wing veining and a long segmented body on hero, mini envelopes, and opened letters.
+- The 24 recipient cards remain in the established two-column mobile grid and must visually read as real little envelopes using explicit top-flap and lower-fold line geometry, never scratch-like diagonal decoration.
 - Daughter and Son still use distinct copy, but the same visual system.
-- Opened letters use the same universal size and position and must look printed on **raw organic paper**, with visible subtle paper texture and strong dark readable ink — never washed-out gray.
+- Opened letters use the same universal size and position and must look printed on warm raw-organic paper with visible tactile texture and strong dark readable ink.
 - Opened letter is a fixed full-screen experience with the current bounded sheet geometry.
 - All opened letters use the same layout.
 - Top accent remains a thin refined neutral-gold line.
