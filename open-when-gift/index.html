@@ -52,9 +52,11 @@
   .btn.secondary{background:#fff5f7;color:var(--rose-dark);border:1px solid var(--line);box-shadow:none}
   .share{display:none;margin-top:14px;padding:14px;border:1px solid var(--line);background:var(--rose-soft-2);border-radius:16px;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
   .share.show{display:block}
-  .preview-note{display:none;margin:18px 0 0;padding:16px 18px;background:#f3e7ea;border:1px solid var(--line);border-radius:20px;color:var(--ink-soft);line-height:1.5}
+  .preview-note{display:none;margin:26px 0 14px;padding:22px 20px;background:linear-gradient(180deg,#8f5967 0%,#7d4a59 100%);border-radius:24px;color:#fffaf6;line-height:1.5;box-shadow:0 10px 24px rgba(91,56,67,.12);text-align:center}
   .preview-note.show{display:block}
-  .preview-note strong{display:block;color:var(--rose-dark);font-family:Georgia,"Times New Roman",serif;font-size:18px;margin-bottom:4px}
+  .preview-kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#f0dfe4;margin-bottom:8px}
+  .preview-note strong{display:block;color:#fffaf6;font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:500;margin-bottom:8px}
+  .preview-note span{display:block;color:#f8edf0;font-size:14px;line-height:1.55}
   .keep-card{margin:18px 0 0;padding:18px;background:linear-gradient(180deg,#fffaf4 0%,#f5e8eb 100%);border:1px solid var(--line);border-radius:22px;box-shadow:0 6px 18px rgba(88,57,65,.04)}
   .keep-card h3{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:500;color:var(--rose-dark)}
   .keep-card p{margin:0;color:var(--ink-soft);font-size:14px;line-height:1.55}
@@ -136,8 +138,9 @@
     </section>
 
     <div class="preview-note" id="previewNote">
-      <strong>This is exactly what she will receive.</strong>
-      Check the gift below before you send it.
+      <div class="preview-kicker">Sender preview</div>
+      <strong>Your gift preview</strong>
+      <span id="previewCopy">Below is exactly what she will see when she opens her gift. You can open any card to check it before you send it.</span>
     </div>
 
     <section id="giftExperience" style="display:none">
@@ -230,6 +233,7 @@ const lastPanel = document.getElementById('lastPanel');
 const giftExperience = document.getElementById('giftExperience');
 const previewNote = document.getElementById('previewNote');
 const savedToast = document.getElementById('savedToast');
+const previewCopy = document.getElementById('previewCopy');
 
 function applyNames(){
   document.getElementById('kicker').textContent = 'A gift from ' + sender;
@@ -326,6 +330,7 @@ document.getElementById('makeLink').onclick = () => {
   document.getElementById('forLine').textContent = recipient ? ('For ' + recipient) : 'For My Daughter';
   document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
   document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
+  previewCopy.textContent = 'Below is exactly what ' + recipient + ' will see when she opens her gift. You can open any card to check it before you send it.';
   previewNote.classList.add('show');
   giftExperience.style.display = 'block';
   share.scrollIntoView({behavior:'smooth', block:'start'});
