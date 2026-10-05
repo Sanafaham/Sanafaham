@@ -264,7 +264,19 @@ document.getElementById('makeLink').onclick = () => {
   url.searchParams.set('to', recipient);
   url.searchParams.set('from', sender);
   share.classList.add('show');
-  share.innerHTML = '<strong>Your gift is ready.</strong><br><br>' + url.toString() + '<br><br><span style="color:#806a72">Send this link to her. She will see only the gift, not this setup screen.</span>';
+  share.innerHTML = '<strong>Your gift is ready.</strong><br><br><a href="' + url.toString() + '" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#7d4a59;color:white;padding:12px 18px;border-radius:999px;margin-right:8px">Open gift</a><button type="button" id="shareGiftBtn" style="min-height:44px;padding:11px 16px;border-radius:999px;border:1px solid #dbc8cd;background:#fff5f7;color:#7d4a59">Share gift</button><br><br><a href="' + url.toString() + '" target="_blank" rel="noopener" style="color:#7d4a59;word-break:break-all">' + url.toString() + '</a><br><br><span style="color:#806a72">She will see only the gift, not this setup screen.</span>';
+  const shareBtn = document.getElementById('shareGiftBtn');
+  if(shareBtn){
+    shareBtn.onclick = async () => {
+      if(navigator.share){
+        try{
+          await navigator.share({title:'OPEN WHEN…', text:'A little gift for you', url:url.toString()});
+        }catch(e){}
+      }else{
+        window.open(url.toString(), '_blank');
+      }
+    };
+  }
   applyNames();
 };
 
