@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>OPEN WHEN… For My Daughter</title>
-<meta name="theme-color" id="themeColor" content="#9b6a76" />
+<meta name="theme-color" id="themeColor" content="#8a6545" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="OPEN WHEN" />
@@ -215,6 +215,127 @@
   .footer-note{text-align:center;color:#9a7d85;font-size:12px;margin:16px 0 4px}
   @media (min-width:700px){h1{font-size:44px}.subhead{font-size:24px}.card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media (max-width:540px){body{padding:12px}.gift-maker .grid2{grid-template-columns:1fr}.btn-row .btn{width:100%}h1{font-size:30px}.subhead{font-size:18px}.hero-copy{font-size:13px}.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.open-card{min-height:160px}.open-card .title{font-size:18px}.letter-title{font-size:27px}.letter-body{font-size:18px;line-height:1.55}.share-actions{display:grid;grid-template-columns:1fr 1fr}.share-link,.share-native{width:100%}}
+
+  /* OWNER-APPROVED NEUTRAL STATIONERY SYSTEM — shared by every edition */
+  :root{
+    --bg:#f3eee5;
+    --paper:#fffdf8;
+    --paper-2:#faf6ee;
+    --kraft:#b89065;
+    --kraft-deep:#8a6545;
+    --accent:#536b64;
+    --accent-soft:#dfe7e1;
+    --ink:#342a26;
+    --ink-soft:#75665c;
+    --line:#d8caba;
+    --shadow:0 12px 28px rgba(77,58,43,.10);
+  }
+  body.son-edition{
+    --bg:#f3eee5;--paper:#fffdf8;--paper-2:#faf6ee;--kraft:#b89065;--kraft-deep:#8a6545;
+    --accent:#536b64;--accent-soft:#dfe7e1;--ink:#342a26;--ink-soft:#75665c;--line:#d8caba;
+    --shadow:0 12px 28px rgba(77,58,43,.10);
+  }
+  html,body{background:var(--bg);color:var(--ink)}
+  body{padding:14px}
+  .app{max-width:760px}
+  .hero-box,.hero-box:before,.hero-box:after{background:none;border:0}
+  .hero-box{padding:38px 10px 10px;box-shadow:none;overflow:visible;position:relative}
+  .hero-box:before{
+    content:"";display:block;position:absolute;z-index:0;
+    width:82%;height:74%;left:9%;top:13px;
+    background:linear-gradient(145deg,#c5a078 0%,#ad825b 100%);
+    border:1px solid rgba(82,60,41,.14);border-radius:13px;
+    transform:rotate(-2deg);box-shadow:0 10px 22px rgba(69,47,31,.12)
+  }
+  .hero-box:after{
+    content:"";display:block;position:absolute;z-index:0;
+    width:59%;height:1px;left:31%;top:70px;
+    background:rgba(83,59,41,.26);transform:rotate(24deg);
+    border:0;border-radius:0
+  }
+  .hero-sleeve{
+    position:relative;z-index:1;background:var(--paper);border:1px solid rgba(129,104,82,.18);
+    border-radius:16px;padding:27px 20px 24px;text-align:center;box-shadow:0 11px 22px rgba(70,51,37,.11);
+    overflow:visible
+  }
+  .eyebrow{font-family:"Cormorant Garamond",Georgia,serif;font-size:16px;font-style:italic;color:#6d5b50}
+  h1{font-family:"Cormorant Garamond",Georgia,serif;font-size:37px;font-weight:500;letter-spacing:.17em;color:#2f2723}
+  .rule{background:#8f7966}
+  .subhead{font-family:"Cormorant Garamond",Georgia,serif;color:#4b3c34;font-size:23px}
+  .sprig-wrap{margin:14px auto 12px}
+  .dragonfly-mark{width:92px;height:auto;display:block}
+  .hero-copy{font-family:"Cormorant Garamond",Georgia,serif;color:#5f534b;font-size:13px;letter-spacing:.16em;line-height:1.5}
+  .daughter-botanical,.son-botanical{display:none!important}
+
+  .gift-maker,.section-card,.letter-panel,.keep-card{background:var(--paper);border-color:var(--line);box-shadow:0 6px 16px rgba(77,58,43,.045)}
+  .gift-maker{border-radius:18px}
+  .gift-maker h2,.letter-panel h2{font-family:"Cormorant Garamond",Georgia,serif;color:var(--ink);font-size:22px;letter-spacing:.15em}
+  .maker-sub{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:17px;color:var(--accent)}
+  .edition-label,label{color:var(--accent)}
+  .edition-btn{background:#f8f3eb;color:#4d4037;border-color:#d6c6b5}
+  .edition-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 12px rgba(83,107,100,.16)}
+  input{background:#fffdf8;border-color:#d6c6b5;color:#332b26;font-family:"Cormorant Garamond",Georgia,serif;font-size:18px}
+  .btn{background:var(--accent);box-shadow:0 6px 12px rgba(83,107,100,.18)}
+  .btn.secondary{background:#f7f2ea;color:var(--accent);border-color:#d6c6b5}
+  .personalize{background:#fffdf8;border-color:#d6c6b5}
+  .personalize summary{font-family:"Cormorant Garamond",Georgia,serif;color:#352b27}
+  .personalize summary span{color:var(--accent)}
+  .done-personalizing-wrap{background:linear-gradient(180deg,#fffdf8 78%,rgba(255,253,248,0))}
+  .done-personalizing{background:var(--accent);border-color:var(--accent);box-shadow:0 6px 14px rgba(83,107,100,.16)}
+  .edit-letter{background:#faf6ee;border-color:#d8caba}
+  .edit-letter-title{font-family:"Cormorant Garamond",Georgia,serif;color:#332a26;font-size:16px}
+  .edit-letter-status{color:var(--accent)}
+  .edit-letter-status.personalized{background:var(--accent);color:white;border-radius:999px;padding:4px 8px}
+  .edit-letter-chevron{color:var(--accent)}
+  .edit-letter textarea{background:#fffdf8;border-color:#d6c6b5;color:#352d29;font-family:"Cormorant Garamond",Georgia,serif;font-size:17px}
+  .reset-letter{color:var(--accent)}
+  .share{background:#f1ebe1;border-color:#d8caba;color:var(--ink)}
+  .share-title,.share-link,.share-native{color:var(--accent)}
+  .share-link.primary{background:var(--accent);border-color:var(--accent)}
+  .preview-note{background:linear-gradient(180deg,#8d6a4b,#79583e);box-shadow:0 10px 24px rgba(88,61,40,.14)}
+  .preview-kicker,.preview-note span{color:#f5ecdf}
+  .keep-card{background:#fffdf8;border-radius:18px}
+  .keep-summary-text strong{font-family:"Cormorant Garamond",Georgia,serif;color:#3b302a}
+  .keep-summary-text span,.keep-chevron{color:var(--accent)}
+  .keep-step{background:#faf6ee;border-color:#dfd2c4}
+  .section-head h3{font-family:"Cormorant Garamond",Georgia,serif;letter-spacing:.07em;text-transform:uppercase;color:#332a26}
+  .section-head span{color:#6e6057}
+
+  .open-card{
+    min-height:154px;border-radius:14px;background:#fffdf8;border:1px solid #d7c9ba;
+    box-shadow:0 7px 14px rgba(72,53,39,.075);padding:20px 14px 13px;text-align:center;position:relative;overflow:hidden
+  }
+  .open-card:nth-child(4n+2),.open-card:nth-child(4n+5){background:#c7a27c;border-color:#b78e65}
+  .open-card:before{
+    content:"";position:absolute;left:-4%;top:-20px;width:108%;height:70px;
+    border-bottom:1px solid rgba(95,73,55,.18);transform:skewY(-13deg);pointer-events:none
+  }
+  .open-card:after{
+    content:"";position:absolute;right:-4%;top:-20px;width:108%;height:70px;
+    border-bottom:1px solid rgba(95,73,55,.14);transform:skewY(13deg);pointer-events:none
+  }
+  .open-card.opened{background:#efe7db}
+  .open-card:nth-child(4n+2).opened,.open-card:nth-child(4n+5).opened{background:#b99169}
+  .open-card .no{display:none}
+  .open-card .title{font-family:"Cormorant Garamond",Georgia,serif;color:#332a26;font-size:20px;line-height:1.12;position:relative;z-index:2;margin-top:38px}
+  .open-card .hint{font-family:"Cormorant Garamond",Georgia,serif;color:#6a5a50;position:relative;z-index:2;margin-top:8px}
+  .card-sprig{width:46px;height:28px;position:absolute;top:12px;left:50%;transform:translateX(-50%);margin:0;z-index:2}
+
+  .letter-panel.show{background:#f3eee5;border:0}
+  .letter-sheet{background:#fffdf8;border-color:rgba(157,135,112,.28);border-top-color:#9b876f;box-shadow:0 12px 28px rgba(65,47,34,.08)}
+  .letter-open-mark,.letter-meta,.from-line{color:#67584e}
+  .letter-title,.letter-body{color:#382f2b}
+  .back-cards{color:var(--accent)}
+  .letter-floral{width:58px}
+  .open-last{background:linear-gradient(180deg,#a7815f,#8c684b);border-color:#8c684b;color:#fffaf3}
+  .footer-note{color:#87776c}
+  .share-foot{color:#77685e}
+  .btn:focus-visible,.open-card:focus-visible,.open-last:focus-visible,input:focus-visible,summary:focus-visible{outline-color:var(--accent)}
+  @media(max-width:540px){
+    h1{font-size:31px}.hero-box{padding-top:34px}.hero-sleeve{padding:24px 16px 21px}.subhead{font-size:20px}
+    .hero-copy{font-size:12px}.open-card{min-height:146px}.open-card .title{font-size:18px}
+  }
+
 </style>
 </head>
 <body>
@@ -226,31 +347,13 @@
         <div class="rule"></div>
         <p class="subhead" id="forLine">For My Daughter</p>
         <div class="sprig-wrap">
-          <svg class="sprig daughter-botanical" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M20 75C42 58 58 39 76 10" stroke="#74565F" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M42 52C36 48 31 47 25 48" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M56 39C50 35 45 34 39 35" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M66 28C61 24 56 22 50 23" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M58 52C64 47 70 45 77 46" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M70 39C75 34 81 31 88 31" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M81 24C86 20 91 18 97 18" stroke="#74565F" stroke-width="1.8" stroke-linecap="round"/>
-            <g fill="#D8A2AE" stroke="#74565F" stroke-width="1.6">
-              <circle cx="26" cy="48" r="5.4"/><circle cx="20.2" cy="44.2" r="5.1"/><circle cx="21.8" cy="51.8" r="5"/><circle cx="29.4" cy="42.8" r="5"/><circle cx="31.4" cy="50.8" r="4.9"/>
-              <circle cx="39" cy="35" r="5.2"/><circle cx="33.5" cy="31.8" r="4.8"/><circle cx="35" cy="38.4" r="4.8"/><circle cx="42.9" cy="30" r="4.8"/><circle cx="45" cy="37.5" r="4.8"/>
-              <circle cx="50" cy="23" r="5"/><circle cx="45.5" cy="19.8" r="4.6"/><circle cx="46.8" cy="26" r="4.6"/><circle cx="53.8" cy="18.8" r="4.6"/><circle cx="55.6" cy="25.4" r="4.5"/>
-              <circle cx="77" cy="46" r="5.4"/><circle cx="71.2" cy="42.2" r="5.1"/><circle cx="72.8" cy="49.8" r="5"/><circle cx="80.4" cy="40.8" r="5"/><circle cx="82.4" cy="48.8" r="4.9"/>
-              <circle cx="88" cy="31" r="5.2"/><circle cx="82.5" cy="27.8" r="4.8"/><circle cx="84" cy="34.4" r="4.8"/><circle cx="91.9" cy="26" r="4.8"/><circle cx="94" cy="33.5" r="4.8"/>
-              <circle cx="97" cy="18" r="5"/><circle cx="92.5" cy="14.8" r="4.6"/><circle cx="93.8" cy="21" r="4.6"/><circle cx="100.8" cy="13.8" r="4.6"/><circle cx="102.6" cy="20.4" r="4.5"/>
+          <svg class="dragonfly-mark" viewBox="0 0 160 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g stroke="#54473f" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M80 24V77M80 31C69 22 52 11 26 14C40 30 57 37 78 38M80 31C91 22 108 11 134 14C120 30 103 37 82 38M79 43C61 36 43 37 27 48C48 57 63 55 79 49M81 43C99 36 117 37 133 48C112 57 97 55 81 49"/>
+              <path d="M75 23C76 18 78 16 80 16C82 16 84 18 85 23M77 16L73 11M83 16L87 11"/>
+              <path d="M80 52L76 59M80 57L85 64M80 64L76 71M80 70L84 76"/>
             </g>
-          </svg>
-          <svg class="son-botanical" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M22 76C40 61 58 42 79 12" stroke="#4F6782" stroke-width="2.1" stroke-linecap="round"/>
-            <path d="M39 58C31 55 27 50 27 43C35 43 41 48 43 54" fill="#8CA0B4" stroke="#4F6782" stroke-width="1.3"/>
-            <path d="M52 45C44 42 40 36 41 29C49 30 55 35 57 41" fill="#8CA0B4" stroke="#4F6782" stroke-width="1.3"/>
-            <path d="M66 31C59 28 55 22 57 15C64 16 70 21 71 27" fill="#8CA0B4" stroke="#4F6782" stroke-width="1.3"/>
-            <path d="M56 51C62 45 69 43 76 46C73 53 66 57 59 56" fill="#8CA0B4" stroke="#4F6782" stroke-width="1.3"/>
-            <path d="M70 37C77 30 84 28 91 31C88 38 81 42 73 42" fill="#8CA0B4" stroke="#4F6782" stroke-width="1.3"/>
-            <path d="M80 22C86 16 94 14 100 18C97 24 91 28 83 28" fill="#8CA0B4" stroke="#4F6782" stroke-width="1.3"/>
+            <path d="M80 23V77" stroke="#536B64" stroke-width="2.2"/>
           </svg>
         </div>
         <div class="hero-copy">24 little reminders for the moments when I may not be right beside you.</div>
@@ -324,17 +427,19 @@
       <section class="letter-panel" id="letterPanel">
       <div class="letter-sheet">
       <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
-      <svg class="letter-divider" viewBox="0 0 54 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M1 9H19M35 9H53" stroke="#B79A5E" stroke-width="1"/>
-        <path d="M27 3.8C25.9 1.8 23 2.6 23.6 5c-2.4-.5-3.2 2.4-1.1 3.5-2.1 1.2-1 4 1.3 3.4-.5 2.4 2.4 3.2 3.5 1.1 1.2 2.1 4 .9 3.4-1.4 2.4.5 3.2-2.4 1.1-3.5 2.1-1.2 1-4-1.3-3.4.5-2.4-2.4-3.2-3.5-1.1Z" fill="#D8A2AE" stroke="#74565F" stroke-width=".8"/>
+      <svg class="letter-divider" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 12H25M55 12H78" stroke="#9B876F" stroke-width="1"/>
+        <g transform="translate(30 2)" stroke="#536B64" stroke-width=".9" stroke-linecap="round">
+          <path d="M10 5V18M10 7C7 4 3 2 0 3C3 7 6 9 10 9M10 7C13 4 17 2 20 3C17 7 14 9 10 9M10 10C6 8 3 9 1 12C5 14 8 13 10 12M10 10C14 8 17 9 19 12C15 14 12 13 10 12"/>
+        </g>
       </svg>
       <div class="letter-meta" id="letterMeta">01</div>
       <h2 class="letter-title" id="letterTitle"></h2>
       <div class="letter-body" id="letterBody"></div>
-      <svg class="letter-floral" viewBox="0 0 72 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M8 45C24 34 35 22 48 6" stroke="#74565F" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M26 29C21 26 17 25 13 26M36 20C32 17 28 16 24 17M38 31C43 27 48 26 53 27M47 18C52 14 57 12 62 13" stroke="#74565F" stroke-width="1.3" stroke-linecap="round"/>
-        <g fill="#D8A2AE" stroke="#74565F" stroke-width="1.1"><circle cx="13" cy="26" r="3.6"/><circle cx="24" cy="17" r="3.5"/><circle cx="53" cy="27" r="3.7"/><circle cx="62" cy="13" r="3.5"/></g>
+      <svg class="letter-floral" viewBox="0 0 80 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g transform="translate(20 4)" stroke="#536B64" stroke-width="1.05" stroke-linecap="round">
+          <path d="M20 6V36M20 9C14 4 7 2 0 5C6 12 12 15 19 15M21 9C27 4 34 2 40 5C34 12 28 15 21 15M19 18C13 14 7 15 2 21C9 25 14 24 20 22M21 18C27 14 33 15 38 21C31 25 26 24 20 22"/>
+        </g>
       </svg>
       <div class="from-line" id="fromLine">A little reminder for you</div>
       <div class="letter-actions">
@@ -348,9 +453,11 @@
       <section class="letter-panel" id="lastPanel">
       <div class="letter-sheet">
       <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
-      <svg class="letter-divider" viewBox="0 0 54 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M1 9H19M35 9H53" stroke="#B79A5E" stroke-width="1"/>
-        <path d="M27 3.8C25.9 1.8 23 2.6 23.6 5c-2.4-.5-3.2 2.4-1.1 3.5-2.1 1.2-1 4 1.3 3.4-.5 2.4 2.4 3.2 3.5 1.1 1.2 2.1 4 .9 3.4-1.4 2.4.5 3.2-2.4 1.1-3.5 2.1-1.2 1-4-1.3-3.4.5-2.4-2.4-3.2-3.5-1.1Z" fill="#D8A2AE" stroke="#74565F" stroke-width=".8"/>
+      <svg class="letter-divider" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 12H25M55 12H78" stroke="#9B876F" stroke-width="1"/>
+        <g transform="translate(30 2)" stroke="#536B64" stroke-width=".9" stroke-linecap="round">
+          <path d="M10 5V18M10 7C7 4 3 2 0 3C3 7 6 9 10 9M10 7C13 4 17 2 20 3C17 7 14 9 10 9M10 10C6 8 3 9 1 12C5 14 8 13 10 12M10 10C14 8 17 9 19 12C15 14 12 13 10 12"/>
+        </g>
       </svg>
       <div class="letter-meta">ONE LAST THING</div>
       <h2 class="letter-title">You never had to earn this.</h2>
@@ -484,7 +591,7 @@ function applyEditionUI(){
   const isSon = edition === 'son';
   document.body.classList.toggle('son-edition', isSon);
   const themeColor = document.getElementById('themeColor');
-  if(themeColor) themeColor.setAttribute('content', isSon ? '#243b5a' : '#9b6a76');
+  if(themeColor) themeColor.setAttribute('content', '#8a6545');
   editionDaughter.classList.toggle('active', !isSon);
   editionSon.classList.toggle('active', isSon);
   editionDaughter.setAttribute('aria-pressed', isSon ? 'false' : 'true');
@@ -632,10 +739,8 @@ function render(){
     const btn = document.createElement('button');
     btn.className = 'open-card' + (opened.has(i) ? ' opened' : '');
     btn.innerHTML = '<div><div class="no">' + String(i+1).padStart(2,'0') + '</div><div class="title">Open when ' + x[0].toLowerCase() + '</div>'
-      + '<svg class="card-sprig" viewBox="0 0 72 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-      + '<path d="M8 45C24 34 35 22 48 6" stroke="#74565F" stroke-width="1.6" stroke-linecap="round"/>'
-      + '<path d="M26 29C21 26 17 25 13 26M36 20C32 17 28 16 24 17M38 31C43 27 48 26 53 27M47 18C52 14 57 12 62 13" stroke="#74565F" stroke-width="1.3" stroke-linecap="round"/>'
-      + '<g fill="#D8A2AE" stroke="#74565F" stroke-width="1.1"><circle cx="13" cy="26" r="3.6"/><circle cx="24" cy="17" r="3.5"/><circle cx="53" cy="27" r="3.7"/><circle cx="62" cy="13" r="3.5"/></g>'
+      + '<svg class="card-sprig" viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      + '<g transform="translate(20 2)" stroke="#536B64" stroke-width="1" stroke-linecap="round"><path d="M20 5V34M20 8C14 3 7 2 0 5C6 11 12 14 19 14M21 8C27 3 34 2 40 5C34 11 28 14 21 14M19 18C13 14 7 15 2 20C9 24 14 23 20 21M21 18C27 14 33 15 38 20C31 24 26 23 20 21"/></g>'
       + '</svg></div><div class="hint">' + (opened.has(i) ? 'Opened' : 'Tap to open') + '</div>';
     btn.onclick = () => openLetter(i);
     grid.appendChild(btn);
