@@ -2,6 +2,10 @@
   "name": "open-when-gift",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "node scripts/protect.mjs",
+    "test": "node scripts/protect.mjs"
+  },
   "dependencies": {
     "@vercel/blob": "^2.0.0"
   }
