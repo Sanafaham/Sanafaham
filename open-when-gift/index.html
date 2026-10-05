@@ -74,7 +74,8 @@ button{cursor:pointer}
 .personalize>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:20px 18px;font-family:"Cormorant Garamond",Georgia,serif;font-size:25px;cursor:pointer}
 .personalize>summary::-webkit-details-marker{display:none}
 .personalize>summary span{font:500 15px Inter,sans-serif;color:var(--green)}
-.personalize-body{padding:0 14px 16px}
+.personalize-body{padding:0 14px 16px;color:var(--ink)}
+.personalize button,.personalize textarea{color:inherit;-webkit-text-fill-color:currentColor}
 .edit-letter{border-top:1px solid rgba(110,100,90,.35)}
 .edit-toggle{width:100%;border:0;background:none;padding:15px 2px;display:grid;grid-template-columns:1fr auto;gap:12px;text-align:left;align-items:center}
 .edit-title{font-family:"Cormorant Garamond",Georgia,serif;font-size:19px;color:var(--ink)}
@@ -164,6 +165,8 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
   box-shadow:none!important;
   border:0!important;
   mix-blend-mode:multiply;
+  isolation:isolate;
+  filter:contrast(1.08) saturate(.95);
 }
 
 </style>
@@ -196,15 +199,15 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
     <label class="label" for="sender">From</label>
     <input class="input" id="sender" maxlength="40" placeholder="e.g. Mama, Papa, Mum, Dad">
 
+    <button class="primary" id="makeLink" type="button">Create my gift</button>
+
     <details class="personalize" id="personalize">
       <summary>Personalize the letters <span>Optional</span></summary>
       <div class="personalize-body">
-        <div id="personalizeList"></div>
         <button class="done-personalizing" id="donePersonalizing" type="button">Done personalizing</button>
+        <div id="personalizeList"></div>
       </div>
     </details>
-
-    <button class="primary" id="makeLink" type="button">Create my gift</button>
     <div class="save-status" id="saveStatus"></div>
     <div class="share" id="share"></div>
   </section>
