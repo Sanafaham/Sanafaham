@@ -54,6 +54,18 @@
   .btn:active,.open-card:active,.open-last:active{transform:scale(.985)}
   .btn:focus-visible,.open-card:focus-visible,.open-last:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #9b6a76;outline-offset:3px}
   .btn.secondary{background:#fff5f7;color:var(--rose-dark);border:1px solid var(--line);box-shadow:none}
+  .personalize{margin-top:16px;border:1px solid var(--line);border-radius:18px;background:#fffdf9;overflow:hidden}
+  .personalize summary{cursor:pointer;list-style:none;padding:16px 16px;font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .personalize summary::-webkit-details-marker{display:none}
+  .personalize summary span{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;color:var(--ink-soft)}
+  .personalize-inner{padding:0 14px 14px;display:grid;gap:10px}
+  .edit-letter{border:1px solid var(--line);border-radius:15px;background:var(--paper-2);padding:12px}
+  .edit-letter-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+  .edit-letter-title{font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:15px;line-height:1.3}
+  .reset-letter{background:transparent;color:#8b6872;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+  .edit-letter textarea{width:100%;min-height:112px;resize:vertical;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .save-status{display:none;margin-top:10px;font-size:13px;color:var(--ink-soft)}
+  .save-status.show{display:block}
   .share{display:none;margin-top:16px;padding:18px;border:1px solid var(--line);background:linear-gradient(180deg,#f5e9ec 0%,#f1e2e6 100%);border-radius:20px;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
   .share.show{display:block}
   .share-title{font-family:Georgia,"Times New Roman",serif;font-size:22px;color:var(--rose-dark);margin-bottom:4px}
@@ -193,10 +205,16 @@
           <input id="sender" placeholder="e.g. Mama, Papa, Mum, Dad" maxlength="40" autocomplete="off" autocapitalize="words" />
         </div>
       </div>
+      <details class="personalize" id="personalize">
+        <summary>
+          Personalize the letters <span>Optional</span>
+        </summary>
+        <div class="personalize-inner" id="personalizeList"></div>
+      </details>
       <div class="btn-row">
         <button class="btn" id="makeLink">Create my gift</button>
-
       </div>
+      <div class="save-status" id="saveStatus"></div>
       <div class="share" id="share"></div>
     </section>
 
@@ -320,7 +338,8 @@ if (qs.has('utm_source') || qs.has('utm_medium') || qs.has('utm_campaign') || qs
 let recipient = (qs.get('to') || '').trim();
 let sender = (qs.get('from') || '').trim();
 let giftId = (qs.get('id') || '').trim();
-const storageKey = giftId
+let customMessages = letters.map(x => x[1]);
+let storageKey = giftId
   ? 'openwhen:gift:' + giftId
   : 'openwhen:legacy:' + (recipient || 'daughter') + ':' + sender;
 let storedOpened = [];
@@ -336,6 +355,43 @@ const lastPanel = document.getElementById('lastPanel');
 const giftExperience = document.getElementById('giftExperience');
 const previewNote = document.getElementById('previewNote');
 const previewCopy = document.getElementById('previewCopy');
+const personalizeList = document.getElementById('personalizeList');
+const saveStatus = document.getElementById('saveStatus');
+
+function renderPersonalizer(){
+  personalizeList.innerHTML = '';
+  letters.forEach((x,i)=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'edit-letter';
+    wrap.innerHTML =
+      '<div class="edit-letter-head">'
+      + '<div class="edit-letter-title">' + String(i+1).padStart(2,'0') + ' · Open when ' + x[0].toLowerCase() + '</div>'
+      + '<button type="button" class="reset-letter">Reset to original</button>'
+      + '</div>'
+      + '<textarea maxlength="4000" aria-label="Personalize letter ' + (i+1) + '"></textarea>';
+    const ta = wrap.querySelector('textarea');
+    ta.value = customMessages[i];
+    ta.addEventListener('input', () => { customMessages[i] = ta.value; });
+    wrap.querySelector('.reset-letter').onclick = () => {
+      customMessages[i] = letters[i][1];
+      ta.value = letters[i][1];
+    };
+    personalizeList.appendChild(wrap);
+  });
+}
+
+async function loadGiftFromServer(id){
+  const response = await fetch('/api/gifts?id=' + encodeURIComponent(id), {cache:'no-store'});
+  if(!response.ok) throw new Error('Gift not found');
+  const gift = await response.json();
+  recipient = (gift.recipient || '').trim();
+  sender = (gift.sender || '').trim();
+  customMessages = Array.isArray(gift.messages) && gift.messages.length === 24
+    ? gift.messages
+    : letters.map(x => x[1]);
+  giftId = id;
+  storageKey = 'openwhen:gift:' + giftId;
+}
 
 function applyNames(){
   if(qs.has('gift')){
@@ -386,7 +442,7 @@ function openLetter(i){
   document.body.classList.add('letter-open');
   document.getElementById('letterMeta').textContent = String(i+1).padStart(2,'0');
   document.getElementById('letterTitle').textContent = 'Open when ' + letters[i][0].toLowerCase();
-  document.getElementById('letterBody').textContent = letters[i][1];
+  document.getElementById('letterBody').textContent = customMessages[i] || letters[i][1];
   letterPanel.scrollTop = 0;
 }
 
@@ -408,7 +464,7 @@ document.getElementById('closeLast').onclick = () => {
   requestAnimationFrame(() => window.scrollTo({top:cardsScrollY, behavior:'auto'}));
 };
 
-document.getElementById('makeLink').onclick = () => {
+document.getElementById('makeLink').onclick = async () => {
   recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
   sender = (document.getElementById('sender').value || '').trim();
   if(!sender){
@@ -419,55 +475,98 @@ document.getElementById('makeLink').onclick = () => {
     setTimeout(()=>senderInput.setCustomValidity(''), 0);
     return;
   }
-  const url = new URL(location.href);
-  url.search = '';
+
+  if(customMessages.some(m => !m || !m.trim())){
+    saveStatus.textContent = 'Each letter needs a message. Reset any empty letter to the original.';
+    saveStatus.classList.add('show');
+    return;
+  }
+
+  const makeBtn = document.getElementById('makeLink');
+  makeBtn.disabled = true;
+  makeBtn.style.opacity = '.6';
+  saveStatus.textContent = 'Saving your gift…';
+  saveStatus.classList.add('show');
+
   giftId = (window.crypto && crypto.randomUUID)
     ? crypto.randomUUID()
     : Date.now().toString(36) + Math.random().toString(36).slice(2);
-  url.searchParams.set('gift','1');
-  url.searchParams.set('id', giftId);
-  url.searchParams.set('to', recipient);
-  url.searchParams.set('from', sender);
-  share.classList.add('show');
-  const msg = 'I made something for you' + (recipient ? ', ' + recipient : '') + ' ❤️\nOpen it when you’re ready.';
-  const giftUrl = url.toString();
-  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg + '\n' + giftUrl);
-  const mailUrl = 'mailto:?subject=' + encodeURIComponent('A little gift for you') + '&body=' + encodeURIComponent(msg + '\n\n' + giftUrl);
-  const smsUrl = 'sms:&body=' + encodeURIComponent(msg + '\n' + giftUrl);
-  share.innerHTML = '<div class="share-title">Your gift is ready</div>'
-    + '<div class="share-sub">Check it once, then send it however you normally talk to ' + recipient + '.</div>'
-    + '<div class="share-actions">'
-    + '<a class="share-link primary" href="' + giftUrl + '" target="_blank" rel="noopener">Open gift</a>'
-    + '<a class="share-link" href="' + waUrl + '">WhatsApp</a>'
-    + '<a class="share-link" href="' + smsUrl + '">Messages</a>'
-    + '<a class="share-link" href="' + mailUrl + '">Email</a>'
-    + '<button type="button" class="share-native" id="shareGiftBtn">Share…</button>'
-    + '</div>'
-    + '<div class="share-foot">' + recipient + ' will see only the finished gift. The message is already written for you.</div>';
-  const shareBtn = document.getElementById('shareGiftBtn');
-  if(shareBtn){
-    shareBtn.onclick = async () => {
-      if(navigator.share){
-        try{
-          await navigator.share({title:'OPEN WHEN…', text:msg, url:giftUrl});
-        }catch(e){}
-      }else{
-        window.open(giftUrl, '_blank');
-      }
-    };
+
+  try{
+    const response = await fetch('/api/gifts', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:giftId, recipient, sender, messages:customMessages})
+    });
+    if(!response.ok) throw new Error('save failed');
+
+    const url = new URL(location.href);
+    url.search = '';
+    url.searchParams.set('gift', giftId);
+
+    storageKey = 'openwhen:gift:' + giftId;
+    const msg = 'I made something for you' + (recipient ? ', ' + recipient : '') + ' ❤️\nOpen it when you’re ready.';
+    const giftUrl = url.toString();
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg + '\n' + giftUrl);
+    const mailUrl = 'mailto:?subject=' + encodeURIComponent('A little gift for you') + '&body=' + encodeURIComponent(msg + '\n\n' + giftUrl);
+    const smsUrl = 'sms:&body=' + encodeURIComponent(msg + '\n' + giftUrl);
+
+    share.classList.add('show');
+    share.innerHTML = '<div class="share-title">Your gift is ready</div>'
+      + '<div class="share-sub">Check it once, then send it however you normally talk to ' + recipient + '.</div>'
+      + '<div class="share-actions">'
+      + '<a class="share-link primary" href="' + giftUrl + '" target="_blank" rel="noopener">Open gift</a>'
+      + '<a class="share-link" href="' + waUrl + '">WhatsApp</a>'
+      + '<a class="share-link" href="' + smsUrl + '">Messages</a>'
+      + '<a class="share-link" href="' + mailUrl + '">Email</a>'
+      + '<button type="button" class="share-native" id="shareGiftBtn">Share…</button>'
+      + '</div>'
+      + '<div class="share-foot">' + recipient + ' will see only the finished gift, including any letters you personalized.</div>';
+
+    const shareBtn = document.getElementById('shareGiftBtn');
+    if(shareBtn){
+      shareBtn.onclick = async () => {
+        if(navigator.share){
+          try{ await navigator.share({title:'OPEN WHEN…', text:msg, url:giftUrl}); }catch(e){}
+        }else{
+          window.open(giftUrl, '_blank');
+        }
+      };
+    }
+
+    document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + recipient;
+    document.getElementById('forLine').textContent = 'A little gift to keep close';
+    document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
+    document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
+    previewCopy.textContent = 'Below is exactly what ' + recipient + ' will see when she opens her gift. You can open any card to check it before you send it.';
+    previewNote.classList.add('show');
+    giftExperience.style.display = 'block';
+    saveStatus.textContent = 'Saved privately. Your share link is ready.';
+    share.scrollIntoView({behavior:'smooth', block:'start'});
+  }catch(e){
+    saveStatus.textContent = 'I could not save this gift yet. Please try again.';
+  }finally{
+    makeBtn.disabled = false;
+    makeBtn.style.opacity = '';
   }
-  document.getElementById('kicker').textContent = 'From ' + (sender || 'Someone special') + ', for ' + (recipient || 'My Daughter');
-  document.getElementById('forLine').textContent = 'A little gift to keep close';
-  document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
-  document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
-  previewCopy.textContent = 'Below is exactly what ' + recipient + ' will see when she opens her gift. You can open any card to check it before you send it.';
-  previewNote.classList.add('show');
-  giftExperience.style.display = 'block';
-  share.scrollIntoView({behavior:'smooth', block:'start'});
 };
 
-applyNames();
-render();
+async function boot(){
+  renderPersonalizer();
+  const giftParam = (qs.get('gift') || '').trim();
+  if(giftParam && giftParam !== '1'){
+    try{
+      await loadGiftFromServer(giftParam);
+    }catch(e){
+      document.body.innerHTML = '<div style="max-width:560px;margin:80px auto;padding:24px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#433238"><h2>This gift could not be opened.</h2><p>Please ask the sender for a fresh link.</p></div>';
+      return;
+    }
+  }
+  applyNames();
+  render();
+}
+
+boot();
 </script>
 </body>
 </html>
