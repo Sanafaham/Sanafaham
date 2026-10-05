@@ -33,6 +33,7 @@
   .hero-box:after{width:120px;height:120px;left:-55px;top:-65px}
   .hero-sleeve{background:var(--paper);border-radius:22px;padding:26px 20px 22px;text-align:center;border:1px solid rgba(124,84,95,.10);position:relative}
   .eyebrow{font-size:14px;color:var(--ink-soft);margin-bottom:8px;letter-spacing:.02em}
+  .eyebrow:empty{display:none}
   h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:34px;font-weight:500;line-height:1.05;letter-spacing:.08em;color:var(--ink)}
   .rule{width:48px;height:1px;background:#b28a94;margin:10px auto 14px}
   .subhead{margin:0;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;font-weight:400;color:var(--rose-dark)}
@@ -40,26 +41,41 @@
   .sprig{width:76px;height:auto;display:block}
   .hero-copy{max-width:350px;margin:0 auto;color:var(--ink-soft);line-height:1.45;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
   .section-card,.letter-panel,.gift-maker{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:0 6px 18px rgba(88,57,65,.04)}
-  .gift-maker{padding:22px 18px;margin-top:18px}
-  .gift-maker h2,.letter-panel h2{margin:0 0 14px;font-size:16px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--rose-dark)}
+  .gift-maker{padding:24px 20px;margin-top:18px}
+  .gift-maker h2,.letter-panel h2{margin:0 0 8px;font-size:16px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--rose-dark)}
+  .maker-sub{margin:0 0 18px;color:var(--ink-soft);font-size:14px;line-height:1.5}
   .gift-maker .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   label{display:block;margin:0 0 6px;font-size:12px;color:var(--ink-soft)}
   input{width:100%;min-height:48px;border:1px solid var(--line);background:var(--paper-2);border-radius:14px;padding:12px 14px;color:var(--ink);font-size:16px}
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
   button{border:none;cursor:pointer}
-  .btn{min-height:48px;padding:12px 20px;border-radius:999px;background:var(--rose-dark);color:#fff;font-size:16px;box-shadow:0 6px 12px rgba(110,66,79,.14)}
+  .btn{min-height:48px;padding:12px 20px;border-radius:999px;background:var(--rose-dark);color:#fff;font-size:16px;box-shadow:0 6px 12px rgba(110,66,79,.14);transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease}
+  .btn:active,.open-card:active,.open-last:active{transform:scale(.985)}
+  .btn:focus-visible,.open-card:focus-visible,.open-last:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #9b6a76;outline-offset:3px}
   .btn.secondary{background:#fff5f7;color:var(--rose-dark);border:1px solid var(--line);box-shadow:none}
-  .share{display:none;margin-top:14px;padding:14px;border:1px solid var(--line);background:var(--rose-soft-2);border-radius:16px;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
+  .share{display:none;margin-top:16px;padding:18px;border:1px solid var(--line);background:linear-gradient(180deg,#f5e9ec 0%,#f1e2e6 100%);border-radius:20px;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
   .share.show{display:block}
+  .share-title{font-family:Georgia,"Times New Roman",serif;font-size:22px;color:var(--rose-dark);margin-bottom:4px}
+  .share-sub{color:var(--ink-soft);line-height:1.5;margin-bottom:14px}
+  .share-actions{display:flex;flex-wrap:wrap;gap:9px}
+  .share-link,.share-native{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 16px;border-radius:999px;text-decoration:none;border:1px solid var(--line);background:#fff8fa;color:var(--rose-dark);font-size:15px}
+  .share-link.primary{background:var(--rose-dark);color:#fff;border-color:var(--rose-dark)}
+  .share-native{cursor:pointer}
+  .share-foot{margin-top:12px;color:#806a72;font-size:13px;line-height:1.45}
   .preview-note{display:none;margin:26px 0 14px;padding:22px 20px;background:linear-gradient(180deg,#8f5967 0%,#7d4a59 100%);border-radius:24px;color:#fffaf6;line-height:1.5;box-shadow:0 10px 24px rgba(91,56,67,.12);text-align:center}
   .preview-note.show{display:block}
   .preview-kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#f0dfe4;margin-bottom:8px}
   .preview-note strong{display:block;color:#fffaf6;font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:500;margin-bottom:8px}
   .preview-note span{display:block;color:#f8edf0;font-size:14px;line-height:1.55}
-  .keep-card{margin:18px 0 0;padding:18px;background:linear-gradient(180deg,#fffaf4 0%,#f5e8eb 100%);border:1px solid var(--line);border-radius:22px;box-shadow:0 6px 18px rgba(88,57,65,.04)}
-  .keep-card h3{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:500;color:var(--rose-dark)}
-  .keep-card p{margin:0;color:var(--ink-soft);font-size:14px;line-height:1.55}
-  .keep-steps{margin-top:12px;display:grid;gap:8px}
+  .keep-card{margin:18px 0 0;background:linear-gradient(180deg,#fffaf4 0%,#f5e8eb 100%);border:1px solid var(--line);border-radius:22px;box-shadow:0 6px 18px rgba(88,57,65,.04);overflow:hidden}
+  .keep-card summary{list-style:none;cursor:pointer;padding:17px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .keep-card summary::-webkit-details-marker{display:none}
+  .keep-summary-text strong{display:block;font-family:Georgia,"Times New Roman",serif;font-size:19px;font-weight:500;color:var(--rose-dark);margin-bottom:3px}
+  .keep-summary-text span{display:block;color:var(--ink-soft);font-size:13px;line-height:1.4}
+  .keep-chevron{font-size:20px;color:var(--rose);transition:transform .2s ease}
+  .keep-card[open] .keep-chevron{transform:rotate(180deg)}
+  .keep-inner{padding:0 18px 18px}
+  .keep-steps{display:grid;gap:8px}
   .keep-step{padding:10px 12px;background:rgba(255,250,244,.8);border:1px solid rgba(219,200,205,.9);border-radius:14px;font-size:13px;line-height:1.45;color:var(--ink)}
   .card-sprig{width:42px;height:32px;display:block;margin:8px 0 0 auto;opacity:.95}
   .saved-toast{display:none;margin-top:12px;padding:12px 14px;background:#f3e7ea;border:1px solid var(--line);border-radius:14px;color:var(--rose-dark);font-size:14px;line-height:1.45}
@@ -68,22 +84,24 @@
   .section-head h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:500;color:var(--ink)}
   .section-head span{font-size:13px;color:var(--ink-soft)}
   .card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .open-card{min-height:170px;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 6px 18px rgba(90,58,67,.04)}
+  .open-card{min-height:170px;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 6px 18px rgba(90,58,67,.04);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  @media (hover:hover){.open-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(90,58,67,.08);border-color:#cdb3ba}}
   .open-card.opened{background:var(--rose-soft-2)}
   .open-card .no{font-size:12px;letter-spacing:.24em;color:var(--rose);margin-bottom:8px}
   .open-card .title{font-family:Georgia,"Times New Roman",serif;font-size:20px;line-height:1.15;color:var(--rose-dark)}
   .open-card .hint{margin-top:16px;font-size:13px;color:#9a7882}
-  .letter-panel{display:none;margin-top:18px;padding:22px 20px}
+  .letter-panel{display:none;margin-top:18px;padding:24px 20px;border-top:4px solid var(--rose)}
   .letter-panel.show{display:block}
   .letter-meta{font-size:13px;letter-spacing:.26em;color:var(--rose);margin-bottom:16px}
   .letter-title{margin:0 0 18px;font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:28px;line-height:1.15;color:var(--rose-dark)}
   .letter-body{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.9;white-space:pre-line;color:var(--ink)}
-  .from-line{margin-top:18px;font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--ink-soft)}
+  .letter-floral{width:64px;margin:18px auto 6px;display:block}
+  .from-line{margin-top:12px;font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--ink-soft);text-align:center}
   .letter-actions{margin-top:18px}
   .open-last{margin-top:18px;width:100%;background:linear-gradient(180deg,#ecd9de 0%, #e4c8d0 100%);border:1px solid #d5b4be;border-radius:24px;padding:24px 18px;font-family:Georgia,"Times New Roman",serif;font-size:22px;color:var(--rose-dark)}
   .footer-note{text-align:center;color:#9a7d85;font-size:12px;margin:16px 0 4px}
   @media (min-width:700px){h1{font-size:44px}.subhead{font-size:24px}.card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-  @media (max-width:540px){body{padding:12px}.gift-maker .grid2{grid-template-columns:1fr}h1{font-size:30px}.subhead{font-size:18px}.hero-copy{font-size:13px}.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.open-card{min-height:160px}.open-card .title{font-size:18px}.letter-title{font-size:24px}.letter-body{font-size:16px;line-height:1.85}}
+  @media (max-width:540px){body{padding:12px}.gift-maker .grid2{grid-template-columns:1fr}.btn-row .btn{width:100%}h1{font-size:30px}.subhead{font-size:18px}.hero-copy{font-size:13px}.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.open-card{min-height:160px}.open-card .title{font-size:18px}.letter-title{font-size:24px}.letter-body{font-size:16px;line-height:1.85}.share-actions{display:grid;grid-template-columns:1fr 1fr}.share-link,.share-native{width:100%}}
 </style>
 </head>
 <body>
@@ -118,19 +136,20 @@
     </section>
 
     <section class="gift-maker" id="setup">
-      <h2>Create the gift link</h2>
+      <h2>Create your gift</h2>
+      <p class="maker-sub">Personalize it, check it, then share it when you’re ready.</p>
       <div class="grid2">
         <div>
           <label for="recipient">Daughter's first name</label>
-          <input id="recipient" placeholder="Layla" maxlength="40" />
+          <input id="recipient" placeholder="Her first name" maxlength="40" autocomplete="off" autocapitalize="words" />
         </div>
         <div>
           <label for="sender">From</label>
-          <input id="sender" placeholder="Your name or title" maxlength="40" />
+          <input id="sender" placeholder="e.g. Mama, Papa, Mum, Dad" maxlength="40" autocomplete="off" autocapitalize="words" />
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn" id="makeLink">Create gift link</button>
+        <button class="btn" id="makeLink">Create my gift</button>
 
       </div>
       <div class="share" id="share"></div>
@@ -143,14 +162,21 @@
     </div>
 
     <section id="giftExperience" style="display:none">
-      <section class="keep-card" id="keepCard">
-        <h3>Keep this gift on your phone</h3>
-        <p>You can save OPEN WHEN to your Home Screen so it opens like an app whenever you need it.</p>
-        <div class="keep-steps">
-          <div class="keep-step"><strong>iPhone / iPad:</strong> open this gift in Safari → tap the Share button ↑ → <strong>Add to Home Screen</strong> → Add.</div>
-          <div class="keep-step"><strong>Android:</strong> open this gift in Chrome → tap ⋮ → <strong>Add to Home screen</strong>.</div>
+      <details class="keep-card" id="keepCard">
+        <summary>
+          <div class="keep-summary-text">
+            <strong>Keep this gift on your phone</strong>
+            <span>Save it to your Home Screen so it opens like a little app.</span>
+          </div>
+          <span class="keep-chevron">⌄</span>
+        </summary>
+        <div class="keep-inner">
+          <div class="keep-steps">
+            <div class="keep-step"><strong>iPhone / iPad:</strong> open this gift in Safari → tap Share ↑ → <strong>Add to Home Screen</strong> → Add.</div>
+            <div class="keep-step"><strong>Android:</strong> open this gift in Chrome → tap ⋮ → <strong>Add to Home screen</strong>.</div>
+          </div>
         </div>
-      </section>
+      </details>
 
       <div class="section-head">
         <h3>Choose what you need today</h3>
@@ -163,7 +189,12 @@
       <div class="letter-meta" id="letterMeta">LETTER 01</div>
       <h2 class="letter-title" id="letterTitle"></h2>
       <div class="letter-body" id="letterBody"></div>
-      <div class="from-line" id="fromLine">A little reminder from Mama</div>
+      <svg class="letter-floral" viewBox="0 0 72 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M8 45C24 34 35 22 48 6" stroke="#74565F" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M26 29C21 26 17 25 13 26M36 20C32 17 28 16 24 17M38 31C43 27 48 26 53 27M47 18C52 14 57 12 62 13" stroke="#74565F" stroke-width="1.3" stroke-linecap="round"/>
+        <g fill="#D8A2AE" stroke="#74565F" stroke-width="1.1"><circle cx="13" cy="26" r="3.6"/><circle cx="24" cy="17" r="3.5"/><circle cx="53" cy="27" r="3.7"/><circle cx="62" cy="13" r="3.5"/></g>
+      </svg>
+      <div class="from-line" id="fromLine">A little reminder for you</div>
       <div class="letter-actions">
         <button class="btn" id="closeLetter">Keep this with me</button>
         <div class="saved-toast" id="savedToast">Kept with your gift. For easy access anytime, save OPEN WHEN to your Home Screen using the instructions above.</div>
@@ -318,18 +349,21 @@ document.getElementById('makeLink').onclick = () => {
   url.searchParams.set('to', recipient);
   url.searchParams.set('from', sender);
   share.classList.add('show');
-  const msg = 'I made something for you ❤️\nOpen it when you’re ready.';
+  const msg = 'I made something for you' + (recipient ? ', ' + recipient : '') + ' ❤️\nOpen it when you’re ready.';
   const giftUrl = url.toString();
   const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg + '\n' + giftUrl);
   const mailUrl = 'mailto:?subject=' + encodeURIComponent('A little gift for you') + '&body=' + encodeURIComponent(msg + '\n\n' + giftUrl);
   const smsUrl = 'sms:&body=' + encodeURIComponent(msg + '\n' + giftUrl);
-  share.innerHTML = '<strong>Your gift is ready.</strong><br><br>'
-    + '<a href="' + giftUrl + '" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#7d4a59;color:white;padding:12px 18px;border-radius:999px;margin:0 8px 8px 0">Open gift</a>'
-    + '<a href="' + waUrl + '" style="display:inline-block;text-decoration:none;background:#fff5f7;color:#7d4a59;padding:12px 18px;border:1px solid #dbc8cd;border-radius:999px;margin:0 8px 8px 0">WhatsApp</a>'
-    + '<a href="' + smsUrl + '" style="display:inline-block;text-decoration:none;background:#fff5f7;color:#7d4a59;padding:12px 18px;border:1px solid #dbc8cd;border-radius:999px;margin:0 8px 8px 0">Messages</a>'
-    + '<a href="' + mailUrl + '" style="display:inline-block;text-decoration:none;background:#fff5f7;color:#7d4a59;padding:12px 18px;border:1px solid #dbc8cd;border-radius:999px;margin:0 8px 8px 0">Email</a>'
-    + '<button type="button" id="shareGiftBtn" style="min-height:44px;padding:11px 16px;border-radius:999px;border:1px solid #dbc8cd;background:#fff5f7;color:#7d4a59;margin:0 0 8px 0">Share…</button>'
-    + '<br><div style="margin-top:8px;color:#806a72">The recipient sees only the gift. The message is prefilled for you.</div>';
+  share.innerHTML = '<div class="share-title">Your gift is ready</div>'
+    + '<div class="share-sub">Check it once, then send it however you normally talk to ' + recipient + '.</div>'
+    + '<div class="share-actions">'
+    + '<a class="share-link primary" href="' + giftUrl + '" target="_blank" rel="noopener">Open gift</a>'
+    + '<a class="share-link" href="' + waUrl + '">WhatsApp</a>'
+    + '<a class="share-link" href="' + smsUrl + '">Messages</a>'
+    + '<a class="share-link" href="' + mailUrl + '">Email</a>'
+    + '<button type="button" class="share-native" id="shareGiftBtn">Share…</button>'
+    + '</div>'
+    + '<div class="share-foot">' + recipient + ' will see only the finished gift. The message is already written for you.</div>';
   const shareBtn = document.getElementById('shareGiftBtn');
   if(shareBtn){
     shareBtn.onclick = async () => {
