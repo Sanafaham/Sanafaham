@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>OPEN WHEN… For My Daughter</title>
-<meta name="theme-color" id="themeColor" content="#8a6545" />
+<meta name="theme-color" id="themeColor" content="#536b64" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="OPEN WHEN" />
@@ -336,6 +336,176 @@
     .hero-copy{font-size:12px}.open-card{min-height:146px}.open-card .title{font-size:18px}
   }
 
+
+  /* FINAL STATIONERY REFINEMENT — raw paper + muted green + true dragonflies */
+  :root{
+    --bg:#f3efe6;
+    --paper:#fffdf8;
+    --paper-2:#faf7f0;
+    --raw:#cbb496;
+    --raw-deep:#b79b79;
+    --green:#536b64;
+    --green-dark:#42564f;
+    --green-soft:#e2e9e4;
+    --ink:#342a26;
+    --ink-soft:#74665d;
+    --line:#d7c9ba;
+  }
+
+  .hero-box{
+    padding:44px 10px 12px;
+    position:relative;
+    overflow:visible;
+  }
+  .hero-box:before{
+    content:"";
+    position:absolute;
+    z-index:0;
+    width:84%;
+    height:70%;
+    left:8%;
+    top:19px;
+    background:#cfb89a;
+    border:1px solid rgba(91,72,54,.16);
+    border-radius:10px;
+    transform:rotate(-1.5deg);
+    box-shadow:0 10px 22px rgba(63,46,34,.12);
+  }
+  .hero-box:after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    width:58%;
+    height:58%;
+    left:22%;
+    top:26px;
+    background:transparent;
+    border-left:1px solid rgba(94,75,57,.22);
+    border-bottom:1px solid rgba(94,75,57,.22);
+    transform:rotate(45deg) skew(-6deg,-6deg);
+    border-radius:0 0 0 6px;
+    box-shadow:none;
+  }
+  .hero-sleeve{
+    z-index:1;
+    overflow:visible;
+    border-radius:16px;
+    padding:28px 18px 24px;
+  }
+
+  .edition-btn.active,
+  .btn,
+  .done-personalizing,
+  .share-link.primary{
+    background:var(--green)!important;
+    border-color:var(--green)!important;
+    color:#fff!important;
+  }
+  .maker-sub,
+  .edition-label,
+  label,
+  .personalize summary span,
+  .edit-letter-status,
+  .edit-letter-chevron,
+  .reset-letter,
+  .keep-summary-text span,
+  .keep-chevron,
+  .section-head span,
+  .share-title,
+  .share-link,
+  .share-native,
+  .back-cards{
+    color:var(--green)!important;
+  }
+  .edit-letter-status.personalized{
+    background:var(--green)!important;
+    color:#fff!important;
+  }
+  .preview-note{
+    background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%)!important;
+  }
+  .open-last{
+    background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%)!important;
+    border-color:var(--green-dark)!important;
+  }
+  .share{
+    background:#eef2ee!important;
+  }
+
+  .open-card{
+    min-height:150px;
+    border-radius:10px;
+    background:#fffdf8;
+    border:1px solid #d9cdbc;
+    box-shadow:0 8px 15px rgba(72,53,39,.08);
+    padding:46px 14px 13px;
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+  }
+  .open-card:nth-child(4n+2),
+  .open-card:nth-child(4n+5){
+    background:#d2bea4;
+    border-color:#c0a688;
+  }
+  .open-card.opened{background:#f0ebe3}
+  .open-card:nth-child(4n+2).opened,
+  .open-card:nth-child(4n+5).opened{background:#c7b092}
+
+  /* true envelope construction */
+  .open-card:before{
+    content:"";
+    position:absolute;
+    left:-1px;
+    right:-1px;
+    top:-1px;
+    height:78px;
+    background:
+      linear-gradient(150deg, transparent 49.5%, rgba(102,80,61,.20) 50%, transparent 50.8%),
+      linear-gradient(30deg, transparent 49.5%, rgba(102,80,61,.20) 50%, transparent 50.8%);
+    pointer-events:none;
+    z-index:1;
+  }
+  .open-card:after{
+    content:"";
+    position:absolute;
+    left:8%;
+    right:8%;
+    top:-33px;
+    height:96px;
+    background:inherit;
+    border:1px solid rgba(102,80,61,.16);
+    transform:rotate(45deg);
+    transform-origin:center;
+    pointer-events:none;
+    z-index:0;
+  }
+  .open-card .title,
+  .open-card .hint,
+  .card-sprig{position:relative;z-index:3}
+  .open-card .title{margin-top:8px}
+  .open-card .hint{margin-top:12px;color:#74665d}
+  .card-sprig{
+    position:absolute;
+    top:16px;
+    left:50%;
+    transform:translateX(-50%);
+    width:48px;
+    height:30px;
+  }
+
+  .letter-panel.show{background:#f3efe6}
+  .letter-sheet{
+    background:#fffdf8;
+    border-color:rgba(157,135,112,.28);
+    border-top-color:#8f806c;
+  }
+  .letter-open-mark,
+  .letter-meta,
+  .from-line{color:#67594f}
+  .letter-divider,
+  .letter-floral{color:var(--green)}
+
 </style>
 </head>
 <body>
@@ -347,13 +517,18 @@
         <div class="rule"></div>
         <p class="subhead" id="forLine">For My Daughter</p>
         <div class="sprig-wrap">
-          <svg class="dragonfly-mark" viewBox="0 0 160 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <g stroke="#54473f" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M80 24V77M80 31C69 22 52 11 26 14C40 30 57 37 78 38M80 31C91 22 108 11 134 14C120 30 103 37 82 38M79 43C61 36 43 37 27 48C48 57 63 55 79 49M81 43C99 36 117 37 133 48C112 57 97 55 81 49"/>
-              <path d="M75 23C76 18 78 16 80 16C82 16 84 18 85 23M77 16L73 11M83 16L87 11"/>
-              <path d="M80 52L76 59M80 57L85 64M80 64L76 71M80 70L84 76"/>
+          <svg class="dragonfly-mark" viewBox="0 0 180 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g stroke="#4b403a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M90 20V84"/>
+              <ellipse cx="90" cy="21" rx="4.5" ry="6"/>
+              <path d="M86 18L79 10M94 18L101 10"/>
+              <path d="M86 31C69 18 46 9 17 14C32 31 57 40 86 42"/>
+              <path d="M94 31C111 18 134 9 163 14C148 31 123 40 94 42"/>
+              <path d="M87 46C67 39 42 41 19 56C41 65 64 62 87 53"/>
+              <path d="M93 46C113 39 138 41 161 56C139 65 116 62 93 53"/>
+              <path d="M90 29L86 36M90 36L94 44M90 44L86 52M90 52L94 60M90 60L86 68M90 68L94 76"/>
             </g>
-            <path d="M80 23V77" stroke="#536B64" stroke-width="2.2"/>
+            <path d="M90 25V84" stroke="#536B64" stroke-width="2.4"/>
           </svg>
         </div>
         <div class="hero-copy">24 little reminders for the moments when I may not be right beside you.</div>
@@ -428,17 +603,21 @@
       <div class="letter-sheet">
       <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
       <svg class="letter-divider" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M2 12H25M55 12H78" stroke="#9B876F" stroke-width="1"/>
-        <g transform="translate(30 2)" stroke="#536B64" stroke-width=".9" stroke-linecap="round">
-          <path d="M10 5V18M10 7C7 4 3 2 0 3C3 7 6 9 10 9M10 7C13 4 17 2 20 3C17 7 14 9 10 9M10 10C6 8 3 9 1 12C5 14 8 13 10 12M10 10C14 8 17 9 19 12C15 14 12 13 10 12"/>
+        <path d="M2 12H24M56 12H78" stroke="#8F806C" stroke-width="1"/>
+        <g transform="translate(28 1)" stroke="#536B64" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 4V21"/>
+          <path d="M11 7C7 4 3 3 0 5C3 8 7 9 11 10M13 7C17 4 21 3 24 5C21 8 17 9 13 10"/>
+          <path d="M11 11C7 9 3 10 1 13C5 15 8 15 11 14M13 11C17 9 21 10 23 13C19 15 16 15 13 14"/>
         </g>
       </svg>
       <div class="letter-meta" id="letterMeta">01</div>
       <h2 class="letter-title" id="letterTitle"></h2>
       <div class="letter-body" id="letterBody"></div>
-      <svg class="letter-floral" viewBox="0 0 80 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <g transform="translate(20 4)" stroke="#536B64" stroke-width="1.05" stroke-linecap="round">
-          <path d="M20 6V36M20 9C14 4 7 2 0 5C6 12 12 15 19 15M21 9C27 4 34 2 40 5C34 12 28 15 21 15M19 18C13 14 7 15 2 21C9 25 14 24 20 22M21 18C27 14 33 15 38 21C31 25 26 24 20 22"/>
+      <svg class="letter-floral" viewBox="0 0 90 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g transform="translate(20 4)" stroke="#536B64" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M25 5V40"/>
+          <path d="M23 10C16 5 8 4 0 8C7 14 15 17 23 17M27 10C34 5 42 4 50 8C43 14 35 17 27 17"/>
+          <path d="M23 19C16 15 9 17 3 23C11 28 18 27 24 25M27 19C34 15 41 17 47 23C39 28 32 27 26 25"/>
         </g>
       </svg>
       <div class="from-line" id="fromLine">A little reminder for you</div>
@@ -454,9 +633,11 @@
       <div class="letter-sheet">
       <div class="letter-open-mark" aria-hidden="true">OPEN WHEN…</div>
       <svg class="letter-divider" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M2 12H25M55 12H78" stroke="#9B876F" stroke-width="1"/>
-        <g transform="translate(30 2)" stroke="#536B64" stroke-width=".9" stroke-linecap="round">
-          <path d="M10 5V18M10 7C7 4 3 2 0 3C3 7 6 9 10 9M10 7C13 4 17 2 20 3C17 7 14 9 10 9M10 10C6 8 3 9 1 12C5 14 8 13 10 12M10 10C14 8 17 9 19 12C15 14 12 13 10 12"/>
+        <path d="M2 12H24M56 12H78" stroke="#8F806C" stroke-width="1"/>
+        <g transform="translate(28 1)" stroke="#536B64" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 4V21"/>
+          <path d="M11 7C7 4 3 3 0 5C3 8 7 9 11 10M13 7C17 4 21 3 24 5C21 8 17 9 13 10"/>
+          <path d="M11 11C7 9 3 10 1 13C5 15 8 15 11 14M13 11C17 9 21 10 23 13C19 15 16 15 13 14"/>
         </g>
       </svg>
       <div class="letter-meta">ONE LAST THING</div>
@@ -591,7 +772,7 @@ function applyEditionUI(){
   const isSon = edition === 'son';
   document.body.classList.toggle('son-edition', isSon);
   const themeColor = document.getElementById('themeColor');
-  if(themeColor) themeColor.setAttribute('content', '#8a6545');
+  if(themeColor) themeColor.setAttribute('content', '#536b64');
   editionDaughter.classList.toggle('active', !isSon);
   editionSon.classList.toggle('active', isSon);
   editionDaughter.setAttribute('aria-pressed', isSon ? 'false' : 'true');
@@ -740,7 +921,7 @@ function render(){
     btn.className = 'open-card' + (opened.has(i) ? ' opened' : '');
     btn.innerHTML = '<div><div class="no">' + String(i+1).padStart(2,'0') + '</div><div class="title">Open when ' + x[0].toLowerCase() + '</div>'
       + '<svg class="card-sprig" viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-      + '<g transform="translate(20 2)" stroke="#536B64" stroke-width="1" stroke-linecap="round"><path d="M20 5V34M20 8C14 3 7 2 0 5C6 11 12 14 19 14M21 8C27 3 34 2 40 5C34 11 28 14 21 14M19 18C13 14 7 15 2 20C9 24 14 23 20 21M21 18C27 14 33 15 38 20C31 24 26 23 20 21"/></g>'
+      + '<g transform="translate(15 1)" stroke="#536B64" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M25 4V36"/><path d="M23 9C16 4 8 3 0 7C7 13 15 16 23 16M27 9C34 4 42 3 50 7C43 13 35 16 27 16"/><path d="M23 18C16 14 9 16 3 22C11 27 18 26 24 24M27 18C34 14 41 16 47 22C39 27 32 26 26 24"/></g>'
       + '</svg></div><div class="hint">' + (opened.has(i) ? 'Opened' : 'Tap to open') + '</div>';
     btn.onclick = () => openLetter(i);
     grid.appendChild(btn);
