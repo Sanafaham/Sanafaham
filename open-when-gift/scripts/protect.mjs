@@ -78,6 +78,12 @@ const htmlRules = [
   ['mini envelope top flap protected', 'clip-path:polygon(0 0,100% 0,50% 90%)!important'],
   ['all 24 cards use one approved ivory design', '/* OWNER LOCK — ALL 24 CARDS MATCH THE APPROVED IVORY HERO CARD */'],
   ['all cards same ivory background', 'background-color:#f3eee5!important'],
+  ['exact approved page color', '--approved-page:#dfdbd3'],
+  ['exact approved paper color', '--approved-paper:#efeae0'],
+  ['exact approved green color', '--approved-green:#31453e'],
+  ['exact approved kraft color', '--approved-kraft:#cbb9a3'],
+  ['approved paper texture sampled from reference', '--approved-paper-texture:url("data:image/webp;base64,'],
+
   ['no alternating card colors', '.open-card:nth-child(4n+2)'],
   ['mini card open-when heading', 'class="card-mini-head"'],
   ['mini card dragonfly', 'class="dragonfly-img"'],
