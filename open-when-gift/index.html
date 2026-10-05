@@ -114,7 +114,7 @@
       </div>
       <div class="btn-row">
         <button class="btn" id="makeLink">Create gift link</button>
-        <button class="btn secondary" id="previewGift">Preview</button>
+
       </div>
       <div class="share" id="share"></div>
     </section>
@@ -244,17 +244,6 @@ document.getElementById('openLast').onclick = () => {
   lastPanel.scrollIntoView({behavior:'smooth', block:'start'});
 };
 
-document.getElementById('previewGift').onclick = () => {
-  recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
-  sender = (document.getElementById('sender').value || 'Mama').trim();
-  document.getElementById('kicker').textContent = 'A gift from ' + sender;
-  document.getElementById('forLine').textContent = recipient ? ('For ' + recipient) : 'For My Daughter';
-  document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
-  document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
-  giftExperience.style.display = 'block';
-  giftExperience.scrollIntoView({behavior:'smooth', block:'start'});
-};
-
 document.getElementById('makeLink').onclick = () => {
   recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
   sender = (document.getElementById('sender').value || 'Mama').trim();
@@ -264,16 +253,27 @@ document.getElementById('makeLink').onclick = () => {
   url.searchParams.set('to', recipient);
   url.searchParams.set('from', sender);
   share.classList.add('show');
-  share.innerHTML = '<strong>Your gift is ready.</strong><br><br><a href="' + url.toString() + '" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#7d4a59;color:white;padding:12px 18px;border-radius:999px;margin-right:8px">Open gift</a><button type="button" id="shareGiftBtn" style="min-height:44px;padding:11px 16px;border-radius:999px;border:1px solid #dbc8cd;background:#fff5f7;color:#7d4a59">Share gift</button><br><br><a href="' + url.toString() + '" target="_blank" rel="noopener" style="color:#7d4a59;word-break:break-all">' + url.toString() + '</a><br><br><span style="color:#806a72">She will see only the gift, not this setup screen.</span>';
+  const msg = 'I made something for you ❤️\nOpen it when you’re ready.';
+  const giftUrl = url.toString();
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg + '\n' + giftUrl);
+  const mailUrl = 'mailto:?subject=' + encodeURIComponent('A little gift for you') + '&body=' + encodeURIComponent(msg + '\n\n' + giftUrl);
+  const smsUrl = 'sms:&body=' + encodeURIComponent(msg + '\n' + giftUrl);
+  share.innerHTML = '<strong>Your gift is ready.</strong><br><br>'
+    + '<a href="' + giftUrl + '" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#7d4a59;color:white;padding:12px 18px;border-radius:999px;margin:0 8px 8px 0">Open gift</a>'
+    + '<a href="' + waUrl + '" style="display:inline-block;text-decoration:none;background:#fff5f7;color:#7d4a59;padding:12px 18px;border:1px solid #dbc8cd;border-radius:999px;margin:0 8px 8px 0">WhatsApp</a>'
+    + '<a href="' + smsUrl + '" style="display:inline-block;text-decoration:none;background:#fff5f7;color:#7d4a59;padding:12px 18px;border:1px solid #dbc8cd;border-radius:999px;margin:0 8px 8px 0">Messages</a>'
+    + '<a href="' + mailUrl + '" style="display:inline-block;text-decoration:none;background:#fff5f7;color:#7d4a59;padding:12px 18px;border:1px solid #dbc8cd;border-radius:999px;margin:0 8px 8px 0">Email</a>'
+    + '<button type="button" id="shareGiftBtn" style="min-height:44px;padding:11px 16px;border-radius:999px;border:1px solid #dbc8cd;background:#fff5f7;color:#7d4a59;margin:0 0 8px 0">Share…</button>'
+    + '<br><div style="margin-top:8px;color:#806a72">The recipient sees only the gift. The message is prefilled for you.</div>';
   const shareBtn = document.getElementById('shareGiftBtn');
   if(shareBtn){
     shareBtn.onclick = async () => {
       if(navigator.share){
         try{
-          await navigator.share({title:'OPEN WHEN…', text:'A little gift for you', url:url.toString()});
+          await navigator.share({title:'OPEN WHEN…', text:msg, url:giftUrl});
         }catch(e){}
       }else{
-        window.open(url.toString(), '_blank');
+        window.open(giftUrl, '_blank');
       }
     };
   }
