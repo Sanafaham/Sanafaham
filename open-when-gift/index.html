@@ -139,12 +139,12 @@
     grid-template-rows:18px 16px 18px 64px minmax(0,1fr) 58px 28px 44px;
     align-items:start;
     overflow:hidden;
-    transform-origin:left center;
+    transform-origin:right center;
     backface-visibility:hidden;
     will-change:transform,opacity;
   }
   .letter-sheet{
-    -webkit-transform-origin:left center;
+    -webkit-transform-origin:right center;
     -webkit-backface-visibility:hidden;
     transform-style:preserve-3d;
   }
@@ -153,8 +153,8 @@
     -webkit-animation:openKeepsake .55s cubic-bezier(.22,.75,.28,1) both;
   }
   @keyframes openKeepsake{
-    0%{transform:rotateY(-82deg) translateX(-10px);opacity:.35}
-    62%{transform:rotateY(7deg) translateX(0);opacity:1}
+    0%{transform:rotateY(82deg) translateX(10px);opacity:.35}
+    62%{transform:rotateY(-7deg) translateX(0);opacity:1}
     100%{transform:rotateY(0deg) translateX(0);opacity:1}
   }
   @media (prefers-reduced-motion:reduce){
