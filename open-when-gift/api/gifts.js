@@ -17,19 +17,20 @@ export default async function handler(req, res) {
     try {
       const body = req.body || {};
       const id = safeText(body.id, 120).replace(/[^a-zA-Z0-9_-]/g, '');
+      const edition = body.edition === 'son' ? 'son' : (body.edition === 'daughter' ? 'daughter' : '');
       const recipient = safeText(body.recipient, MAX_NAME);
       const sender = safeText(body.sender, MAX_NAME);
       const messages = Array.isArray(body.messages)
         ? body.messages.slice(0, 24).map(v => safeText(v, MAX_TEXT))
         : [];
 
-      if (!id || !recipient || !sender || messages.length !== 24 || messages.some(v => !v)) {
+      if (!id || !edition || !recipient || !sender || messages.length !== 24 || messages.some(v => !v)) {
         return res.status(400).json({ error: 'Invalid gift data.' });
       }
 
       const gift = {
         version: 1,
-        edition: 'daughter',
+        edition,
         id,
         recipient,
         sender,
