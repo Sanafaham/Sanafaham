@@ -62,6 +62,13 @@ const htmlRules = [
   ['shared raster dragonfly asset', 'data:image/webp;base64,UklGRhQO'],
   ['dynamic sender reminder line', 'id="fromLine"'],
   ['opened-letter safe row spacing', 'grid-template-rows:22px 42px 20px 74px minmax(0,1fr) 46px 40px 54px!important'],
+  ['approved main app restoration isolated from letters', '/* RESTORE APPROVED MAIN APP LOOK — preserve opened-letter fixes */'],
+  ['approved main app scoped outside letters', 'body:not(.letter-open) .hero-sleeve'],
+  ['approved richer main paper', '--approved-paper:#c9b9a2'],
+  ['approved richer kraft', '--approved-kraft:#b99a76'],
+  ['approved main green', '--approved-green:#33483f'],
+  ['mini envelope top flap protected', 'clip-path:polygon(0 0,100% 0,50% 90%)!important'],
+
   ['opened-letter row gap', 'row-gap:4px!important'],
   ['footer reminder spacing', 'min-height:36px!important'],
   ['back button spacing', 'min-height:44px!important'],
