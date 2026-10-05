@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="OPEN WHEN" />
-<link rel="apple-touch-icon" href="/open-when-icon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/open-when-icon.png" />
 <style>
   :root{
     --bg:#f6f1ea;
@@ -251,6 +251,11 @@ const letters = [
 ];
 
 const qs = new URLSearchParams(location.search);
+if (qs.has('utm_source') || qs.has('utm_medium') || qs.has('utm_campaign') || qs.has('utm_content') || qs.has('utm_term')) {
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(k => qs.delete(k));
+  const clean = location.pathname + (qs.toString() ? '?' + qs.toString() : '') + location.hash;
+  history.replaceState(null, '', clean);
+}
 let recipient = (qs.get('to') || '').trim();
 let sender = (qs.get('from') || '').trim();
 const storageKey = 'openwhen:' + (recipient || 'daughter') + ':' + sender;
