@@ -315,7 +315,10 @@ if (qs.has('utm_source') || qs.has('utm_medium') || qs.has('utm_campaign') || qs
 }
 let recipient = (qs.get('to') || '').trim();
 let sender = (qs.get('from') || '').trim();
-const storageKey = 'openwhen:' + (recipient || 'daughter') + ':' + sender;
+let giftId = (qs.get('id') || '').trim();
+const storageKey = giftId
+  ? 'openwhen:gift:' + giftId
+  : 'openwhen:legacy:' + (recipient || 'daughter') + ':' + sender;
 let storedOpened = [];
 try { storedOpened = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 const opened = new Set(Array.isArray(storedOpened) ? storedOpened : []);
@@ -414,7 +417,11 @@ document.getElementById('makeLink').onclick = () => {
   }
   const url = new URL(location.href);
   url.search = '';
+  giftId = (window.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : Date.now().toString(36) + Math.random().toString(36).slice(2);
   url.searchParams.set('gift','1');
+  url.searchParams.set('id', giftId);
   url.searchParams.set('to', recipient);
   url.searchParams.set('from', sender);
   share.classList.add('show');
