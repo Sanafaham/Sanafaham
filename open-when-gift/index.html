@@ -2288,6 +2288,385 @@ h1,.subhead,.hero-copy,.gift-maker h2,.section-head h3,.personalize summary,
 .letter-body,.letter-title{color:var(--owner-ink)!important}
 .from-line{color:var(--owner-soft)!important}
 
+
+/* =========================================================
+   OWNER APPROVED VISUAL — 2026-10-06
+   Exact target: ivory raw paper + light kraft + deep green.
+   This block intentionally comes LAST and owns visual styling.
+   ========================================================= */
+:root{
+  --ow-page:#e9e4de;
+  --ow-paper:#f0eae2;
+  --ow-paper-2:#eee7de;
+  --ow-kraft:#c7b29a;
+  --ow-green:#2a3f39;
+  --ow-ink:#1f2321;
+  --ow-soft:#625b55;
+  --ow-line:#b9aa99;
+  --ow-shadow:0 12px 28px rgba(48,42,36,.13);
+  --ow-paper-texture:
+    radial-gradient(circle at 18% 22%,rgba(93,78,63,.055) 0 .55px,transparent .8px),
+    radial-gradient(circle at 74% 68%,rgba(255,255,255,.34) 0 .65px,transparent .9px),
+    linear-gradient(115deg,rgba(103,87,72,.025),transparent 30%,rgba(255,255,255,.10) 62%,transparent 88%);
+  --ow-dragonfly:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 180'%3E%3Cg fill='none' stroke='%23332922' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='150' cy='39' rx='8' ry='9' fill='%235d6956' stroke-width='2'/%3E%3Cellipse cx='150' cy='55' rx='10' ry='11' fill='%23736d3d' stroke-width='2'/%3E%3Cellipse cx='150' cy='73' rx='8' ry='10' fill='%233a5d67' stroke-width='2'/%3E%3Cpath d='M145 31L136 18M155 31L164 18' stroke-width='2'/%3E%3Cpath d='M150 82L150 162' stroke='%233b5965' stroke-width='5'/%3E%3Cpath d='M146 88h8M146 98h8M146 108h8M146 118h8M146 128h8M147 138h6M147 148h6' stroke-width='1.5'/%3E%3Cpath d='M143 49C111 21 70 10 16 20C43 54 86 68 140 70Z' fill='%23f8f4ed' fill-opacity='.28' stroke-width='2'/%3E%3Cpath d='M157 49C189 21 230 10 284 20C257 54 214 68 160 70Z' fill='%23f8f4ed' fill-opacity='.28' stroke-width='2'/%3E%3Cpath d='M143 69C108 54 66 58 18 92C55 109 99 101 142 82Z' fill='%23f8f4ed' fill-opacity='.24' stroke-width='2'/%3E%3Cpath d='M157 69C192 54 234 58 282 92C245 109 201 101 158 82Z' fill='%23f8f4ed' fill-opacity='.24' stroke-width='2'/%3E%3Cpath d='M140 53L38 26M141 58L69 31M141 63L100 37M160 53L262 26M159 58L231 31M159 63L200 37M142 73L39 90M142 78L76 96M142 82L108 91M158 73L261 90M158 78L224 96M158 82L192 91' stroke-width='.8' opacity='.86'/%3E%3Cpath d='M61 25L91 60M90 29L112 65M239 25L209 60M210 29L188 65M61 89L91 73M90 96L116 78M239 89L209 73M210 96L184 78' stroke-width='.65' opacity='.70'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+html,body{
+  background:var(--ow-page)!important;
+  color:var(--ow-ink)!important;
+  background-image:none!important;
+}
+body{
+  padding:14px!important;
+}
+.app{
+  max-width:760px!important;
+}
+
+/* HERO = real card over a recognizable kraft envelope */
+.hero-box{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:50px 6px 10px!important;
+  overflow:visible!important;
+  position:relative!important;
+}
+.hero-box:before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  left:5%!important;
+  top:12px!important;
+  width:90%!important;
+  height:74%!important;
+  background:
+    radial-gradient(circle at 18% 25%,rgba(89,67,48,.07) 0 .65px,transparent .9px),
+    linear-gradient(120deg,rgba(84,62,44,.035),transparent 45%,rgba(255,255,255,.06) 75%),
+    var(--ow-kraft)!important;
+  background-size:19px 21px,100% 100%,auto!important;
+  border:1px solid #aa9278!important;
+  border-radius:8px!important;
+  transform:rotate(-1.4deg)!important;
+  box-shadow:0 12px 24px rgba(54,44,35,.16)!important;
+}
+.hero-box:after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  left:5%!important;
+  top:12px!important;
+  width:90%!important;
+  height:47%!important;
+  background:rgba(255,255,255,.045)!important;
+  clip-path:polygon(0 0,100% 0,50% 88%)!important;
+  border:0!important;
+  border-radius:8px 8px 0 0!important;
+  transform:rotate(-1.4deg)!important;
+  filter:drop-shadow(0 1px 0 rgba(76,57,42,.28))!important;
+}
+.hero-sleeve{
+  position:relative!important;
+  z-index:2!important;
+  background:var(--ow-paper-texture),var(--ow-paper)!important;
+  background-size:18px 20px,23px 22px,100% 100%,auto!important;
+  border:1px solid #c5b8a8!important;
+  border-radius:18px!important;
+  padding:38px 24px 34px!important;
+  box-shadow:var(--ow-shadow)!important;
+}
+h1{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:clamp(38px,7vw,58px)!important;
+  font-weight:500!important;
+  letter-spacing:.14em!important;
+  line-height:1!important;
+  color:var(--ow-ink)!important;
+}
+.rule{
+  width:62px!important;
+  height:1px!important;
+  background:#8f806f!important;
+  margin:16px auto 18px!important;
+}
+.subhead{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:clamp(25px,4.6vw,34px)!important;
+  font-style:italic!important;
+  font-weight:500!important;
+  color:var(--ow-ink)!important;
+}
+.sprig-wrap{
+  width:min(88%,330px)!important;
+  height:170px!important;
+  margin:10px auto 4px!important;
+  display:block!important;
+  background-image:var(--ow-dragonfly)!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:contain!important;
+  mix-blend-mode:multiply!important;
+}
+.sprig-wrap > *{display:none!important}
+.sprig-wrap:after{display:none!important;content:none!important}
+.hero-copy{
+  max-width:600px!important;
+  margin:2px auto 0!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  color:var(--ow-ink)!important;
+  font-size:clamp(16px,3vw,21px)!important;
+  font-weight:500!important;
+  line-height:1.42!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase!important;
+}
+
+/* MAIN FORM CARD — same ivory as approved image */
+.gift-maker,
+.keep-card,
+.personalize,
+.edit-letter,
+.share,
+.letter-sheet{
+  background:var(--ow-paper-texture),var(--ow-paper)!important;
+  background-size:18px 20px,23px 22px,100% 100%,auto!important;
+  border-color:var(--ow-line)!important;
+}
+.gift-maker{
+  margin-top:24px!important;
+  padding:30px 24px!important;
+  border:1px solid var(--ow-line)!important;
+  border-radius:20px!important;
+  box-shadow:0 8px 20px rgba(48,42,36,.08)!important;
+}
+.gift-maker h2{
+  margin:0 0 4px!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:clamp(32px,6vw,44px)!important;
+  font-weight:500!important;
+  letter-spacing:.12em!important;
+  line-height:1!important;
+  color:var(--ow-ink)!important;
+}
+.maker-sub{
+  margin:8px 0 26px!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:clamp(20px,4vw,28px)!important;
+  font-style:italic!important;
+  color:var(--ow-ink)!important;
+  line-height:1.2!important;
+}
+.edition-label,label{
+  color:#334943!important;
+  font-size:15px!important;
+}
+.edition-choice{
+  gap:12px!important;
+  margin-bottom:22px!important;
+}
+.edition-btn{
+  min-height:60px!important;
+  border-radius:16px!important;
+  border:1px solid #b6a590!important;
+  background:#f2ece4!important;
+  color:var(--ow-ink)!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:24px!important;
+  font-weight:500!important;
+}
+.edition-btn.active{
+  background:var(--ow-green)!important;
+  border-color:var(--ow-green)!important;
+  color:#fff!important;
+  box-shadow:0 7px 15px rgba(42,63,57,.16)!important;
+}
+input{
+  min-height:62px!important;
+  border:1px solid #b6a590!important;
+  border-radius:16px!important;
+  background:#f4eee7!important;
+  color:var(--ow-ink)!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:24px!important;
+  padding:14px 16px!important;
+}
+input::placeholder{
+  color:#8b8279!important;
+  opacity:.85!important;
+}
+.personalize{
+  margin-top:22px!important;
+  border-radius:18px!important;
+}
+.personalize summary{
+  padding:19px 18px!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  color:var(--ow-ink)!important;
+  font-size:23px!important;
+}
+.personalize summary span{
+  color:#5d6d67!important;
+  font-size:14px!important;
+}
+.btn-row{
+  margin-top:20px!important;
+}
+.btn,
+.done-personalizing,
+.share-link.primary,
+.open-last,
+.preview-note{
+  background:var(--ow-green)!important;
+  border-color:var(--ow-green)!important;
+  color:#fff!important;
+}
+#makeLink{
+  width:100%!important;
+  min-height:62px!important;
+  border-radius:18px!important;
+  font-size:20px!important;
+}
+button:focus-visible,input:focus-visible,summary:focus-visible{
+  outline-color:var(--ow-green)!important;
+}
+
+/* Supporting UI uses the same system */
+.keep-card,.share{color:var(--ow-ink)!important}
+.keep-summary-text strong,.share-title,.section-head h3{
+  color:var(--ow-ink)!important;
+}
+.keep-summary-text span,.share-sub,.share-foot,.section-head span{
+  color:var(--ow-soft)!important;
+}
+.preview-note{
+  box-shadow:0 10px 24px rgba(42,63,57,.14)!important;
+}
+
+/* MINI CARDS = unmistakable little envelopes */
+.open-card{
+  --env:var(--ow-paper-2);
+  min-height:166px!important;
+  position:relative!important;
+  overflow:hidden!important;
+  padding:66px 15px 15px!important;
+  border:1px solid var(--ow-line)!important;
+  border-radius:10px!important;
+  background:var(--ow-paper-texture),var(--env)!important;
+  background-size:18px 20px,23px 22px,100% 100%,auto!important;
+  box-shadow:0 8px 17px rgba(48,42,36,.10)!important;
+}
+.open-card:nth-child(4n+2),
+.open-card:nth-child(4n+5){--env:#d1b899}
+.open-card.opened{--env:#ded6cc}
+.open-card:before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:2!important;
+  inset:0 0 auto 0!important;
+  height:82px!important;
+  background:rgba(255,255,255,.055)!important;
+  clip-path:polygon(0 0,100% 0,50% 91%)!important;
+  filter:drop-shadow(0 1px 0 rgba(81,66,52,.36))!important;
+}
+.open-card:after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:1!important;
+  inset:auto 0 0 0!important;
+  height:78px!important;
+  background:
+    linear-gradient(34deg,transparent 49%,rgba(92,74,58,.24) 50%,transparent 51%) left bottom/50% 100% no-repeat,
+    linear-gradient(-34deg,transparent 49%,rgba(92,74,58,.24) 50%,transparent 51%) right bottom/50% 100% no-repeat!important;
+}
+.env-lines{display:none!important}
+.dragonfly-img{
+  display:block!important;
+  position:absolute!important;
+  top:12px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:74px!important;
+  height:44px!important;
+  z-index:4!important;
+  background-image:var(--ow-dragonfly)!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:contain!important;
+  color:transparent!important;
+  font-size:0!important;
+  object-fit:contain!important;
+  mix-blend-mode:multiply!important;
+}
+.open-card .title{
+  position:relative!important;
+  z-index:4!important;
+  margin-top:8px!important;
+  color:var(--ow-ink)!important;
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:22px!important;
+  line-height:1.08!important;
+}
+.open-card .hint{
+  position:relative!important;
+  z-index:4!important;
+  color:var(--ow-soft)!important;
+}
+
+/* OPENED LETTERS — retain working flip + corrected protected spacing */
+.letter-panel.show{
+  background:var(--ow-page)!important;
+}
+.letter-sheet{
+  background:var(--ow-paper-texture),var(--ow-paper)!important;
+  background-size:18px 20px,23px 22px,100% 100%,auto!important;
+  border:1px solid var(--ow-line)!important;
+  border-top-color:#8f806f!important;
+}
+.letter-open-mark,.letter-meta,.letter-title,.letter-body,.from-line{
+  color:var(--ow-ink)!important;
+  opacity:1!important;
+}
+.letter-title,.letter-body{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+}
+.letter-dragonfly-img{
+  display:block!important;
+  width:74px!important;
+  height:44px!important;
+  margin:0 auto!important;
+  background-image:var(--ow-dragonfly)!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:contain!important;
+  color:transparent!important;
+  font-size:0!important;
+  object-fit:contain!important;
+  mix-blend-mode:multiply!important;
+}
+.from-line:before,.open-card .title:before{
+  display:none!important;
+  content:none!important;
+}
+
+@media(max-width:540px){
+  body{padding:10px!important}
+  .hero-box{padding-top:43px!important}
+  .hero-sleeve{padding:30px 18px 28px!important}
+  .sprig-wrap{height:145px!important;width:92%!important}
+  .hero-copy{font-size:15px!important;letter-spacing:.13em!important}
+  .gift-maker{padding:25px 20px!important}
+  .gift-maker .grid2{grid-template-columns:1fr!important;gap:14px!important}
+  .edition-btn{font-size:21px!important}
+  input{font-size:22px!important}
+  .card-grid{gap:10px!important}
+  .open-card{min-height:154px!important;padding-top:60px!important}
+}
+
 </style>
 </head>
 <body>
