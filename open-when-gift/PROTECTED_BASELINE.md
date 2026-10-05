@@ -32,14 +32,19 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Home Screen guidance remains compact and available.
 - No web-app manifest is added until it can preserve the gift token safely.
 
-## Protected card design
+## Protected visual system
 
-- 24 cards remain in the established two-column mobile grid.
+- All relationship editions now share one **neutral stationery system**: warm ivory paper, kraft/taupe envelope tones, charcoal ink, and a restrained muted green accent.
+- No gender-coded pink Daughter skin or blue Son skin remains.
+- The hero card is complete and fully visible, with a kraft envelope visibly peeking behind it.
+- The **dragonfly** is the approved core motif. Old floral/leaf motifs remain retired from the production UI.
+- The 24 recipient cards remain in the established two-column mobile grid and use a clean envelope-inspired visual treatment without decorative foliage clutter.
+- Daughter and Son still use distinct copy, but the same visual system.
 - Opened letters use the same universal size and position.
 - Opened letter is a fixed full-screen experience with the current bounded sheet geometry.
 - All opened letters use the same layout.
-- Top accent is the thin **gold** line.
-- Tiny OPEN WHEN mark, centered floral divider, number, title, body, flower stalk, sender line, Back to my cards.
+- Top accent remains a thin refined neutral-gold line.
+- Tiny OPEN WHEN mark, centered dragonfly divider, number, title, body, dragonfly footer, sender line, Back to my cards.
 - Cormorant Garamond opened-letter typography remains.
 - Title remains the luxury italic treatment.
 - Border/shadow stay light and stationery-like rather than web-box heavy.
