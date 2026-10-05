@@ -55,16 +55,23 @@
   .btn:focus-visible,.open-card:focus-visible,.open-last:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #9b6a76;outline-offset:3px}
   .btn.secondary{background:#fff5f7;color:var(--rose-dark);border:1px solid var(--line);box-shadow:none}
   .personalize{margin-top:16px;border:1px solid var(--line);border-radius:18px;background:#fffdf9;overflow:hidden}
-  .personalize summary{cursor:pointer;list-style:none;padding:16px 16px;font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .personalize summary{cursor:pointer;list-style:none;padding:16px;font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
   .personalize summary::-webkit-details-marker{display:none}
   .personalize summary span{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;color:var(--ink-soft)}
-  .personalize-inner{padding:0 14px 14px;display:grid;gap:10px}
-  .edit-letter{border:1px solid var(--line);border-radius:15px;background:var(--paper-2);padding:12px}
-  .edit-letter-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
-  .edit-letter-title{font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:15px;line-height:1.3}
-  .reset-letter{background:transparent;color:#8b6872;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
-  .reset-letter.is-original{color:#9a8b90;text-decoration:none;cursor:default}
-  .edit-letter textarea{width:100%;min-height:112px;resize:vertical;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .personalize-inner{padding:0 12px 12px;display:grid;gap:7px}
+  .edit-letter{border:1px solid var(--line);border-radius:14px;background:var(--paper-2);overflow:hidden}
+  .edit-letter-toggle{width:100%;background:transparent;padding:13px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;text-align:left;color:var(--ink)}
+  .edit-letter-title{font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:14px;line-height:1.3}
+  .edit-letter-status{font-size:11px;color:#97848a;white-space:nowrap}
+  .edit-letter-status.personalized{color:var(--rose-dark);font-weight:600}
+  .edit-letter-chevron{font-size:16px;color:#9a8088;transition:transform .18s ease}
+  .edit-letter.open .edit-letter-chevron{transform:rotate(180deg)}
+  .edit-letter-editor{display:none;padding:0 12px 12px}
+  .edit-letter.open .edit-letter-editor{display:block}
+  .edit-letter textarea{width:100%;min-height:128px;resize:vertical;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .edit-letter-actions{display:flex;justify-content:flex-end;margin-top:8px}
+  .reset-letter{display:none;background:transparent;color:#8b6872;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
+  .edit-letter.is-personalized .reset-letter{display:inline-block}
   .save-status{display:none;margin-top:10px;font-size:13px;color:var(--ink-soft)}
   .save-status.show{display:block}
   .share{display:none;margin-top:16px;padding:18px;border:1px solid var(--line);background:linear-gradient(180deg,#f5e9ec 0%,#f1e2e6 100%);border-radius:20px;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
@@ -361,43 +368,66 @@ const saveStatus = document.getElementById('saveStatus');
 
 function renderPersonalizer(){
   personalizeList.innerHTML = '';
+
   letters.forEach((x,i)=>{
     const wrap = document.createElement('div');
     wrap.className = 'edit-letter';
+
     wrap.innerHTML =
-      '<div class="edit-letter-head">'
-      + '<div class="edit-letter-title">' + String(i+1).padStart(2,'0') + ' · Open when ' + x[0].toLowerCase() + '</div>'
-      + '<button type="button" class="reset-letter">Reset to original</button>'
-      + '</div>'
-      + '<textarea maxlength="4000" aria-label="Personalize letter ' + (i+1) + '"></textarea>';
+      '<button type="button" class="edit-letter-toggle" aria-expanded="false">'
+      + '<span class="edit-letter-title">' + String(i+1).padStart(2,'0') + ' · Open when ' + x[0].toLowerCase() + '</span>'
+      + '<span class="edit-letter-status">Original</span>'
+      + '<span class="edit-letter-chevron">⌄</span>'
+      + '</button>'
+      + '<div class="edit-letter-editor">'
+      + '<textarea maxlength="4000" aria-label="Personalize letter ' + (i+1) + '"></textarea>'
+      + '<div class="edit-letter-actions"><button type="button" class="reset-letter">Reset to original</button></div>'
+      + '</div>';
+
+    const toggle = wrap.querySelector('.edit-letter-toggle');
+    const status = wrap.querySelector('.edit-letter-status');
     const ta = wrap.querySelector('textarea');
-    ta.value = customMessages[i];
     const resetBtn = wrap.querySelector('.reset-letter');
 
-    function syncResetState(){
-      const isOriginal = ta.value === letters[i][1];
-      resetBtn.textContent = isOriginal ? 'Original' : 'Reset to original';
-      resetBtn.classList.toggle('is-original', isOriginal);
-      resetBtn.disabled = isOriginal;
-      resetBtn.setAttribute('aria-disabled', isOriginal ? 'true' : 'false');
+    ta.value = customMessages[i];
+
+    function syncState(){
+      const isPersonalized = ta.value !== letters[i][1];
+      wrap.classList.toggle('is-personalized', isPersonalized);
+      status.textContent = isPersonalized ? 'Personalized' : 'Original';
+      status.classList.toggle('personalized', isPersonalized);
     }
+
+    toggle.onclick = () => {
+      const opening = !wrap.classList.contains('open');
+
+      personalizeList.querySelectorAll('.edit-letter.open').forEach(el => {
+        el.classList.remove('open');
+        const btn = el.querySelector('.edit-letter-toggle');
+        if(btn) btn.setAttribute('aria-expanded','false');
+      });
+
+      if(opening){
+        wrap.classList.add('open');
+        toggle.setAttribute('aria-expanded','true');
+        setTimeout(() => ta.focus({preventScroll:true}), 0);
+      }
+    };
 
     ta.addEventListener('input', () => {
       customMessages[i] = ta.value;
-      syncResetState();
+      syncState();
     });
 
-    syncResetState();
-
     resetBtn.onclick = (e) => {
-      if(resetBtn.disabled) return;
       e.preventDefault();
-      e.stopPropagation();
       customMessages[i] = letters[i][1];
       ta.value = letters[i][1];
       ta.scrollTop = 0;
-      syncResetState();
+      syncState();
     };
+
+    syncState();
     personalizeList.appendChild(wrap);
   });
 }
