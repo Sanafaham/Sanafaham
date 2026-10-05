@@ -90,10 +90,10 @@
   <div class="app">
     <section class="hero-box">
       <div class="hero-sleeve">
-        <div class="eyebrow" id="kicker">From Mama, for My Daughter</div>
+        <div class="eyebrow" id="kicker"></div>
         <h1>OPEN WHEN…</h1>
         <div class="rule"></div>
-        <p class="subhead" id="forLine">A little gift to keep close</p>
+        <p class="subhead" id="forLine">For My Daughter</p>
         <div class="sprig-wrap">
           <svg class="sprig" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M20 75C42 58 58 39 76 10" stroke="#74565F" stroke-width="2.2" stroke-linecap="round"/>
@@ -126,7 +126,7 @@
         </div>
         <div>
           <label for="sender">From</label>
-          <input id="sender" placeholder="Mama" maxlength="40" />
+          <input id="sender" placeholder="Your name or title" maxlength="40" />
         </div>
       </div>
       <div class="btn-row">
@@ -221,7 +221,7 @@ const letters = [
 
 const qs = new URLSearchParams(location.search);
 let recipient = (qs.get('to') || '').trim();
-let sender = (qs.get('from') || 'Mama').trim();
+let sender = (qs.get('from') || '').trim();
 const storageKey = 'openwhen:' + (recipient || 'daughter') + ':' + sender;
 let storedOpened = [];
 try { storedOpened = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
@@ -238,10 +238,15 @@ const savedToast = document.getElementById('savedToast');
 const previewCopy = document.getElementById('previewCopy');
 
 function applyNames(){
-  document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || 'My Daughter');
-  document.getElementById('forLine').textContent = 'A little gift to keep close';
-  document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
-  document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
+  if(qs.has('gift')){
+    document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || 'My Daughter');
+    document.getElementById('forLine').textContent = 'A little gift to keep close';
+    document.getElementById('fromLine').textContent = sender ? ('A little reminder from ' + sender) : 'A little reminder for you';
+    document.getElementById('lastFrom').textContent = sender ? ('Always with you. ' + sender + '.') : 'Always with you.';
+  } else {
+    document.getElementById('kicker').textContent = '';
+    document.getElementById('forLine').textContent = 'For My Daughter';
+  }
   document.getElementById('sender').value = sender;
   if(recipient) document.getElementById('recipient').value = recipient;
   if(qs.has('gift')) {
@@ -298,7 +303,15 @@ document.getElementById('openLast').onclick = () => {
 
 document.getElementById('makeLink').onclick = () => {
   recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
-  sender = (document.getElementById('sender').value || 'Mama').trim();
+  sender = (document.getElementById('sender').value || '').trim();
+  if(!sender){
+    const senderInput = document.getElementById('sender');
+    senderInput.focus();
+    senderInput.setCustomValidity('Please enter who the gift is from.');
+    senderInput.reportValidity();
+    setTimeout(()=>senderInput.setCustomValidity(''), 0);
+    return;
+  }
   const url = new URL(location.href);
   url.search = '';
   url.searchParams.set('gift','1');
@@ -329,7 +342,7 @@ document.getElementById('makeLink').onclick = () => {
       }
     };
   }
-  document.getElementById('kicker').textContent = 'From ' + sender + ', for ' + (recipient || 'My Daughter');
+  document.getElementById('kicker').textContent = 'From ' + (sender || 'Someone special') + ', for ' + (recipient || 'My Daughter');
   document.getElementById('forLine').textContent = 'A little gift to keep close';
   document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
   document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
