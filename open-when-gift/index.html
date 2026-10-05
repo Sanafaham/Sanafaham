@@ -2667,6 +2667,118 @@ button:focus-visible,input:focus-visible,summary:focus-visible{
   .open-card{min-height:154px!important;padding-top:60px!important}
 }
 
+
+/* OWNER LOCK — ALL 24 CARDS MATCH THE APPROVED IVORY HERO CARD */
+.open-card,
+.open-card:nth-child(4n+2),
+.open-card:nth-child(4n+5),
+.open-card.opened,
+.open-card:nth-child(4n+2).opened,
+.open-card:nth-child(4n+5).opened{
+  background-color:#f3eee5!important;
+  background-image:
+    radial-gradient(circle at 20% 24%,rgba(93,80,67,.045) 0 .55px,transparent .75px),
+    radial-gradient(circle at 72% 68%,rgba(255,255,255,.26) 0 .6px,transparent .8px),
+    linear-gradient(118deg,rgba(111,91,72,.025),transparent 34%,rgba(255,255,255,.08) 68%,transparent 88%)!important;
+  background-size:18px 20px,23px 22px,100% 100%!important;
+  border:1px solid #c8bba9!important;
+  border-radius:18px!important;
+  box-shadow:0 7px 16px rgba(53,45,38,.11)!important;
+  min-height:180px!important;
+  padding:14px 14px 15px!important;
+  color:#26221f!important;
+  text-align:center!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+
+/* no envelope geometry — these are miniature versions of the approved card */
+.open-card:before,
+.open-card:after{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  filter:none!important;
+}
+.env-lines{display:none!important}
+
+.open-card .card-mini-head{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:10px!important;
+  line-height:1!important;
+  letter-spacing:.26em!important;
+  color:#2e2925!important;
+  text-transform:uppercase!important;
+  margin-top:2px!important;
+}
+
+.open-card .card-mini-rule{
+  width:28px!important;
+  height:1px!important;
+  background:#8f8172!important;
+  margin:8px auto 7px!important;
+}
+
+.open-card .no{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:10px!important;
+  letter-spacing:.24em!important;
+  color:#5d534b!important;
+  margin:0 0 5px!important;
+}
+
+.open-card .dragonfly-img{
+  position:static!important;
+  transform:none!important;
+  width:74px!important;
+  height:44px!important;
+  margin:2px auto 5px!important;
+  display:block!important;
+  background-image:var(--owner-dragonfly)!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:contain!important;
+  object-fit:contain!important;
+  mix-blend-mode:multiply!important;
+  z-index:auto!important;
+}
+
+.open-card .title{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:20px!important;
+  line-height:1.06!important;
+  font-weight:500!important;
+  font-style:normal!important;
+  color:#28231f!important;
+  margin:0 auto!important;
+  text-align:center!important;
+  max-width:150px!important;
+}
+
+.open-card .hint{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  margin-top:10px!important;
+  font-size:13px!important;
+  color:#53635d!important;
+  text-align:center!important;
+  letter-spacing:.02em!important;
+}
+
+@media(max-width:540px){
+  .open-card,
+  .open-card:nth-child(4n+2),
+  .open-card:nth-child(4n+5),
+  .open-card.opened{
+    min-height:174px!important;
+    padding:12px 12px 14px!important;
+  }
+  .open-card .title{font-size:18px!important;max-width:138px!important}
+  .open-card .dragonfly-img{width:68px!important;height:40px!important}
+}
+
 </style>
 </head>
 <body>
@@ -3049,9 +3161,14 @@ function render(){
     const btn = document.createElement('button');
     btn.className = 'open-card' + (opened.has(i) ? ' opened' : '');
     btn.innerHTML =
-'<div><div class="no">' + String(i+1).padStart(2,'0') + '</div><div class="title">Open when ' + x[0].toLowerCase() + '</div>'
+      '<div>'
+      + '<div class="card-mini-head">OPEN WHEN...</div>'
+      + '<div class="card-mini-rule"></div>'
+      + '<div class="no">' + String(i+1).padStart(2,'0') + '</div>'
       + '<img class="dragonfly-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" aria-hidden="true">'
-      + '</div><div class="hint">' + (opened.has(i) ? 'Opened' : 'Tap to open') + '</div>';
+      + '<div class="title">Open when ' + x[0].toLowerCase() + '</div>'
+      + '</div>'
+      + '<div class="hint">' + (opened.has(i) ? 'Opened' : 'Tap to open') + '</div>';
     btn.onclick = () => openLetter(i);
     grid.appendChild(btn);
   });
