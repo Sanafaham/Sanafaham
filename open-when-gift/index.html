@@ -119,14 +119,15 @@
       <div class="share" id="share"></div>
     </section>
 
-    <div class="section-head">
-      <h3>Choose what you need today</h3>
-      <span id="count">0 of 24 opened</span>
-    </div>
+    <section id="giftExperience" style="display:none">
+      <div class="section-head">
+        <h3>Choose what you need today</h3>
+        <span id="count">0 of 24 opened</span>
+      </div>
 
-    <section class="card-grid" id="grid"></section>
+      <section class="card-grid" id="grid"></section>
 
-    <section class="letter-panel" id="letterPanel">
+      <section class="letter-panel" id="letterPanel">
       <div class="letter-meta" id="letterMeta">LETTER 01</div>
       <h2 class="letter-title" id="letterTitle"></h2>
       <div class="letter-body" id="letterBody"></div>
@@ -136,9 +137,9 @@
       </div>
     </section>
 
-    <button class="open-last" id="openLast">Open this one last</button>
+      <button class="open-last" id="openLast">Open this one last</button>
 
-    <section class="letter-panel" id="lastPanel">
+      <section class="letter-panel" id="lastPanel">
       <div class="letter-meta">ONE LAST THING</div>
       <h2 class="letter-title">You never had to earn this.</h2>
       <div class="letter-body">There is nothing you could achieve that would make me love you more.
@@ -150,7 +151,8 @@ You were never required to earn that.
 You are my daughter.
 
 That was enough from the beginning.</div>
-      <div class="from-line" id="lastFrom">Always with you. Mama.</div>
+        <div class="from-line" id="lastFrom">Always with you. Mama.</div>
+      </section>
     </section>
 
     <div class="footer-note">OPEN WHEN… digital keepsake</div>
@@ -194,6 +196,7 @@ const setup = document.getElementById('setup');
 const share = document.getElementById('share');
 const letterPanel = document.getElementById('letterPanel');
 const lastPanel = document.getElementById('lastPanel');
+const giftExperience = document.getElementById('giftExperience');
 
 function applyNames(){
   document.getElementById('kicker').textContent = 'A gift from ' + sender;
@@ -202,7 +205,13 @@ function applyNames(){
   document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
   document.getElementById('sender').value = sender;
   if(recipient) document.getElementById('recipient').value = recipient;
-  if(qs.has('gift')) setup.style.display = 'none';
+  if(qs.has('gift')) {
+    setup.style.display = 'none';
+    giftExperience.style.display = 'block';
+  } else {
+    setup.style.display = 'block';
+    giftExperience.style.display = 'none';
+  }
 }
 
 function render(){
@@ -238,7 +247,12 @@ document.getElementById('openLast').onclick = () => {
 document.getElementById('previewGift').onclick = () => {
   recipient = (document.getElementById('recipient').value || 'My Daughter').trim();
   sender = (document.getElementById('sender').value || 'Mama').trim();
-  applyNames();
+  document.getElementById('kicker').textContent = 'A gift from ' + sender;
+  document.getElementById('forLine').textContent = recipient ? ('For ' + recipient) : 'For My Daughter';
+  document.getElementById('fromLine').textContent = 'A little reminder from ' + sender;
+  document.getElementById('lastFrom').textContent = 'Always with you. ' + sender + '.';
+  giftExperience.style.display = 'block';
+  giftExperience.scrollIntoView({behavior:'smooth', block:'start'});
 };
 
 document.getElementById('makeLink').onclick = () => {
@@ -250,7 +264,7 @@ document.getElementById('makeLink').onclick = () => {
   url.searchParams.set('to', recipient);
   url.searchParams.set('from', sender);
   share.classList.add('show');
-  share.textContent = url.toString();
+  share.innerHTML = '<strong>Your gift is ready.</strong><br><br>' + url.toString() + '<br><br><span style="color:#806a72">Send this link to her. She will see only the gift, not this setup screen.</span>';
   applyNames();
 };
 
