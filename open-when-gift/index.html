@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open When… For My Daughter</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#fbf8f9;color:#2e292c}
+main{max-width:760px;margin:auto;padding:18px}
+.hero{background:linear-gradient(#ead1d7,#f8f0f2);padding:32px 20px;border-radius:24px;text-align:center}
+h1{font-family:Georgia,serif;font-size:40px;margin:8px 0}
+.sub{font-family:Georgia,serif;font-style:italic;color:#9c6675;font-size:22px}
+.setup,.letter{background:#fff;border:1px solid #e6d7dc;border-radius:18px;padding:18px;margin-top:16px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:12px;margin-bottom:6px;color:#6e5c64}
+input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #e6d7dc;border-radius:12px}
+button{cursor:pointer}
+.btn{padding:11px 16px;border-radius:999px;border:1px solid #e6d7dc;background:#fff;margin-top:12px}
+.btn.primary{background:#3c3438;color:#fff;border-color:#3c3438}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.card{min-height:130px;border:1px solid #e6d7dc;border-radius:16px;padding:14px;background:#fffdf9;text-align:left;display:flex;flex-direction:column;justify-content:space-between}
+.card.opened{background:#f5ecef}
+.num{font-size:10px;letter-spacing:.15em;color:#a3838e}
+.title{font-family:Georgia,serif;font-size:17px}
+.state{font-size:11px;color:#9b7e88}
+.letter{display:none}
+.letter.show{display:block}
+.letter h2{font-family:Georgia,serif;font-weight:400}
+.letter p{font-family:Georgia,serif;line-height:1.7;white-space:pre-line}
+.last{margin-top:16px;background:#ead4da;border-radius:18px;padding:14px;text-align:center}
+.last button{border:0;background:transparent;font-family:Georgia,serif;font-size:20px;padding:18px;width:100%}
+.share{display:none;margin-top:12px;padding:12px;background:#f5ecef;border-radius:12px;overflow-wrap:anywhere}
+.share.show{display:block}
+@media(max-width:620px){.grid{grid-template-columns:repeat(2,1fr)}.fields{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<div id="kicker">A gift from Mum</div>
+<h1>OPEN WHEN…</h1>
+<div class="sub" id="forLine">For My Daughter</div>
+<p>Twenty-four little reminders for the moments when I may not be right beside you.</p>
+</section>
+
+<section class="setup" id="setup">
+<h2>Create the gift link</h2>
+<div class="fields">
+<div><label>Daughter's first name</label><input id="recipient" placeholder="Layla"></div>
+<div><label>From</label><input id="sender" placeholder="Mum"></div>
+</div>
+<button class="btn primary" id="makeLink">Create gift link</button>
+<div class="share" id="share"></div>
+</section>
+
+<section>
+<div class="grid" id="grid"></div>
+
+<div class="letter" id="letter">
+<div class="num" id="letterNum"></div>
+<h2 id="letterTitle"></h2>
+<p id="letterText"></p>
+<p><small id="fromLine">A little reminder from Mum</small></p>
+<button class="btn primary" id="closeLetter">Keep this with me</button>
+</div>
+
+<div class="last"><button id="openLast">Open this one last</button></div>
+<div class="letter" id="lastLetter">
+<div class="num">ONE LAST THING</div>
+<h2>You never had to earn this.</h2>
+<p>There is nothing you could achieve that would make me love you more.
+
+And there is nothing you could fail at that would make me love you less.
+
+You were never required to earn that.
+
+You are my daughter.
+
+That was enough from the beginning.</p>
+<p><small id="lastFrom">Always with you. Mum.</small></p>
+</div>
+</section>
+</main>
+
+<script>
+const letters = [
+["You’ve had a bad day","Some days are simply awful.\n\nYou do not have to find the lesson in it tonight. You do not have to pretend you are fine.\n\nGet through today.\n\nTomorrow gets a fresh chance.\n\nAnd remember, one bad day has never changed who you are."],
+["You doubt yourself","There will be moments when you wonder if you are good enough, capable enough, strong enough.\n\nYou are.\n\nDo the next thing anyway."],
+["You miss me","I miss you too. Probably more than I tell you.\n\nYou know the voice. You know the look. You know I’m with you."],
+["You feel alone","Feeling alone and being alone are not the same thing.\n\nMine is one of the lives that would feel completely different without you."],
+["You can’t sleep","Your brain does not need to solve your entire life at 2 a.m.\n\nSleep first. Tomorrow can handle tomorrow."],
+["Someone hurts you","You are allowed to be hurt.\n\nDo not let somebody else’s behavior make you question your value."],
+["You’re angry with me","Yes, even then.\n\nWe can be angry and still belong to each other."],
+["You need courage","Courage often feels like fear with one more step taken anyway.\n\nTake the step."],
+["Something wonderful happens","Stop. Enjoy this.\n\nYou did something worth celebrating. I hope you are proud. I am."],
+["Your heart gets broken","The loss of one relationship does not mean the loss of your future.\n\nLet your heart heal."],
+["You make a mistake","Fix what you can. Apologize when you should. Learn something. Then stop punishing yourself."],
+["You need to laugh","We have survived approximately 4,782 ridiculous situations already.\n\nThis will become another story."],
+["You feel behind","There is no official schedule for your life.\n\nYou are not late."],
+["You need to hear the truth","You are not always right. Neither am I.\n\nWelcome to being human. Just keep learning."],
+["You’re proud of yourself","Good. Stay there for a minute.\n\nYou are allowed to be proud of yourself."],
+["You feel like giving up","Ask yourself: do I truly want to stop, or am I just tired?\n\nIf tired, rest. Then decide."],
+["Life doesn’t go to plan","Some of the best things in your life will arrive because the original plan fell apart."],
+["You need to remember who you are","You are not your job, relationship, mistakes, or somebody else’s opinion.\n\nProtect who you are."],
+["You’re making a big decision","Do not make it from fear.\n\nAsk what you would choose if nobody else had an opinion."],
+["You need permission","You can change your mind. You can begin again. You can say no. Including to me."],
+["You don’t feel beautiful","Your body has carried you through every day you have survived.\n\nBe kind to her."],
+["You need your mum","I’m here.\n\nCall me. Sit with me. Cry. Talk. Or say nothing. I am still your mum."],
+["I’m not here one day","I got something extraordinary in this life. I got to be your mother.\n\nLive fully."],
+["You need one more reminder","You do not have to have everything figured out.\n\nKeep becoming more yourself."]
+];
+
+const qs=new URLSearchParams(location.search);
+let recipient=(qs.get("to")||"").trim();
+let sender=(qs.get("from")||"Mum").trim();
+const opened=new Set();
+const grid=document.getElementById("grid");
+
+function applyNames(){
+ document.getElementById("kicker").textContent="A gift from "+sender;
+ document.getElementById("forLine").textContent=recipient?("For "+recipient):"For My Daughter";
+ document.getElementById("fromLine").textContent="A little reminder from "+sender;
+ document.getElementById("lastFrom").textContent="Always with you. "+sender+".";
+ if(qs.has("gift")) document.getElementById("setup").style.display="none";
+}
+function render(){
+ grid.innerHTML="";
+ letters.forEach((x,i)=>{
+   const b=document.createElement("button");
+   b.className="card"+(opened.has(i)?" opened":"");
+   b.innerHTML='<span class="num">'+String(i+1).padStart(2,"0")+'</span><span class="title">Open when '+x[0].toLowerCase()+'</span><span class="state">'+(opened.has(i)?"Opened":"Tap to open")+'</span>';
+   b.onclick=()=>openLetter(i);
+   grid.appendChild(b);
+ });
+}
+function openLetter(i){
+ opened.add(i); render();
+ document.getElementById("letterNum").textContent="LETTER "+String(i+1).padStart(2,"0");
+ document.getElementById("letterTitle").textContent="Open when "+letters[i][0].toLowerCase();
+ document.getElementById("letterText").textContent=letters[i][1];
+ document.getElementById("lastLetter").classList.remove("show");
+ document.getElementById("letter").classList.add("show");
+}
+document.getElementById("closeLetter").onclick=()=>document.getElementById("letter").classList.remove("show");
+document.getElementById("openLast").onclick=()=>{
+ document.getElementById("letter").classList.remove("show");
+ document.getElementById("lastLetter").classList.add("show");
+};
+document.getElementById("makeLink").onclick=()=>{
+ recipient=(document.getElementById("recipient").value||"My Daughter").trim();
+ sender=(document.getElementById("sender").value||"Mum").trim();
+ const u=new URL(location.href);
+ u.search="";
+ u.searchParams.set("gift","1");
+ u.searchParams.set("to",recipient);
+ u.searchParams.set("from",sender);
+ const box=document.getElementById("share");
+ box.classList.add("show");
+ box.textContent=u.toString();
+ applyNames();
+};
+applyNames(); render();
+</script>
+</body>
+</html>
