@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/protect.mjs",
     "test": "node scripts/protect.mjs"
   },
   "dependencies": {
