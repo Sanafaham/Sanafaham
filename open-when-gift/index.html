@@ -63,6 +63,7 @@
   .edit-letter-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
   .edit-letter-title{font-family:Georgia,"Times New Roman",serif;color:var(--rose-dark);font-size:15px;line-height:1.3}
   .reset-letter{background:transparent;color:#8b6872;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+  .reset-letter.is-original{color:#9a8b90;text-decoration:none;cursor:default}
   .edit-letter textarea{width:100%;min-height:112px;resize:vertical;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
   .save-status{display:none;margin-top:10px;font-size:13px;color:var(--ink-soft)}
   .save-status.show{display:block}
@@ -371,22 +372,31 @@ function renderPersonalizer(){
       + '<textarea maxlength="4000" aria-label="Personalize letter ' + (i+1) + '"></textarea>';
     const ta = wrap.querySelector('textarea');
     ta.value = customMessages[i];
+    const resetBtn = wrap.querySelector('.reset-letter');
+
+    function syncResetState(){
+      const isOriginal = ta.value === letters[i][1];
+      resetBtn.textContent = isOriginal ? 'Original' : 'Reset to original';
+      resetBtn.classList.toggle('is-original', isOriginal);
+      resetBtn.disabled = isOriginal;
+      resetBtn.setAttribute('aria-disabled', isOriginal ? 'true' : 'false');
+    }
+
     ta.addEventListener('input', () => {
       customMessages[i] = ta.value;
-      const resetBtn = wrap.querySelector('.reset-letter');
-      resetBtn.textContent = ta.value === letters[i][1] ? 'Original' : 'Reset to original';
+      syncResetState();
     });
-    const resetBtn = wrap.querySelector('.reset-letter');
-    resetBtn.textContent = customMessages[i] === letters[i][1] ? 'Original' : 'Reset to original';
+
+    syncResetState();
+
     resetBtn.onclick = (e) => {
+      if(resetBtn.disabled) return;
       e.preventDefault();
       e.stopPropagation();
       customMessages[i] = letters[i][1];
       ta.value = letters[i][1];
       ta.scrollTop = 0;
-      ta.dispatchEvent(new Event('input', {bubbles:true}));
-      resetBtn.textContent = 'Original restored';
-      setTimeout(() => { resetBtn.textContent = 'Original'; }, 900);
+      syncResetState();
     };
     personalizeList.appendChild(wrap);
   });
