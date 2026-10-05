@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="OPEN WHEN" />
-<link rel="manifest" href="/manifest.webmanifest" />
 <link rel="apple-touch-icon" href="/open-when-icon.svg" />
 <style>
   :root{
@@ -149,7 +148,7 @@
         <p>You can save OPEN WHEN to your Home Screen so it opens like an app whenever you need it.</p>
         <div class="keep-steps">
           <div class="keep-step"><strong>iPhone / iPad:</strong> open this gift in Safari → tap the Share button ↑ → <strong>Add to Home Screen</strong> → Add.</div>
-          <div class="keep-step"><strong>Android:</strong> open in Chrome → tap ⋮ → <strong>Add to Home screen</strong> or <strong>Install app</strong>.</div>
+          <div class="keep-step"><strong>Android:</strong> open this gift in Chrome → tap ⋮ → <strong>Add to Home screen</strong>.</div>
         </div>
       </section>
 
@@ -223,7 +222,10 @@ const letters = [
 const qs = new URLSearchParams(location.search);
 let recipient = (qs.get('to') || '').trim();
 let sender = (qs.get('from') || 'Mama').trim();
-const opened = new Set();
+const storageKey = 'openwhen:' + (recipient || 'daughter') + ':' + sender;
+let storedOpened = [];
+try { storedOpened = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
+const opened = new Set(Array.isArray(storedOpened) ? storedOpened : []);
 const grid = document.getElementById('grid');
 const count = document.getElementById('count');
 const setup = document.getElementById('setup');
@@ -271,6 +273,7 @@ function render(){
 
 function openLetter(i){
   opened.add(i);
+  try { localStorage.setItem(storageKey, JSON.stringify(Array.from(opened))); } catch(e) {}
   render();
   lastPanel.classList.remove('show');
   letterPanel.classList.add('show');
