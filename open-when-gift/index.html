@@ -371,10 +371,22 @@ function renderPersonalizer(){
       + '<textarea maxlength="4000" aria-label="Personalize letter ' + (i+1) + '"></textarea>';
     const ta = wrap.querySelector('textarea');
     ta.value = customMessages[i];
-    ta.addEventListener('input', () => { customMessages[i] = ta.value; });
-    wrap.querySelector('.reset-letter').onclick = () => {
+    ta.addEventListener('input', () => {
+      customMessages[i] = ta.value;
+      const resetBtn = wrap.querySelector('.reset-letter');
+      resetBtn.textContent = ta.value === letters[i][1] ? 'Original' : 'Reset to original';
+    });
+    const resetBtn = wrap.querySelector('.reset-letter');
+    resetBtn.textContent = customMessages[i] === letters[i][1] ? 'Original' : 'Reset to original';
+    resetBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       customMessages[i] = letters[i][1];
       ta.value = letters[i][1];
+      ta.scrollTop = 0;
+      ta.dispatchEvent(new Event('input', {bubbles:true}));
+      resetBtn.textContent = 'Original restored';
+      setTimeout(() => { resetBtn.textContent = 'Original'; }, 900);
     };
     personalizeList.appendChild(wrap);
   });
