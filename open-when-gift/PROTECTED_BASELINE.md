@@ -1,7 +1,8 @@
 # OPEN WHEN — PROTECTED BASELINE
 
 Status: OWNER-APPROVED CURRENT GOOD STATE  
-Date locked: 2026-10-05
+Date locked: 2026-10-05  
+Edition expansion approved: Daughter + Son launch batch
 
 This file defines the settled behavior that future OPEN WHEN work must preserve unless the owner explicitly approves a change.
 
@@ -9,8 +10,11 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 
 - Creator page remains separate from recipient gift view.
 - Receiver never sees creator/personalization controls.
-- Product currently remains the **For My Daughter** edition.
-- Creator enters recipient first name and sender name.
+- Launch product supports exactly two protected editions: **For My Daughter** and **For My Son**.
+- Creator first chooses **My Daughter** or **My Son**, then enters recipient first name and sender name.
+- Switching editions changes the recipient label, original 24-letter set, and final relationship wording without changing the shared engine.
+- Each edition has exactly 24 built-in letters.
+- The saved gift record persists the selected edition so recipient links cannot mix Daughter and Son content.
 - Sender name is required.
 - Personalization is optional.
 - Personalization uses compact 24-row accordion navigation.
@@ -53,6 +57,7 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Personalized gift data stays in the private Vercel Blob store.
 - Blob token is server-side only via `BLOB_READ_WRITE_TOKEN`.
 - Gift reads/writes remain private.
+- Edition is validated server-side as only `daughter` or `son`.
 - Exactly 24 messages are validated server-side.
 - Gift endpoint remains no-store.
 
