@@ -357,6 +357,12 @@ function applyEdition(){
   recipientLabel.textContent=(isSon?"Son's":"Daughter's")+' first name';
   recipientInput.placeholder=isSon?'His first name':'Her first name';
   if(!giftId) els('forLine').textContent='For My '+editionName();
+  els('lastBody').textContent='There is nothing you could achieve that would make me love you more.\n\n'
+    +'And there is nothing you could fail at that would make me love you less.\n\n'
+    +'You were never required to earn that.\n\n'
+    +'You are my '+edition+'.\n\n'
+    +'That was enough from the beginning.';
+  els('lastFrom').textContent=sender?'Always with you. '+sender+'.':'Always with you.';
 }
 function switchEdition(next){
   if(next===edition) return;
