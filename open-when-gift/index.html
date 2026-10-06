@@ -172,8 +172,12 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
 }
 
 
-.open-last{display:block;width:min(100%,420px);margin:28px auto 0;padding:18px 22px;border:1px solid var(--line);border-radius:18px;background:var(--green);color:var(--paper-light);font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-style:italic;letter-spacing:.02em;cursor:pointer}
-.open-last:active{transform:translateY(1px)}
+.final-keepsake-card{display:flex;width:min(100%,420px);min-height:250px;margin:28px auto 0;padding:28px 22px;border:1px solid var(--line);border-radius:24px;background:var(--paper)!important;color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:13px;text-align:center;box-shadow:0 10px 24px rgba(36,33,31,.08)}
+.final-keepsake-card .seal{display:block;width:118px;height:70px;background-image:var(--dragonfly)!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important}
+.final-keepsake-card .open-when{font-size:12px;letter-spacing:.28em}
+.final-keepsake-card .title{font-size:28px;line-height:1.05;font-weight:400}
+.final-keepsake-card .state{font-size:20px;font-style:italic}
+.final-keepsake-card:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -233,7 +237,12 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
       <div class="count" id="count">0 of 24 opened</div>
     </div>
     <div class="grid" id="grid"></div>
-    <button class="open-last" id="openLast" type="button">Open this one last</button>
+    <button class="envelope-card final-keepsake-card" id="openLast" type="button" aria-label="Open the final keepsake">
+  <span class="dragonfly seal" aria-hidden="true"></span>
+  <span class="open-when">ONE LAST THING...</span>
+  <span class="title">You never had to earn this.</span>
+  <span class="state">Open this one last</span>
+</button>
   </section>
 
   <div class="footer">OPEN WHEN… digital keepsake</div>
