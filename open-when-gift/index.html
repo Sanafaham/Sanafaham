@@ -171,6 +171,9 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
   filter:none!important;
 }
 
+
+.open-last{display:block;width:min(100%,420px);margin:28px auto 0;padding:18px 22px;border:1px solid var(--line);border-radius:18px;background:var(--green);color:var(--paper-light);font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-style:italic;letter-spacing:.02em;cursor:pointer}
+.open-last:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -230,6 +233,7 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
       <div class="count" id="count">0 of 24 opened</div>
     </div>
     <div class="grid" id="grid"></div>
+    <button class="open-last" id="openLast" type="button">Open this one last</button>
   </section>
 
   <div class="footer">OPEN WHEN… digital keepsake</div>
@@ -243,6 +247,25 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
     <div class="letter-body" id="letterBody"></div>
     <div class="letter-footer"><div class="df"></div><div class="from-line" id="fromLine">A little reminder for you</div></div>
     <div style="text-align:center"><button class="back" id="closeLetter" type="button">Back to my cards</button></div>
+  </article>
+</section>
+
+<section class="letter-panel" id="lastPanel" aria-hidden="true">
+  <article class="letter-sheet">
+    <div class="letter-top"><div class="mini">THE END</div><div class="df"></div></div>
+    <div class="letter-no">ONE LAST THING</div>
+    <div class="letter-title">You never had to earn this.</div>
+    <div class="letter-body" id="lastBody">There is nothing you could achieve that would make me love you more.
+
+And there is nothing you could fail at that would make me love you less.
+
+You were never required to earn that.
+
+You are my daughter.
+
+That was enough from the beginning.</div>
+    <div class="letter-footer"><div class="df"></div><div class="from-line" id="lastFrom">Always with you.</div></div>
+    <div style="text-align:center"><button class="back" id="closeLast" type="button">Back to my cards</button></div>
   </article>
 </section>
 
@@ -398,16 +421,27 @@ function renderGrid(){
 }
 function openLetter(i){
   cardsScrollY=window.scrollY;
+  if(lastPanel){lastPanel.classList.remove('show');lastPanel.setAttribute('aria-hidden','true');}
   opened.add(i); saveOpened(); renderGrid();
   els('letterMeta').textContent=String(i+1).padStart(2,'0');
   els('letterTitle').textContent='Open when '+letters[i][0].toLowerCase();
   els('letterBody').textContent=customMessages[i]||letters[i][1];
   els('fromLine').textContent=sender?'A little reminder from '+sender:'A little reminder for you';
+  els('lastFrom').textContent=sender?'Always with you. '+sender+'.':'Always with you.';
   letterSheet.classList.remove('flip'); void letterSheet.offsetWidth; letterSheet.classList.add('flip');
   letterPanel.classList.add('show'); letterPanel.setAttribute('aria-hidden','false');
 }
 els('closeLetter').onclick=()=>{
   letterPanel.classList.remove('show'); letterPanel.setAttribute('aria-hidden','true');
+  requestAnimationFrame(()=>window.scrollTo({top:cardsScrollY,behavior:'auto'}));
+};
+els('openLast').onclick=()=>{
+  cardsScrollY=window.scrollY;
+  letterPanel.classList.remove('show'); letterPanel.setAttribute('aria-hidden','true');
+  lastPanel.classList.add('show'); lastPanel.setAttribute('aria-hidden','false');
+};
+els('closeLast').onclick=()=>{
+  lastPanel.classList.remove('show'); lastPanel.setAttribute('aria-hidden','true');
   requestAnimationFrame(()=>window.scrollTo({top:cardsScrollY,behavior:'auto'}));
 };
 
