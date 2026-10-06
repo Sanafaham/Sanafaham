@@ -451,6 +451,7 @@ els('closeLetter').onclick=()=>{
   requestAnimationFrame(()=>window.scrollTo({top:cardsScrollY,behavior:'auto'}));
 };
 els('openLast').onclick=()=>{
+  applyEdition();
   cardsScrollY=window.scrollY;
   letterPanel.classList.remove('show'); letterPanel.setAttribute('aria-hidden','true');
   lastPanel.classList.add('show'); lastPanel.setAttribute('aria-hidden','false');
