@@ -31,6 +31,7 @@ const required = [
   ['final keepsake card', 'final-keepsake-card'],
   ['edition-specific final line', "You are my '+edition+'."],
   ['final card refreshes edition', "els('openLast').onclick=()=>{\n  applyEdition();"],
+  ['final text visible on small iPhones', '#lastPanel .letter-body{overflow:visible}'],
   ['page opens left-to-right', 'transform-origin:left center'],
   ['home icon', '/open-when-icon.png?v=4'],
 ];
