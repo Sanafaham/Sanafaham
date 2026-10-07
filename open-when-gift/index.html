@@ -350,6 +350,7 @@ let giftId = '';
 let storageKey = '';
 let opened = new Set();
 let cardsScrollY = 0;
+let accessToken = (qs.get('access')||'').trim();
 
 const els = id => document.getElementById(id);
 const setup=els('setup'), giftExperience=els('giftExperience'), previewNote=els('previewNote'),
@@ -474,8 +475,10 @@ makeLink.onclick=async()=>{
   makeLink.disabled=true; saveStatus.textContent='Saving your gift…'; saveStatus.classList.add('show');
   giftId=(crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
   try{
-    const r=await fetch('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:giftId,edition,recipient,sender,messages:customMessages})});
+    const r=await fetch('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:giftId,edition,recipient,sender,messages:customMessages,accessToken})});
     if(!r.ok) throw new Error('save failed');
+    const saved=await r.json();
+    giftId=saved.id;
     storageKey='openwhen:gift:'+giftId; opened=new Set();
     const url=new URL(location.href); url.search=''; url.searchParams.set('gift',giftId);
     const giftUrl=url.toString();
@@ -514,8 +517,23 @@ async function boot(){
     }catch(e){
       document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>This gift could not be opened.</h1><p>Please ask the sender for a fresh link.</p></main>';
     }
-  }else{
+    return;
+  }
+
+  if(!accessToken){
+    document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>Your Open When gift starts with a private access link.</h1><p>After your payment is confirmed, you’ll receive a one-use link to create one gift.</p></main>';
+    return;
+  }
+
+  try{
+    const r=await fetch('/api/access?token='+encodeURIComponent(accessToken),{cache:'no-store'});
+    if(!r.ok){
+      const data=await r.json().catch(()=>({}));
+      throw new Error(data.error||'This access link is not available.');
+    }
     applyEdition();
+  }catch(e){
+    document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>This access link cannot be used.</h1><p>'+(e.message||'Please ask for a fresh link.')+'</p></main>';
   }
 }
 boot();

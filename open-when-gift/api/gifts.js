@@ -1,10 +1,36 @@
-import { get, put } from '@vercel/blob';
+import { del, get, put } from '@vercel/blob';
+import crypto from 'node:crypto';
 
 const MAX_TEXT = 4000;
 const MAX_NAME = 40;
+const MAX_ID = 120;
+const MAX_ACCESS_TOKEN = 160;
 
 function safeText(value, max) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+function cleanId(value) {
+  return safeText(value, MAX_ID).replace(/[^a-zA-Z0-9_-]/g, '');
+}
+
+function cleanAccessToken(value) {
+  return safeText(value, MAX_ACCESS_TOKEN).replace(/[^a-zA-Z0-9_-]/g, '');
+}
+
+function tokenHash(value) {
+  return crypto.createHash('sha256').update(value).digest('hex');
+}
+
+function usedAtMarker() {
+  return new Date().toISOString();
+}
+
+async function readPrivateJson(pathname, token) {
+  const result = await get(pathname, { access: 'private', token, useCache: false });
+  if (!result || result.statusCode !== 200) return null;
+  const text = await new Response(result.stream).text();
+  return JSON.parse(text);
 }
 
 export default async function handler(req, res) {
@@ -16,7 +42,8 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = req.body || {};
-      const id = safeText(body.id, 120).replace(/[^a-zA-Z0-9_-]/g, '');
+      const requestedId = cleanId(body.id);
+      const accessToken = cleanAccessToken(body.accessToken);
       const edition = body.edition === 'son' ? 'son' : (body.edition === 'daughter' ? 'daughter' : '');
       const recipient = safeText(body.recipient, MAX_NAME);
       const sender = safeText(body.sender, MAX_NAME);
@@ -24,8 +51,38 @@ export default async function handler(req, res) {
         ? body.messages.slice(0, 24).map(v => safeText(v, MAX_TEXT))
         : [];
 
-      if (!id || !edition || !recipient || !sender || messages.length !== 24 || messages.some(v => !v)) {
+      if (!requestedId || !accessToken || !edition || !recipient || !sender || messages.length !== 24 || messages.some(v => !v)) {
         return res.status(400).json({ error: 'Invalid gift data.' });
+      }
+
+      const hash = tokenHash(accessToken);
+      const entitlementPath = 'entitlements/' + hash + '.json';
+      const entitlement = await readPrivateJson(entitlementPath, token);
+
+      if (!entitlement || entitlement.version !== 1 || entitlement.tokenHash !== hash) {
+        return res.status(403).json({ error: 'This access link is not valid.' });
+      }
+      if (entitlement.status !== 'unused') {
+        return res.status(409).json({ error: 'This access link has already been used.' });
+      }
+
+      const id = cleanId(entitlement.giftId);
+      if (!id) return res.status(500).json({ error: 'This access link is not configured correctly.' });
+
+      const giftPath = 'gifts/' + id + '.json';
+      const lockPath = 'entitlement-locks/' + hash + '.lock';
+
+      // Fixed-path, no-overwrite lock: only one concurrent request can acquire it.
+      try {
+        await put(lockPath, usedAtMarker(), {
+          access: 'private',
+          contentType: 'text/plain',
+          addRandomSuffix: false,
+          allowOverwrite: false,
+          token
+        });
+      } catch (error) {
+        return res.status(409).json({ error: 'This access link is already being used or has been used.' });
       }
 
       const gift = {
@@ -38,12 +95,49 @@ export default async function handler(req, res) {
         createdAt: new Date().toISOString()
       };
 
-      await put('gifts/' + id + '.json', JSON.stringify(gift), {
+      /*
+       * Consume the entitlement before publishing the gift. The entitlement record is
+       * server-owned and never exposes the raw token. Vercel Blob's addRandomSuffix:false
+       * gives this token one stable record. A second request sees status=used and is rejected.
+       */
+      const usedAt = new Date().toISOString();
+      await put(entitlementPath, JSON.stringify({
+        ...entitlement,
+        status: 'used',
+        usedAt,
+        giftId: id
+      }), {
         access: 'private',
         contentType: 'application/json',
         addRandomSuffix: false,
+        allowOverwrite: true,
         token
       });
+
+      try {
+        await put(giftPath, JSON.stringify(gift), {
+          access: 'private',
+          contentType: 'application/json',
+          addRandomSuffix: false,
+          token
+        });
+      } catch (error) {
+        // Restore the entitlement if gift persistence fails so a paid buyer is not stranded.
+        await put(entitlementPath, JSON.stringify({
+          ...entitlement,
+          status: 'unused',
+          usedAt: null,
+          giftId: id
+        }), {
+          access: 'private',
+          contentType: 'application/json',
+          addRandomSuffix: false,
+          allowOverwrite: true,
+          token
+        });
+        await del(lockPath, { token }).catch(() => {});
+        throw error;
+      }
 
       return res.status(201).json({ ok: true, id });
     } catch (error) {
@@ -54,21 +148,11 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const id = safeText(req.query?.id, 120).replace(/[^a-zA-Z0-9_-]/g, '');
+      const id = cleanId(req.query?.id);
       if (!id) return res.status(400).json({ error: 'Missing gift id.' });
 
-      const result = await get('gifts/' + id + '.json', {
-        access: 'private',
-        token,
-        useCache: false
-      });
-
-      if (!result || result.statusCode !== 200) {
-        return res.status(404).json({ error: 'Gift not found.' });
-      }
-
-      const text = await new Response(result.stream).text();
-      const gift = JSON.parse(text);
+      const gift = await readPrivateJson('gifts/' + id + '.json', token);
+      if (!gift) return res.status(404).json({ error: 'Gift not found.' });
       return res.status(200).json(gift);
     } catch (error) {
       console.error('gift-load-failed', error);
