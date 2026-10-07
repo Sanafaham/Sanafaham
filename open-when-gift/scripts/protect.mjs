@@ -38,7 +38,7 @@ const required = [
   ['final card refreshes edition', "els('openLast').onclick=()=>{\n  applyEdition();"],
   ['final text visible on small iPhones', '#lastPanel .letter-body{overflow:visible}'],
   ['page opens left-to-right', 'transform-origin:left center'],
-  ['home icon', '/open-when-icon.png?v=4'],
+  ['home icon', '/open-when-icon.png?v=6'],
 ];
 
 let failed = false;
@@ -85,6 +85,14 @@ if (!api.includes("entitlement.status !== 'unused'")) {
 }
 if (!api.includes("status: 'used'")) {
   console.error('MISSING: entitlement consumption');
+  failed = true;
+}
+if (!api.includes("allowOverwrite: false")) {
+  console.error('MISSING: atomic fixed-path entitlement lock');
+  failed = true;
+}
+if (!api.includes("allowOverwrite: true")) {
+  console.error('MISSING: explicit entitlement state overwrite');
   failed = true;
 }
 if (!accessApi.includes("entitlement.status !== 'unused'")) {
