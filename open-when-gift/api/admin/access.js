@@ -27,13 +27,14 @@ export default async function handler(req, res) {
     const rawToken = crypto.randomBytes(32).toString('base64url');
     const hash = crypto.createHash('sha256').update(rawToken).digest('hex');
     const createdAt = new Date().toISOString();
+    const giftId = crypto.randomUUID();
     const entitlement = {
       version: 1,
       tokenHash: hash,
       status: 'unused',
       createdAt,
       usedAt: null,
-      giftId: null
+      giftId
     };
 
     await put('entitlements/' + hash + '.json', JSON.stringify(entitlement), {
