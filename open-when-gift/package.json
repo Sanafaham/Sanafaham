@@ -6,6 +6,6 @@
     "test": "node scripts/protect.mjs"
   },
   "dependencies": {
-    "@vercel/blob": "^2.0.0"
+    "@vercel/blob": "^2.6.1"
   }
 }
