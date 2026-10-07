@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = req.body || {};
-      const id = cleanId(body.id);
+      const requestedId = cleanId(body.id);
       const accessToken = cleanAccessToken(body.accessToken);
       const edition = body.edition === 'son' ? 'son' : (body.edition === 'daughter' ? 'daughter' : '');
       const recipient = safeText(body.recipient, MAX_NAME);
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         ? body.messages.slice(0, 24).map(v => safeText(v, MAX_TEXT))
         : [];
 
-      if (!id || !accessToken || !edition || !recipient || !sender || messages.length !== 24 || messages.some(v => !v)) {
+      if (!requestedId || !accessToken || !edition || !recipient || !sender || messages.length !== 24 || messages.some(v => !v)) {
         return res.status(400).json({ error: 'Invalid gift data.' });
       }
 
@@ -62,12 +62,10 @@ export default async function handler(req, res) {
         return res.status(409).json({ error: 'This access link has already been used.' });
       }
 
-      const giftPath = 'gifts/' + id + '.json';
-      const existingGift = await get(giftPath, { access: 'private', token, useCache: false });
-      if (existingGift && existingGift.statusCode === 200) {
-        return res.status(409).json({ error: 'Gift already exists.' });
-      }
+      const id = cleanId(entitlement.giftId);
+      if (!id) return res.status(500).json({ error: 'This access link is not configured correctly.' });
 
+      const giftPath = 'gifts/' + id + '.json';
       const gift = {
         version: 1,
         edition,
@@ -109,7 +107,7 @@ export default async function handler(req, res) {
           ...entitlement,
           status: 'unused',
           usedAt: null,
-          giftId: null
+          giftId: id
         }), {
           access: 'private',
           contentType: 'application/json',
