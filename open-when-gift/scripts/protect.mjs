@@ -18,7 +18,7 @@ const required = [
   ['son letters', 'const sonLetters = ['],
   ['personalization', 'id="personalize"'],
   ['done personalizing', 'id="donePersonalizing"'],
-  ['done button iOS white text', '-webkit-text-fill-color:#fff!important'],
+  ['done button iOS light text', '-webkit-text-fill-color:#f5f1e9!important'],
   ['create gift', 'id="makeLink"'],
   ['save endpoint', "fetch('/api/gifts'"],
   ['load endpoint', "fetch('/api/gifts?id="],
