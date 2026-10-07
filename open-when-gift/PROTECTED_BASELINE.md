@@ -65,6 +65,11 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Edition is validated server-side as only `daughter` or `son`.
 - Exactly 24 messages are validated server-side.
 - Gift endpoint remains no-store.
+- Creator access is denied without a valid server-issued one-use access token.
+- Raw access tokens are never stored; only SHA-256 token hashes are persisted privately.
+- Each valid access token authorizes exactly one gift creation and is marked used with its gift ID.
+- Used, invalid, copied, or replayed access links cannot authorize another gift.
+- Gift recipient links remain independent of creator access tokens and continue to load by opaque gift ID.
 
 ## Engineering rule
 
