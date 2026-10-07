@@ -1,4 +1,4 @@
-import { get, put } from '@vercel/blob';
+import { del, get, put } from '@vercel/blob';
 import crypto from 'node:crypto';
 
 const MAX_TEXT = 4000;
@@ -20,6 +20,10 @@ function cleanAccessToken(value) {
 
 function tokenHash(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
+}
+
+function usedAtMarker() {
+  return new Date().toISOString();
 }
 
 async function readPrivateJson(pathname, token) {
@@ -66,6 +70,21 @@ export default async function handler(req, res) {
       if (!id) return res.status(500).json({ error: 'This access link is not configured correctly.' });
 
       const giftPath = 'gifts/' + id + '.json';
+      const lockPath = 'entitlement-locks/' + hash + '.lock';
+
+      // Fixed-path, no-overwrite lock: only one concurrent request can acquire it.
+      try {
+        await put(lockPath, usedAtMarker(), {
+          access: 'private',
+          contentType: 'text/plain',
+          addRandomSuffix: false,
+          allowOverwrite: false,
+          token
+        });
+      } catch (error) {
+        return res.status(409).json({ error: 'This access link is already being used or has been used.' });
+      }
+
       const gift = {
         version: 1,
         edition,
@@ -91,6 +110,7 @@ export default async function handler(req, res) {
         access: 'private',
         contentType: 'application/json',
         addRandomSuffix: false,
+        allowOverwrite: true,
         token
       });
 
@@ -112,8 +132,10 @@ export default async function handler(req, res) {
           access: 'private',
           contentType: 'application/json',
           addRandomSuffix: false,
+          allowOverwrite: true,
           token
         });
+        await del(lockPath, { token }).catch(() => {});
         throw error;
       }
 
