@@ -2,6 +2,8 @@ import fs from 'node:fs';
 
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const api = fs.readFileSync(new URL('../api/gifts.js', import.meta.url), 'utf8');
+const accessApi = fs.readFileSync(new URL('../api/access.js', import.meta.url), 'utf8');
+const adminAccessApi = fs.readFileSync(new URL('../api/admin/access.js', import.meta.url), 'utf8');
 
 const required = [
   ['stable ivory paper', '--paper:#EFECE4'],
@@ -20,6 +22,9 @@ const required = [
   ['create gift', 'id="makeLink"'],
   ['save endpoint', "fetch('/api/gifts'"],
   ['load endpoint', "fetch('/api/gifts?id="],
+  ['creator access token', "qs.get('access')"],
+  ['creator access validation', "fetch('/api/access?token="],
+  ['gift save sends access token', 'messages:customMessages,accessToken'],
   ['WhatsApp share', 'https://wa.me/'],
   ['email share', 'mailto:?subject='],
   ['message share', 'sms:&body='],
@@ -67,6 +72,31 @@ if (!api.includes("edition = body.edition === 'son'")) {
 }
 if (!api.includes('messages.length !== 24')) {
   console.error('MISSING: 24-message validation');
+  failed = true;
+}
+
+if (!api.includes("accessToken = cleanAccessToken(body.accessToken)")) {
+  console.error('MISSING: gift creation access token');
+  failed = true;
+}
+if (!api.includes("entitlement.status !== 'unused'")) {
+  console.error('MISSING: used entitlement rejection');
+  failed = true;
+}
+if (!api.includes("status: 'used'")) {
+  console.error('MISSING: entitlement consumption');
+  failed = true;
+}
+if (!accessApi.includes("entitlement.status !== 'unused'")) {
+  console.error('MISSING: access validation rejects used links');
+  failed = true;
+}
+if (!adminAccessApi.includes("process.env.OPEN_WHEN_ADMIN_SECRET")) {
+  console.error('MISSING: protected access issuer');
+  failed = true;
+}
+if (!adminAccessApi.includes("crypto.randomBytes(32)")) {
+  console.error('MISSING: cryptographically random access token');
   failed = true;
 }
 
