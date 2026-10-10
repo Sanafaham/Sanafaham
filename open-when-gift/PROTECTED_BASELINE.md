@@ -1,7 +1,7 @@
 # OPEN WHEN — PROTECTED BASELINE
 
 Status: OWNER-APPROVED CURRENT GOOD STATE  
-Date locked: 2026-10-05  
+Date locked: 2026-10-05 (storage/security and owner access updated 2026-10-10, owner-approved)  
 Edition expansion approved: Daughter + Son launch batch
 
 This file defines the settled behavior that future OPEN WHEN work must preserve unless the owner explicitly approves a change.
@@ -29,7 +29,9 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Receiver gift loads the exact saved personalized copy.
 - Opened-card state persists locally per gift.
 - Receiver can return with **Back to my cards** to the previous card-grid scroll position.
-- Home Screen guidance remains compact and available.
+- Home Screen guidance remains compact and available, including opening the link in Safari (iPhone) or Chrome (Android) first when it was opened inside another app.
+- The buyer's original access link recovers the one gift it created (sender preview and sharing controls) after refresh, closing Safari or reopening the link. It never creates a second gift.
+- Share and creator text supplied by the buyer is rendered as plain text, never as HTML.
 - No web-app manifest is added until it can preserve the gift token safely.
 
 ## Protected visual system
@@ -67,19 +69,37 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Gift endpoint remains no-store.
 - Creator access is denied without a valid server-issued one-use access token.
 - Raw access tokens are never stored; only SHA-256 token hashes are persisted privately.
-- Each valid access token authorizes exactly one gift creation and is marked used with its gift ID.
-- Used, invalid, copied, replayed, or concurrently submitted access links cannot authorize another gift.
-- Gift recipient links remain independent of creator access tokens and continue to load by opaque gift ID.
+- Each access entitlement has one fixed gift ID assigned at issuance; every gift save targets `gifts/<giftId>.json`, so one entitlement can never produce more than one gift.
+- Entitlement state changes use Vercel Blob's documented ETag conditional writes (`ifMatch`): unused → creating (time-limited claim) → used, and unused → revoked. Separate Blob writes are never treated as a transaction.
+- An entitlement becomes `used` only after its gift exists. A crashed or interrupted save is recovered automatically after the claim expires; paid access is never consumed without a gift.
+- The gift save is bounded by the claim and uses `allowOverwrite: false` as a secondary guard.
+- Used, invalid, copied, replayed, revoked or concurrently submitted access links cannot authorize another gift.
+- Possession of the original access link is the buyer's recovery credential: a used link reveals only its own gift ID, the same content the recipient link already shows.
+- Gift recipient links remain independent of creator access tokens and continue to load by opaque gift ID through the unchanged `GET /api/gifts?id=` API.
+- The current page checks access with `POST /api/access` (token in the request body, not the URL). `GET /api/access?token=` keeps its old contract for pages loaded before this release.
+- Pages send no referrer to third parties (`Referrer-Policy: no-referrer`; the owner page uses `same-origin` so its own form posts keep a valid Origin).
+
+## Protected owner access
+
+- The original `X-Open-When-Admin` secret-header issuance remains available until the owner page is fully verified in production.
+- `/owner.html` is owner-only: plain HTML password form posted to `/api/admin/session`; page JavaScript never handles the password; no external scripts or fonts; not indexed.
+- Owner login is disabled unless `OPEN_WHEN_ADMIN_SECRET` is at least 32 characters.
+- Owner sessions are signed cookies (HMAC-SHA256, key derived from the secret), 24-hour expiry, `HttpOnly; Secure; SameSite=Strict; Path=/api/admin`.
+- Every owner request must be same-origin (Origin, or Fetch Metadata when Origin is absent or `null`); owner JSON calls also require `X-Open-When-Owner: 1`.
+- Login attempts are rate limited (5 per 15 minutes per IP, 30 per hour overall) with counters in private Blob storage, reserved before the password is checked and failing closed.
+- Owner history shows issue dates, optional order references, statuses and recipient gift links. It never shows raw access tokens or letter contents.
+- Owner revocation applies to unused links only; revoked links never authorize gift creation.
+- Preview deployments refuse the production Blob store when `OPEN_WHEN_PRODUCTION_STORE_ID` is set. Real-storage tests run only against a separate test store identified by `OPEN_WHEN_TEST_STORE_ID`; production credentials are never given to GitHub Actions or Preview.
 
 ## Engineering rule
 
 Before any future OPEN WHEN feature is treated as complete:
 
 1. Read this baseline.
-2. Run `npm test` in `open-when-gift`.
+2. Run `npm test` in `open-when-gift` (protected baseline guard, logic tests and endpoint tests). Run `npm run test:real-storage` against the isolated test store before release.
 3. Do not weaken or update these protections merely to make a failing change pass.
 4. If an intentional product decision changes a protected behavior, update the baseline only after explicit owner approval.
 5. Verify the Vercel production deployment is READY.
 6. Re-test the touched journey without changing unrelated settled behavior.
 
-The automated guard lives at `open-when-gift/scripts/protect.mjs` and the GitHub workflow is `.github/workflows/open-when-protect.yml`.
+The automated guard lives at `open-when-gift/scripts/protect.mjs`, tests live in `open-when-gift/tests/`, and the GitHub workflow is `.github/workflows/open-when-protect.yml`. Browser checks: `npm i --no-save playwright && node tests/e2e/ui.e2e.mjs` (local, in-memory storage only).

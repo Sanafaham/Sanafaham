@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#373b3a" id="themeColor">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -92,6 +93,7 @@ button{cursor:pointer}
 .primary:disabled{opacity:.45}
 .save-status{display:none;margin-top:10px;font-size:14px;color:var(--muted)}
 .save-status.show{display:block}
+.setup.recovered > :not(.share):not(.save-status){display:none!important}
 .share{display:none;margin-top:20px;padding:22px;border:1px solid var(--line);border-radius:20px;background:var(--paper-light)}
 .share.show{display:block}
 .share-title{font-family:"Cormorant Garamond",Georgia,serif;font-size:31px}
@@ -233,7 +235,9 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
   <section class="gift-experience" id="giftExperience">
     <details class="keep-card paper">
       <summary>Keep this gift on your phone</summary>
-      <p>On iPhone in Safari: tap Share → Add to Home Screen → Add. On Android in Chrome: tap ⋮ → Add to Home screen.</p>
+      <p>Opened this inside WhatsApp, Instagram or another app? First open it in Safari (iPhone) or Chrome (Android).</p>
+      <p>On iPhone in Safari: tap Share (on newer iPhones it may be inside the ••• menu) → Add to Home Screen → Add.</p>
+      <p>On Android in Chrome: tap ⋮ → Add to Home screen → Add.</p>
     </details>
     <div class="section-head">
       <h3>CHOOSE WHAT YOU NEED TODAY</h3>
@@ -465,6 +469,67 @@ els('closeLast').onclick=()=>{
   requestAnimationFrame(()=>window.scrollTo({top:cardsScrollY,behavior:'auto'}));
 };
 
+function giftLinkFor(id){
+  const url=new URL(location.href); url.search=''; url.hash=''; url.searchParams.set('gift',id);
+  return url.toString();
+}
+// Built with text nodes only, so any name the buyer types is shown exactly as typed.
+function renderShare(giftUrl){
+  const msg='I made something for you, '+recipient+' ❤️\nOpen it when you’re ready.';
+  const node=(tag,cls,text)=>{ const n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; };
+  const link=(cls,href,text,blank)=>{ const a=node('a',cls,text); a.href=href; if(blank){a.target='_blank';a.rel='noopener';} return a; };
+  share.textContent='';
+  share.appendChild(node('div','share-title','Your gift is ready'));
+  share.appendChild(node('div','share-sub','Check it once, then send it however you normally talk to '+recipient+'.'));
+  const actions=node('div','share-actions');
+  actions.appendChild(link('primary-link',giftUrl,'Open gift',true));
+  actions.appendChild(link('','https://wa.me/?text='+encodeURIComponent(msg+'\n'+giftUrl),'WhatsApp'));
+  actions.appendChild(link('','sms:&body='+encodeURIComponent(msg+'\n'+giftUrl),'Messages'));
+  actions.appendChild(link('','mailto:?subject='+encodeURIComponent('A little gift for you')+'&body='+encodeURIComponent(msg+'\n\n'+giftUrl),'Email'));
+  const native=node('button','','Share…'); native.type='button'; native.id='nativeShare';
+  native.onclick=async()=>{ if(navigator.share){try{await navigator.share({title:'OPEN WHEN…',text:msg,url:giftUrl})}catch(e){}}else window.open(giftUrl,'_blank'); };
+  actions.appendChild(native);
+  share.appendChild(actions);
+  share.appendChild(node('div','share-foot',recipient+' will see only the finished gift, including any letters you personalized.'));
+  share.classList.add('show');
+}
+function showCreatedGift(){
+  renderShare(giftLinkFor(giftId));
+  els('kicker').textContent='From '+sender+', for '+recipient;
+  els('forLine').textContent='A little gift to keep close';
+  previewNote.classList.add('show');
+  els('previewCopy').textContent='Below is exactly what '+recipient+' will see when '+pronoun()+' opens the gift.';
+  giftExperience.style.display='block';
+  renderGrid();
+  saveStatus.textContent='Saved privately. Your share link is ready.';
+  saveStatus.classList.add('show');
+}
+// The original access link recovers the one gift it already created. It can never create another.
+async function recoverGift(id){
+  await loadGift(id);
+  applyEdition();
+  setup.classList.add('recovered');
+  showCreatedGift();
+  saveStatus.textContent='Your gift was already created. Here it is again, ready to share.';
+  share.scrollIntoView({behavior:'smooth',block:'center'});
+}
+let savingTimer=0;
+function showSaving(){
+  setup.classList.add('recovered');
+  saveStatus.textContent='Your gift is still saving. This page will check again in a moment.';
+  saveStatus.classList.add('show');
+  clearTimeout(savingTimer);
+  savingTimer=setTimeout(()=>checkAccess().catch(()=>{ saveStatus.textContent='Please refresh this page in a minute to see your gift.'; }),5000);
+}
+async function checkAccess(){
+  const r=await fetch('/api/access',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:accessToken})});
+  const data=await r.json().catch(()=>({}));
+  if(r.ok&&data.state==='created'&&data.giftId){ await recoverGift(data.giftId); return; }
+  if(r.ok&&data.state==='saving'){ showSaving(); return; }
+  if(r.ok&&data.state==='unused'){ setup.classList.remove('recovered'); saveStatus.classList.remove('show'); applyEdition(); return; }
+  throw new Error(data.error||'This access link is not available.');
+}
+
 makeLink.onclick=async()=>{
   recipient=(recipientInput.value||'').trim();
   sender=(senderInput.value||'').trim();
@@ -476,23 +541,16 @@ makeLink.onclick=async()=>{
   giftId=(crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
   try{
     const r=await fetch('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:giftId,edition,recipient,sender,messages:customMessages,accessToken})});
-    if(!r.ok) throw new Error('save failed');
+    if(!r.ok){
+      const data=await r.json().catch(()=>({}));
+      if(data.state==='created'&&data.id){ await recoverGift(data.id); return; }
+      if(data.state==='saving'){ showSaving(); return; }
+      throw new Error('save failed');
+    }
     const saved=await r.json();
     giftId=saved.id;
     storageKey='openwhen:gift:'+giftId; opened=new Set();
-    const url=new URL(location.href); url.search=''; url.searchParams.set('gift',giftId);
-    const giftUrl=url.toString();
-    const msg='I made something for you, '+recipient+' ❤️\nOpen it when you’re ready.';
-    share.classList.add('show');
-    share.innerHTML='<div class="share-title">Your gift is ready</div><div class="share-sub">Check it once, then send it however you normally talk to '+recipient+'.</div><div class="share-actions"><a class="primary-link" href="'+giftUrl+'" target="_blank" rel="noopener">Open gift</a><a href="https://wa.me/?text='+encodeURIComponent(msg+'\n'+giftUrl)+'">WhatsApp</a><a href="sms:&body='+encodeURIComponent(msg+'\n'+giftUrl)+'">Messages</a><a href="mailto:?subject='+encodeURIComponent('A little gift for you')+'&body='+encodeURIComponent(msg+'\n\n'+giftUrl)+'">Email</a><button id="nativeShare" type="button">Share…</button></div><div class="share-foot">'+recipient+' will see only the finished gift, including any letters you personalized.</div>';
-    const n=els('nativeShare'); if(n) n.onclick=async()=>{ if(navigator.share){try{await navigator.share({title:'OPEN WHEN…',text:msg,url:giftUrl})}catch(e){}}else window.open(giftUrl,'_blank'); };
-    els('kicker').textContent='From '+sender+', for '+recipient;
-    els('forLine').textContent='A little gift to keep close';
-    previewNote.classList.add('show');
-    els('previewCopy').textContent='Below is exactly what '+recipient+' will see when '+pronoun()+' opens the gift.';
-    giftExperience.style.display='block';
-    renderGrid();
-    saveStatus.textContent='Saved privately. Your share link is ready.';
+    showCreatedGift();
     previewNote.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     saveStatus.textContent='I could not save this gift yet. Please try again.';
@@ -526,14 +584,10 @@ async function boot(){
   }
 
   try{
-    const r=await fetch('/api/access?token='+encodeURIComponent(accessToken),{cache:'no-store'});
-    if(!r.ok){
-      const data=await r.json().catch(()=>({}));
-      throw new Error(data.error||'This access link is not available.');
-    }
-    applyEdition();
+    await checkAccess();
   }catch(e){
-    document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>This access link cannot be used.</h1><p>'+(e.message||'Please ask for a fresh link.')+'</p></main>';
+    document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>This access link cannot be used.</h1><p></p></main>';
+    document.querySelector('main p').textContent=e.message||'Please ask for a fresh link.';
   }
 }
 boot();

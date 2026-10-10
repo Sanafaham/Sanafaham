@@ -2,12 +2,17 @@ name: Protect OPEN WHEN
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'open-when/**']
     paths:
       - 'open-when-gift/**'
+      - '.github/workflows/open-when-protect.yml'
   pull_request:
     paths:
       - 'open-when-gift/**'
+      - '.github/workflows/open-when-protect.yml'
+
+permissions:
+  contents: read
 
 jobs:
   protected-behaviors:
@@ -21,4 +26,13 @@ jobs:
         with:
           node-version: '24'
       - run: npm install
-      - run: npm test
+      - name: Protected baseline, logic and endpoint tests
+        run: npm test
+      - name: Real Vercel Blob tests (isolated test store only)
+        # Uses only the separate test store. Production credentials are never given to GitHub.
+        # Without the secret this step reports SKIPPED and does not touch any store.
+        env:
+          OPEN_WHEN_TEST_BLOB_TOKEN: ${{ secrets.OPEN_WHEN_TEST_BLOB_TOKEN }}
+          OPEN_WHEN_TEST_STORE_ID: ${{ vars.OPEN_WHEN_TEST_STORE_ID }}
+          OPEN_WHEN_PRODUCTION_STORE_ID: ${{ vars.OPEN_WHEN_PRODUCTION_STORE_ID }}
+        run: npm run test:real-storage

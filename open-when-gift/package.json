@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node scripts/protect.mjs"
+    "test": "node scripts/protect.mjs && node --test tests/flows.test.mjs tests/endpoints.test.mjs",
+    "test:real-storage": "node --test tests/real-storage.test.mjs"
   },
   "dependencies": {
-    "@vercel/blob": "^2.6.1"
+    "@vercel/blob": "^2.8.1"
   }
 }

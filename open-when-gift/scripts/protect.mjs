@@ -4,6 +4,14 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const api = fs.readFileSync(new URL('../api/gifts.js', import.meta.url), 'utf8');
 const accessApi = fs.readFileSync(new URL('../api/access.js', import.meta.url), 'utf8');
 const adminAccessApi = fs.readFileSync(new URL('../api/admin/access.js', import.meta.url), 'utf8');
+const read = (rel) => fs.readFileSync(new URL('../' + rel, import.meta.url), 'utf8');
+const storeLib = read('lib/store.js');
+const entLib = read('lib/entitlements.js');
+const authLib = read('lib/owner-auth.js');
+const sessionApi = read('api/admin/session.js');
+const historyApi = read('api/admin/history.js');
+const revokeApi = read('api/admin/revoke.js');
+const ownerHtml = read('owner.html');
 
 const required = [
   ['stable ivory paper', '--paper:#EFECE4'],
@@ -23,7 +31,13 @@ const required = [
   ['save endpoint', "fetch('/api/gifts'"],
   ['load endpoint', "fetch('/api/gifts?id="],
   ['creator access token', "qs.get('access')"],
-  ['creator access validation', "fetch('/api/access?token="],
+  ['creator access validation (token in POST body, not URL)', "fetch('/api/access',{method:'POST'"],
+  ['buyer gift recovery', 'async function recoverGift(id)'],
+  ['recovered view hides creation controls', ".setup.recovered > :not(.share):not(.save-status){display:none!important}"],
+  ['saving state', 'function showSaving()'],
+  ['share box built with text nodes', 'function renderShare(giftUrl)'],
+  ['no-referrer policy', '<meta name="referrer" content="no-referrer">'],
+  ['home screen in-app browser guidance', 'First open it in Safari (iPhone) or Chrome (Android).'],
   ['gift save sends access token', 'messages:customMessages,accessToken'],
   ['WhatsApp share', 'https://wa.me/'],
   ['email share', 'mailto:?subject='],
@@ -54,6 +68,8 @@ const forbidden = [
   ['old embedded dragonfly regression', '--dragonfly:url("data:image/'],
   ['old brown paper token', '--paper:#c9c3b8'],
   ['old green token', '--green:#373b3a'],
+  ['unsafe share rendering', 'share.innerHTML'],
+  ['access token in request URL', "fetch('/api/access?token="],
 ];
 for (const [name, needle] of forbidden) {
   if (html.includes(needle)) {
@@ -75,37 +91,57 @@ if (!api.includes('messages.length !== 24')) {
   failed = true;
 }
 
-if (!api.includes("accessToken = cleanAccessToken(body.accessToken)")) {
-  console.error('MISSING: gift creation access token');
-  failed = true;
+const checks = [
+  // Gift API: validation and the unchanged recipient GET path
+  [api, "accessToken = cleanAccessToken(body.accessToken)", 'gift creation access token'],
+  [api, "createGift(store, { rawToken: accessToken", 'gift creation goes through the entitlement'],
+  [api, "readGift('gifts/' + id + '.json', token)", 'recipient gift loads by opaque gift ID'],
+  // Entitlement protection: conditional writes, fixed gift ID, used only after the gift exists
+  [storeLib, 'ifMatch: etag', 'documented ETag conditional writes'],
+  [storeLib, 'BlobPreconditionFailedError', 'conditional write conflicts detected'],
+  [storeLib, 'allowOverwrite: false', 'gift save never overwrites (secondary guard)'],
+  [storeLib, "access: 'private'", 'private blob storage'],
+  [storeLib, 'useCache: false', 'consistent reads'],
+  [entLib, "status: 'creating', attempt", 'entitlement claimed by conditional write'],
+  [entLib, "status: 'used', usedAt", 'entitlement consumed only at finalize'],
+  [entLib, "if (rec.status === 'revoked') return { status: 403", 'revoked links never create'],
+  [entLib, 'const gPath = giftPath(id);', 'one fixed gift location per entitlement'],
+  [entLib, "await finalize(store, ePath, attempt, now())", 'finalize after the gift exists'],
+  [entLib, 'AbortSignal.timeout(remaining - 5_000)', 'gift save bounded by the lease'],
+  [entLib, "crypto.createHash('sha256')", 'only token hashes are stored'],
+  [accessApi, 'accessState(store, raw, now())', 'access check reports unused/created/saving/revoked'],
+  [accessApi, "(await readBody(req)).token", 'access token accepted in POST body'],
+  // Owner issuance
+  [adminAccessApi, 'process.env.OPEN_WHEN_ADMIN_SECRET', 'protected access issuer'],
+  [adminAccessApi, 'crypto.randomBytes(32)', 'cryptographically random access token'],
+  [adminAccessApi, "req.headers['x-open-when-admin']", 'original secret-header issuance kept'],
+  [adminAccessApi, 'hasOwnerSession(req, now())', 'owner session issuance'],
+  [authLib, 'HttpOnly; Secure; SameSite=Strict', 'owner cookie flags'],
+  [authLib, 'SESSION_TTL_S = 24 * 60 * 60', '24-hour owner session'],
+  [authLib, 'MIN_SECRET_LENGTH = 32', 'admin secret strength requirement'],
+  [authLib, "createHmac('sha256', sessionKey(secret))", 'signed owner sessions'],
+  [authLib, 'export function isSameOrigin(req)', 'cross-site request protection'],
+  [authLib, "header(req, OWNER_HEADER) !== '1'", 'owner header required'],
+  [authLib, "return 'unavailable';", 'login rate limiter fails closed'],
+  [sessionApi, 'reserveLoginAttempt(getStore(), req, secret, now())', 'login rate limited before password check'],
+  [historyApi, 'requireOwner(req, res)', 'history is owner-only'],
+  [revokeApi, 'requireOwner(req, res)', 'revoke is owner-only'],
+  [ownerHtml, '<form method="post" action="/api/admin/session">', 'password posted by plain form'],
+  [ownerHtml, '<meta name="robots" content="noindex,nofollow">', 'owner page not indexed'],
+  [ownerHtml, '<meta name="referrer" content="same-origin">', 'owner page never sends a referrer off-site'],
+];
+for (const [src, needle, name] of checks) {
+  if (!src.includes(needle)) { console.error('MISSING:', name); failed = true; }
 }
-if (!api.includes("entitlement.status !== 'unused'")) {
-  console.error('MISSING: used entitlement rejection');
-  failed = true;
-}
-if (!api.includes("status: 'used'")) {
-  console.error('MISSING: entitlement consumption');
-  failed = true;
-}
-if (!api.includes("allowOverwrite: false")) {
-  console.error('MISSING: atomic fixed-path entitlement lock');
-  failed = true;
-}
-if (!api.includes("allowOverwrite: true")) {
-  console.error('MISSING: explicit entitlement state overwrite');
-  failed = true;
-}
-if (!accessApi.includes("entitlement.status !== 'unused'")) {
-  console.error('MISSING: access validation rejects used links');
-  failed = true;
-}
-if (!adminAccessApi.includes("process.env.OPEN_WHEN_ADMIN_SECRET")) {
-  console.error('MISSING: protected access issuer');
-  failed = true;
-}
-if (!adminAccessApi.includes("crypto.randomBytes(32)")) {
-  console.error('MISSING: cryptographically random access token');
-  failed = true;
+const ownerScript = (ownerHtml.match(/<script>([\s\S]*?)<\/script>/) || [, ''])[1];
+const forbiddenSrc = [
+  [ownerHtml, '<script src', 'third-party or external script on owner page'],
+  [ownerScript, "'password'", 'owner page script touching the password field'],
+  [ownerScript, '.innerHTML', 'owner page innerHTML rendering'],
+  [entLib + storeLib + authLib, 'Math.random', 'non-cryptographic randomness in security code'],
+];
+for (const [src, needle, name] of forbiddenSrc) {
+  if (src.includes(needle)) { console.error('FORBIDDEN:', name); failed = true; }
 }
 
 if (failed) process.exit(1);
