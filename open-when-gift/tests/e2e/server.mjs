@@ -11,6 +11,7 @@ import { makeAdminAccessHandler } from '../../api/admin/access.js';
 import { makeSessionHandler } from '../../api/admin/session.js';
 import { makeHistoryHandler } from '../../api/admin/history.js';
 import { makeRevokeHandler } from '../../api/admin/revoke.js';
+import { makeStoreIdentityHandler } from '../../api/admin/store.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const types = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.webmanifest': 'application/manifest+json' };
@@ -24,7 +25,8 @@ export function startServer({ port = 0, store = memoryStore({ maxDelayMs: 1 }) }
     '/api/admin/access': makeAdminAccessHandler({ getStore }),
     '/api/admin/session': makeSessionHandler({ getStore }),
     '/api/admin/history': makeHistoryHandler({ getStore }),
-    '/api/admin/revoke': makeRevokeHandler({ getStore })
+    '/api/admin/revoke': makeRevokeHandler({ getStore }),
+    '/api/admin/store': makeStoreIdentityHandler()
   };
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://' + req.headers.host);

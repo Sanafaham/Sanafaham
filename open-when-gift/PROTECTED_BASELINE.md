@@ -63,7 +63,7 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 ## Protected storage/security
 
 - Personalized gift data stays in the private Vercel Blob store.
-- Blob token is server-side only via `BLOB_READ_WRITE_TOKEN`.
+- Blob tokens are server-side only and are chosen in one place, `resolveStorage` in `lib/store.js`; no other file reads storage variables. Production and local use `BLOB_READ_WRITE_TOKEN`. Preview uses only `OW_PREVIEW_READ_WRITE_TOKEN`, which must belong to the store in `OW_PREVIEW_STORE_ID` and to a different store than the production token. Preview never falls back to `BLOB_READ_WRITE_TOKEN`; missing, mismatched or unverifiable configuration fails closed before any storage request.
 - Gift reads/writes remain private.
 - Edition is validated server-side as only `daughter` or `son`.
 - Exactly 24 messages are validated server-side.
@@ -84,13 +84,14 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 
 - The original `X-Open-When-Admin` secret-header issuance remains available until the owner page is fully verified in production.
 - `/owner.html` is owner-only: plain HTML password form posted to `/api/admin/session`; page JavaScript never handles the password; no external scripts or fonts; not indexed.
-- Owner login is disabled unless `OPEN_WHEN_ADMIN_SECRET` is at least 32 characters.
+- Owner login is disabled unless `OPEN_WHEN_ADMIN_SECRET` is at least 32 characters. Preview uses only its own `OW_PREVIEW_ADMIN_SECRET` (same rule); if it is missing or equal to the production secret, owner access on Preview stays disabled.
 - Owner sessions are signed cookies (HMAC-SHA256, key derived from the secret), 24-hour expiry, `HttpOnly; Secure; SameSite=Strict; Path=/api/admin`.
 - Every owner request must be same-origin (Origin, or Fetch Metadata when Origin is absent or `null`); owner JSON calls also require `X-Open-When-Owner: 1`.
 - Login attempts are rate limited (5 per 15 minutes per IP, 30 per hour overall) with counters in private Blob storage, reserved before the password is checked and failing closed.
 - Owner history shows issue dates, optional order references, statuses and recipient gift links. It never shows raw access tokens or letter contents.
 - Owner revocation applies to unused links only; revoked links never authorize gift creation.
-- Preview deployments refuse the production Blob store when `OPEN_WHEN_PRODUCTION_STORE_ID` is set. Real-storage tests run only against a separate test store identified by `OPEN_WHEN_TEST_STORE_ID`; production credentials are never given to GitHub Actions or Preview.
+- The owner-only `GET /api/admin/store` check reports the active store ID and environment, never credentials, and makes no storage request.
+- Preview deployments also refuse any store named in `OPEN_WHEN_PRODUCTION_STORE_ID`. Real-storage tests run only against a separate test store identified by `OPEN_WHEN_TEST_STORE_ID`; production credentials are never given to GitHub Actions, and Preview code never uses them. Until the production token is removed from the Preview scope (a separate release step), Preview still receives it as a variable but never reads it.
 
 ## Engineering rule
 

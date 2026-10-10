@@ -77,6 +77,8 @@ button:disabled{opacity:.55}
       <div id="history"></div>
     </section>
 
+    <p class="msg" id="storeInfo"></p>
+
     <form method="post" action="/api/admin/session">
       <input type="hidden" name="action" value="logout">
       <div class="row"><button type="submit" class="quiet">Log out</button></div>
@@ -148,8 +150,18 @@ button:disabled{opacity:.55}
     return api('/api/admin/history').then(function(r){
       if (r.status === 401 || r.status === 503) { showLogin(); return null; }
       return r.json().then(function(d){ if (!r.ok) throw new Error(d.error || 'Could not load history.'); return d; });
-    }).then(function(d){ if (d) { showApp(); renderHistory(d.links || []); } })
+    }).then(function(d){ if (d) { showApp(); renderHistory(d.links || []); loadStoreInfo(); } })
       .catch(function(e){ showApp(); $('historyMsg').textContent = e.message; });
+  }
+
+  function loadStoreInfo(){
+    api('/api/admin/store').then(function(r){ return r.json(); })
+      .then(function(d){
+        $('storeInfo').textContent = d && d.ok
+          ? 'Storage: ' + (d.storeId || 'unknown') + ' (' + d.environment + ')'
+          : 'Storage: ' + ((d && d.error) || 'could not be verified.');
+      })
+      .catch(function(){ $('storeInfo').textContent = 'Storage: could not be verified.'; });
   }
 
   function showLogin(){ $('ownerApp').classList.add('hidden'); $('loginCard').classList.remove('hidden'); }

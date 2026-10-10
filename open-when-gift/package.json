@@ -3,10 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node scripts/protect.mjs && node --test tests/flows.test.mjs tests/endpoints.test.mjs",
+    "test": "node scripts/protect.mjs && node --test tests/flows.test.mjs tests/endpoints.test.mjs tests/storage-isolation.test.mjs tests/sdk-store-binding.test.mjs",
     "test:real-storage": "node --test tests/real-storage.test.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.8.1"
+  },
+  "devDependencies": {
+    "undici": "^6.29.0"
   }
 }

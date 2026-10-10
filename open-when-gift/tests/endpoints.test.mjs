@@ -277,9 +277,11 @@ test('logout clears the cookie', async () => {
   assert.match(res.headers['set-cookie'], /Max-Age=0/);
 });
 
-test('preview deployments refuse the production store', async () => {
+test('preview deployments refuse the production store (full coverage in storage-isolation.test.mjs)', async () => {
   assert.equal(storeIdOfToken('vercel_blob_rw_ABC123_secretpart'), 'ABC123');
-  assert.throws(() => storeFromEnv({ VERCEL_ENV: 'preview', OPEN_WHEN_PRODUCTION_STORE_ID: 'store_ABC123', BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_ABC123_x' }), /production Blob store/);
-  assert.doesNotThrow(() => storeFromEnv({ VERCEL_ENV: 'preview', OPEN_WHEN_PRODUCTION_STORE_ID: 'ABC123', BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_TEST999_x' }));
+  // Preview never uses BLOB_READ_WRITE_TOKEN, even when it is the only token present.
+  assert.throws(() => storeFromEnv({ VERCEL_ENV: 'preview', BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_TEST999_x' }), /Preview storage token is not configured/);
+  assert.throws(() => storeFromEnv({ VERCEL_ENV: 'preview', OPEN_WHEN_PRODUCTION_STORE_ID: 'store_ABC123', OW_PREVIEW_READ_WRITE_TOKEN: 'vercel_blob_rw_ABC123_x', OW_PREVIEW_STORE_ID: 'ABC123' }), /production Blob store/);
+  assert.doesNotThrow(() => storeFromEnv({ VERCEL_ENV: 'preview', OPEN_WHEN_PRODUCTION_STORE_ID: 'ABC123', OW_PREVIEW_READ_WRITE_TOKEN: 'vercel_blob_rw_TEST999_x', OW_PREVIEW_STORE_ID: 'store_TEST999' }));
   assert.doesNotThrow(() => storeFromEnv({ VERCEL_ENV: 'production', OPEN_WHEN_PRODUCTION_STORE_ID: 'ABC123', BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_ABC123_x' }));
 });

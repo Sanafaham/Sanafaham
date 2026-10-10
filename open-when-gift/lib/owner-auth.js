@@ -1,7 +1,9 @@
 // Owner authentication for the OPEN WHEN owner page.
 //
-// - The admin secret (OPEN_WHEN_ADMIN_SECRET) is only ever compared on the server. The owner
-//   types it into a plain HTML form that posts directly to /api/admin/session.
+// - The admin secret is only ever compared on the server. The owner types it into a plain HTML
+//   form that posts directly to /api/admin/session. Production uses OPEN_WHEN_ADMIN_SECRET.
+//   Preview uses only its own OW_PREVIEW_ADMIN_SECRET; if that is missing, or identical to the
+//   production secret, owner access on Preview stays disabled (no fallback).
 // - Sessions are stateless signed cookies: HMAC-SHA256 with a key derived from the secret,
 //   24-hour expiry, HttpOnly, Secure, SameSite=Strict, Path=/api/admin. Rotating the secret
 //   invalidates every session.
@@ -24,9 +26,13 @@ export const IP_WINDOW_MS = 15 * 60 * 1000;
 export const GLOBAL_LIMIT = 30;
 export const GLOBAL_WINDOW_MS = 60 * 60 * 1000;
 
-export function adminSecret() {
-  const s = process.env.OPEN_WHEN_ADMIN_SECRET || '';
-  return s;
+export function adminSecret(env = process.env) {
+  const production = env.OPEN_WHEN_ADMIN_SECRET || '';
+  if (env.VERCEL_ENV === 'preview') {
+    const preview = env.OW_PREVIEW_ADMIN_SECRET || '';
+    return preview && preview !== production ? preview : '';
+  }
+  return production;
 }
 export function secretIsStrong(secret) {
   return typeof secret === 'string' && secret.length >= MIN_SECRET_LENGTH;

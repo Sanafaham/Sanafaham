@@ -1,12 +1,13 @@
 import crypto from 'node:crypto';
-import { storeFromEnv } from '../../lib/store.js';
+import { storeFromEnv, resolveStorage } from '../../lib/store.js';
 import { issueEntitlement } from '../../lib/entitlements.js';
 import { readBody, baseHeaders } from '../../lib/http.js';
-import { timingSafeEqualText, secretIsStrong, isSameOrigin, hasOwnerSession, OWNER_HEADER } from '../../lib/owner-auth.js';
+import { adminSecret as currentAdminSecret, timingSafeEqualText, secretIsStrong, isSameOrigin, hasOwnerSession, OWNER_HEADER } from '../../lib/owner-auth.js';
 
 // Issues a one-use creation link.
 // Two ways in:
-//  1. The original protected method: X-Open-When-Admin header carrying OPEN_WHEN_ADMIN_SECRET
+//  1. The original protected method: X-Open-When-Admin header carrying the admin secret
+//     (OPEN_WHEN_ADMIN_SECRET in Production; OW_PREVIEW_ADMIN_SECRET on Preview, see lib/owner-auth.js)
 //     (kept unchanged until the owner page is fully verified).
 //  2. The owner page: a valid signed owner session cookie, same origin, plus X-Open-When-Owner: 1.
 export function makeAdminAccessHandler({ getStore = storeFromEnv, now = () => Date.now() } = {}) {
@@ -17,9 +18,10 @@ export function makeAdminAccessHandler({ getStore = storeFromEnv, now = () => Da
       return res.status(405).json({ error: 'Method not allowed.' });
     }
 
-    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-    const adminSecret = process.env.OPEN_WHEN_ADMIN_SECRET;
-    if (!blobToken || !adminSecret) return res.status(500).json({ error: 'Access issuing is not configured.' });
+    let storageReady = true;
+    try { resolveStorage(); } catch { storageReady = false; }
+    const adminSecret = currentAdminSecret();
+    if (!storageReady || !adminSecret) return res.status(500).json({ error: 'Access issuing is not configured.' });
 
     const supplied = req.headers['x-open-when-admin'];
     const headerOk = typeof supplied === 'string' && supplied.length > 0 && timingSafeEqualText(supplied, adminSecret);

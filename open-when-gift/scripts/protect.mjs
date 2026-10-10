@@ -12,6 +12,7 @@ const sessionApi = read('api/admin/session.js');
 const historyApi = read('api/admin/history.js');
 const revokeApi = read('api/admin/revoke.js');
 const ownerHtml = read('owner.html');
+const storeApi = read('api/admin/store.js');
 
 const required = [
   ['stable ivory paper', '--paper:#EFECE4'],
@@ -115,7 +116,18 @@ const checks = [
   [read('lib/http.js'), 'Path=/api; HttpOnly; Secure; SameSite=Strict', 'recovery cookie flags'],
   [accessApi, "(await readBody(req)).token", 'access token accepted in POST body'],
   // Owner issuance
-  [adminAccessApi, 'process.env.OPEN_WHEN_ADMIN_SECRET', 'protected access issuer'],
+  [adminAccessApi, 'const adminSecret = currentAdminSecret();', 'protected access issuer uses the central admin secret'],
+  [authLib, "const production = env.OPEN_WHEN_ADMIN_SECRET || '';", 'production admin secret'],
+  [authLib, "return preview && preview !== production ? preview : '';", 'Preview owner access uses only its own secret'],
+  // Storage isolation: one place picks credentials; Preview uses only the isolated store
+  [storeLib, 'export function resolveStorage(env = process.env)', 'central storage credential selection'],
+  [storeLib, "const PREVIEW_TOKEN_VAR = 'OW_PREVIEW_READ_WRITE_TOKEN';", 'Preview storage token'],
+  [storeLib, "if (actual !== expected) throw new StorageConfigError(", 'Preview token must belong to the Preview store'],
+  [storeLib, "throw new StorageConfigError('Preview deployments must not use the production Blob store.');", 'Preview refuses the production store'],
+  [storeLib, 'return blobStore({ token: resolveStorage(env).token });', 'every store goes through resolveStorage'],
+  [api, 'const tokenFromEnv = () => resolveStorage().token;', 'recipient gift loads use resolveStorage'],
+  [storeApi, 'if (!requireOwner(req, res)) return;', 'store identity check is owner-only'],
+  [storeApi, 'json({ ok: true, environment, storeId })', 'store identity check reveals only the store ID'],
   [adminAccessApi, 'crypto.randomBytes(32)', 'cryptographically random access token'],
   [adminAccessApi, "req.headers['x-open-when-admin']", 'original secret-header issuance kept'],
   [adminAccessApi, 'hasOwnerSession(req, now())', 'owner session issuance'],
@@ -143,6 +155,16 @@ const forbiddenSrc = [
   [ownerScript, '.innerHTML', 'owner page innerHTML rendering'],
   [entLib + storeLib + authLib, 'Math.random', 'non-cryptographic randomness in security code'],
 ];
+// Only lib/store.js may read storage credentials from the environment.
+const listJs = (dir) => fs.readdirSync(new URL('../' + dir, import.meta.url), { withFileTypes: true })
+  .flatMap((d) => d.isDirectory() ? listJs(dir + d.name + '/') : (d.name.endsWith('.js') ? [dir + d.name] : []));
+for (const file of [...listJs('api/'), ...listJs('lib/')]) {
+  if (file === 'lib/store.js') continue;
+  const src = read(file);
+  for (const name of ['BLOB_READ_WRITE_TOKEN', 'OW_PREVIEW_READ_WRITE_TOKEN', 'OW_PREVIEW_STORE_ID']) {
+    if (src.includes(name)) { console.error('FORBIDDEN: ' + file + ' reads ' + name + ' directly (use resolveStorage)'); failed = true; }
+  }
+}
 for (const [src, needle, name] of forbiddenSrc) {
   if (src.includes(needle)) { console.error('FORBIDDEN:', name); failed = true; }
 }

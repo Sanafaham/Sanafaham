@@ -1,5 +1,5 @@
 import { get } from '@vercel/blob';
-import { storeFromEnv } from '../lib/store.js';
+import { storeFromEnv, resolveStorage } from '../lib/store.js';
 import { createGift, cleanAccessToken } from '../lib/entitlements.js';
 import { readBody, baseHeaders, readCookie, recoveryCookie, RECOVERY_COOKIE } from '../lib/http.js';
 
@@ -22,11 +22,11 @@ async function readPrivateJson(pathname, token) {
   return JSON.parse(text);
 }
 
-export function makeGiftsHandler({ getStore = storeFromEnv, readGift = readPrivateJson, now = () => Date.now() } = {}) {
+const tokenFromEnv = () => resolveStorage().token;
+
+export function makeGiftsHandler({ getStore = storeFromEnv, getToken = tokenFromEnv, readGift = readPrivateJson, now = () => Date.now() } = {}) {
   return async function handler(req, res) {
     baseHeaders(res);
-
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
 
     if (req.method === 'POST') {
       let store;
@@ -57,6 +57,8 @@ export function makeGiftsHandler({ getStore = storeFromEnv, readGift = readPriva
     }
 
     if (req.method === 'GET') {
+      let token;
+      try { token = getToken(); } catch { token = ''; }
       if (!token) return res.status(500).json({ error: 'Gift storage is not configured.' });
       try {
         const id = cleanId(req.query?.id);

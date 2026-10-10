@@ -144,6 +144,8 @@ await check('owner page: login, issue, copy, history, revoke, logout', async () 
   await page.waitForSelector('#copyBtn:has-text("Copied")');
   assert.equal(await page.evaluate(() => navigator.clipboard.readText()), link);
   await page.waitForSelector('#history .item');
+  await page.waitForSelector('#storeInfo:has-text("Storage:")');
+  assert.equal(await page.textContent('#storeInfo'), 'Storage: store_localtest (local)');
   const hist = await page.textContent('#history');
   assert.ok(hist.includes('#1042') && hist.includes('Unused') && hist.includes('Used'));
   await shot(page, '5-owner-issued');

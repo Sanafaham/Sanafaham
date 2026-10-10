@@ -86,19 +86,59 @@ export function blobStore({ token, prefix = '' } = {}) {
   return { read, exists, create, replace, remove, list: listPaths };
 }
 
-// Read-write tokens look like vercel_blob_rw_<storeId>_<secret>; the SDK parses them the same way.
-export function storeIdOfToken(token) {
-  const [, , , storeId = ''] = String(token || '').split('_');
-  return storeId.startsWith('store_') ? storeId.slice('store_'.length) : storeId;
+// ----- storage credential selection (the ONLY place that reads storage env vars) -----------
+//
+// Which store a read-write token reaches: the pinned @vercel/blob SDK derives the store ID
+// from the token itself (`token.split('_')[3]`) and uses it for the read URL host
+// (<storeId>.private.blob.vercel-storage.com) and the x-vercel-blob-store-id header on writes.
+// storeIdOfToken mirrors that exactly, and tests/sdk-store-binding.test.mjs fails if the
+// installed SDK ever stops sending requests to the store this function reports.
+// Vercel also records the owning store of each connected token variable in its project metadata.
+const RW_PREFIX = 'vercel_blob_rw_';
+const PREVIEW_TOKEN_VAR = 'OW_PREVIEW_READ_WRITE_TOKEN';
+const PREVIEW_STORE_VAR = 'OW_PREVIEW_STORE_ID';
+
+export class StorageConfigError extends Error {
+  constructor(message) { super(message); this.name = 'StorageConfigError'; }
 }
 
-// Defence in depth: a Preview deployment refuses to use the production store if
-// OPEN_WHEN_PRODUCTION_STORE_ID is configured (store IDs are identifiers, not secrets).
-export function storeFromEnv(env = process.env) {
-  const token = env.BLOB_READ_WRITE_TOKEN;
-  const prodId = (env.OPEN_WHEN_PRODUCTION_STORE_ID || '').replace(/^store_/, '');
-  if (env.VERCEL_ENV === 'preview' && prodId && storeIdOfToken(token) === prodId) {
-    throw new Error('Preview deployments must not use the production Blob store.');
+const bareStoreId = (id) => String(id || '').trim().replace(/^store_/, '');
+
+// Returns the bare store ID of a read-write token, or '' when it cannot be determined.
+export function storeIdOfToken(token) {
+  if (typeof token !== 'string' || !token.startsWith(RW_PREFIX)) return '';
+  const [, , , storeId = ''] = token.split('_');
+  return /^[A-Za-z0-9]+$/.test(storeId) ? bareStoreId(storeId) : '';
+}
+
+// Picks the storage credentials for this deployment.
+// Preview: only OW_PREVIEW_READ_WRITE_TOKEN, and only when it provably belongs to the store
+//   named in OW_PREVIEW_STORE_ID and to a different store than the production token.
+//   There is no fallback to BLOB_READ_WRITE_TOKEN; anything missing or unverifiable throws
+//   before any storage request is made.
+// Production and local: BLOB_READ_WRITE_TOKEN, exactly as before.
+export function resolveStorage(env = process.env) {
+  if (env.VERCEL_ENV === 'preview') {
+    const token = env[PREVIEW_TOKEN_VAR] || '';
+    const expected = bareStoreId(env[PREVIEW_STORE_VAR]);
+    if (!token) throw new StorageConfigError('Preview storage token is not configured.');
+    if (!expected) throw new StorageConfigError('Preview store ID is not configured.');
+    const actual = storeIdOfToken(token);
+    if (!actual) throw new StorageConfigError('Preview storage token cannot be verified.');
+    if (actual !== expected) throw new StorageConfigError('Preview storage token does not belong to the Preview store.');
+    const prodToken = env.BLOB_READ_WRITE_TOKEN || '';
+    const prodIds = [bareStoreId(env.OPEN_WHEN_PRODUCTION_STORE_ID), storeIdOfToken(prodToken)].filter(Boolean);
+    if ((prodToken && token === prodToken) || prodIds.includes(actual)) {
+      throw new StorageConfigError('Preview deployments must not use the production Blob store.');
+    }
+    return { token, storeId: 'store_' + actual, environment: 'preview' };
   }
-  return blobStore({ token });
+  const token = env.BLOB_READ_WRITE_TOKEN || '';
+  if (!token) throw new StorageConfigError('Blob storage is not configured.');
+  const id = storeIdOfToken(token);
+  return { token, storeId: id ? 'store_' + id : null, environment: env.VERCEL_ENV || 'local' };
+}
+
+export function storeFromEnv(env = process.env) {
+  return blobStore({ token: resolveStorage(env).token });
 }
