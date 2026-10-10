@@ -50,6 +50,22 @@ await check('buyer creates a gift; unusual name renders as plain text; no script
   assert.match(giftUrl, /\/\?gift=[a-f0-9-]{36}$/);
   for (const [, ref] of referers) assert.equal(ref, '', 'no referrer to third parties');
   await shot(page, '1-created');
+  // Refresh and reopen in the same browser: the gift and share controls come back.
+  await page.reload();
+  await page.waitForSelector('#share.show');
+  assert.equal(await page.getAttribute('.share-actions .primary-link', 'href'), giftUrl);
+  assert.equal(await page.isVisible('#makeLink'), false);
+  assert.ok((await page.textContent('#saveStatus')).includes('already created'));
+  await page.goto('about:blank');
+  await page.goto(base + accessPath);
+  await page.waitForSelector('#share.show');
+  assert.equal(await page.isVisible('#recipient'), false);
+  assert.equal(await page.isVisible('#personalize'), false);
+  await shot(page, '2-recovered');
+  const cookies = await ctx.cookies(base + '/api/access');
+  const rc = cookies.find((c) => c.name === 'ow_recovery');
+  assert.ok(rc && rc.httpOnly && rc.secure && rc.sameSite === 'Strict', 'recovery cookie flags');
+  assert.equal(await page.evaluate(() => document.cookie.includes('ow_recovery')), false, 'not readable by page scripts');
   await ctx.close();
 });
 
@@ -58,23 +74,20 @@ await check('access token never appears in an API request URL', async () => {
   assert.deepEqual(apiWithToken, []);
 });
 
-await check('refresh / reopen on another device recovers the same gift and share controls; no create form', async () => {
-  const ctx = await browser.newContext(phone); // fresh browser: no cookies, no storage
+await check('forwarded creation link on another device: no gift link, no letters, no create form', async () => {
+  const ctx = await browser.newContext(phone); // another device: no recovery cookie
   const page = await ctx.newPage();
+  const giftLoads = [];
+  page.on('request', (r) => { if (r.url().includes('/api/gifts')) giftLoads.push(r.method() + ' ' + r.url()); });
   await page.goto(base + accessPath);
-  await page.waitForSelector('#share.show');
-  assert.equal(await page.getAttribute('.share-actions .primary-link', 'href'), giftUrl);
-  assert.equal(await page.isVisible('#makeLink'), false);
-  assert.equal(await page.isVisible('#recipient'), false);
-  assert.equal(await page.isVisible('#personalize'), false);
-  assert.ok((await page.textContent('#saveStatus')).includes('already created'));
-  assert.equal(await page.isVisible('#previewNote'), true);
-  assert.equal(await page.isVisible('#giftExperience'), true);
-  await shot(page, '2-recovered');
-  await page.reload();
-  await page.waitForSelector('#share.show');
-  assert.equal(await page.isVisible('#makeLink'), false);
+  await page.waitForSelector('main h1');
+  assert.equal(await page.textContent('main h1'), 'This gift has already been created.');
+  const html = await page.content();
+  assert.ok(!html.includes(giftUrl.split('gift=')[1]), 'gift ID not exposed');
+  assert.ok(!html.includes('Letter') && !html.includes('Mama'), 'no private content');
+  assert.deepEqual(giftLoads, [], 'the gift was never fetched');
   assert.equal(giftKeys(server.store).length, 1);
+  await shot(page, '2b-forwarded');
   await ctx.close();
 });
 

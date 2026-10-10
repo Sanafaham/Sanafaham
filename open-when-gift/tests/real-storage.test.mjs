@@ -14,7 +14,7 @@ import crypto from 'node:crypto';
 import { blobStore, storeIdOfToken, ConflictError } from '../lib/store.js';
 import {
   issueEntitlement, accessState, createGift, revokeEntitlement, entitlementHistory,
-  entitlementPath, giftPath, tokenHash, LEASE_MS
+  entitlementPath, giftPath, tokenHash, LEASE_MS, newRecoveryKey
 } from '../lib/entitlements.js';
 import { reserveLoginAttempt, IP_LIMIT } from '../lib/owner-auth.js';
 import { faultyStore, giftPayload } from './helpers.mjs';
@@ -79,8 +79,9 @@ if (!token) {
       assert.equal(ok.length, 1, 'round ' + round + ': exactly one request saves');
       assert.equal(ok[0].body.id, rec.giftId);
       assert.equal(await giftCount(rec.giftId), 1);
-      const state = await accessState(store, rawToken);
-      assert.deepEqual(state, { state: 'created', giftId: rec.giftId });
+      const creator = ok[0].recoveryKey;
+      assert.deepEqual(await accessState(store, rawToken, Date.now(), creator), { state: 'created', giftId: rec.giftId });
+      assert.deepEqual(await accessState(store, rawToken), { state: 'created-elsewhere' });
       const again = await createGift(store, { rawToken, gift: giftPayload() });
       assert.equal(again.status, 409);
     }
@@ -123,9 +124,11 @@ if (!token) {
   test('crash after gift save: recovered immediately and finalized by the next call', async () => {
     const rawToken = newToken();
     const rec = await issueEntitlement(store, { rawToken });
-    await createGift(faultyStore(store, { dieAfterWrites: 2 }), { rawToken, gift: giftPayload() }).catch(() => {});
-    assert.deepEqual(await accessState(store, rawToken), { state: 'created', giftId: rec.giftId });
-    const r = await createGift(store, { rawToken, gift: giftPayload({ recipient: 'Other' }) });
+    const key = newRecoveryKey();
+    await createGift(faultyStore(store, { dieAfterWrites: 2 }), { rawToken, gift: giftPayload(), recoveryKey: key }).catch(() => {});
+    assert.deepEqual(await accessState(store, rawToken, Date.now(), key), { state: 'created', giftId: rec.giftId });
+    assert.deepEqual(await accessState(store, rawToken), { state: 'created-elsewhere' });
+    const r = await createGift(store, { rawToken, gift: giftPayload({ recipient: 'Other' }), recoveryKey: key });
     assert.equal(r.status, 409);
     assert.equal((await store.read(entitlementPath(tokenHash(rawToken)))).data.status, 'used');
     assert.equal((await store.read(giftPath(rec.giftId))).data.recipient, 'Lou');

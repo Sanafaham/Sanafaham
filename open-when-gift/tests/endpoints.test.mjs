@@ -50,7 +50,7 @@ test('existing secret-header issuance still works and wrong headers are refused'
   assert.equal(none.statusCode, 401);
 });
 
-test('buyer journey through the endpoints: create, refresh-recover, never a second gift', async () => {
+test('buyer journey through the endpoints: create, refresh-recover in the same browser, forwarded link gets nothing', async () => {
   const store = memoryStore();
   const a = app(store);
   const { accessToken } = await issueViaHeader(a);
@@ -59,27 +59,42 @@ test('buyer journey through the endpoints: create, refresh-recover, never a seco
   assert.deepEqual(res.body, { valid: true, state: 'unused' });
   assert.equal(res.headers['referrer-policy'], 'no-referrer');
   assert.equal(res.headers['cache-control'], 'no-store');
+  const setCookie = res.headers['set-cookie'];
+  assert.match(setCookie, /^ow_recovery=[A-Za-z0-9_-]{43}; Path=\/api; HttpOnly; Secure; SameSite=Strict; Max-Age=\d+$/);
+  const browser = { cookie: setCookie.split(';')[0] };
 
-  res = await call(a.gifts, mockReq({ method: 'POST', body: { id: 'client-id', accessToken, ...giftPayload() } }));
+  res = await call(a.gifts, mockReq({ method: 'POST', headers: browser, body: { id: 'client-id', accessToken, ...giftPayload() } }));
   assert.equal(res.statusCode, 201);
   const id = res.body.id;
   assert.notEqual(id, 'client-id', 'gift ID comes from the entitlement, not the browser');
+  assert.equal(res.headers['set-cookie'].split(';')[0], browser.cookie, 'the same recovery key is bound');
 
-  // Refresh / reopen the original link: recovery, not creation.
-  res = await call(a.access, mockReq({ method: 'POST', body: { token: accessToken } }));
+  // Refresh / reopen in the same browser: recovery, not creation.
+  res = await call(a.access, mockReq({ method: 'POST', headers: browser, body: { token: accessToken } }));
   assert.deepEqual(res.body, { valid: false, state: 'created', giftId: id });
 
+  // Forwarded link on another device: no gift ID, no content, no new cookie.
+  res = await call(a.access, mockReq({ method: 'POST', body: { token: accessToken } }));
+  assert.deepEqual(res.body, { valid: false, state: 'created-elsewhere' });
+  assert.equal(res.headers['set-cookie'], undefined);
   res = await call(a.gifts, mockReq({ method: 'POST', body: { id: 'x', accessToken, ...giftPayload({ recipient: 'Mallory' }) } }));
   assert.equal(res.statusCode, 409);
-  assert.equal(res.body.state, 'created');
+  assert.deepEqual(Object.keys(res.body).sort(), ['error', 'state']);
+  assert.equal(res.body.state, 'created-elsewhere');
+  assert.equal(res.headers['set-cookie'], undefined);
+
+  // Same browser trying again: told it exists, still one gift.
+  res = await call(a.gifts, mockReq({ method: 'POST', headers: browser, body: { id: 'x', accessToken, ...giftPayload({ recipient: 'Again' }) } }));
+  assert.equal(res.statusCode, 409);
+  assert.equal(res.body.id, id);
   assert.equal(giftKeys(store).length, 1);
 
   // Recipient link loads only the gift, through the unchanged GET API.
   res = await call(a.gifts, mockReq({ method: 'GET', query: { id } }));
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.recipient, 'Lou');
-  assert.ok(!JSON.stringify(res.body).includes(accessToken));
-  assert.ok(!JSON.stringify(res.body).includes(tokenHash(accessToken)));
+  const json = JSON.stringify(res.body);
+  assert.ok(!json.includes(accessToken) && !json.includes(tokenHash(accessToken)) && !json.includes(browser.cookie.split('=')[1]));
 });
 
 test('legacy GET access check keeps its old contract for pages loaded before release', async () => {

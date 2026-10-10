@@ -1,6 +1,6 @@
 import { storeFromEnv } from '../lib/store.js';
-import { accessState } from '../lib/entitlements.js';
-import { readBody, baseHeaders } from '../lib/http.js';
+import { accessState, cleanRecoveryKey, newRecoveryKey } from '../lib/entitlements.js';
+import { readBody, baseHeaders, readCookie, recoveryCookie, RECOVERY_COOKIE } from '../lib/http.js';
 
 // Buyer access check.
 // POST { token } is used by the current page so access tokens never appear in request URLs.
@@ -19,7 +19,8 @@ export function makeAccessHandler({ getStore = storeFromEnv, now = () => Date.no
     try {
       const raw = req.method === 'POST' ? (await readBody(req)).token : req.query?.token;
       if (!raw) return res.status(400).json({ error: 'Missing access token.' });
-      const s = await accessState(store, raw, now());
+      const recoveryKey = cleanRecoveryKey(readCookie(req, RECOVERY_COOKIE));
+      const s = await accessState(store, raw, now(), recoveryKey);
 
       if (req.method === 'GET') {
         // Legacy contract: only an unused link is valid.
@@ -29,8 +30,13 @@ export function makeAccessHandler({ getStore = storeFromEnv, now = () => Date.no
       }
 
       switch (s.state) {
-        case 'unused': return res.status(200).json({ valid: true, state: 'unused' });
+        case 'unused':
+          // Give this browser its recovery key before it creates, so a crash mid-save cannot
+          // separate the buyer from their gift.
+          if (!recoveryKey) res.setHeader('Set-Cookie', recoveryCookie(newRecoveryKey()));
+          return res.status(200).json({ valid: true, state: 'unused' });
         case 'created': return res.status(200).json({ valid: false, state: 'created', giftId: s.giftId });
+        case 'created-elsewhere': return res.status(200).json({ valid: false, state: 'created-elsewhere' });
         case 'saving': return res.status(200).json({ valid: false, state: 'saving' });
         case 'revoked': return res.status(403).json({ valid: false, state: 'revoked', error: 'This access link has been cancelled.' });
         default: return res.status(403).json({ valid: false, state: 'invalid', error: 'This access link is not valid.' });

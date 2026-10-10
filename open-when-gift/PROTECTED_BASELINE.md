@@ -30,7 +30,8 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Opened-card state persists locally per gift.
 - Receiver can return with **Back to my cards** to the previous card-grid scroll position.
 - Home Screen guidance remains compact and available, including opening the link in Safari (iPhone) or Chrome (Android) first when it was opened inside another app.
-- The buyer's original access link recovers the one gift it created (sender preview and sharing controls) after refresh, closing Safari or reopening the link. It never creates a second gift.
+- In the browser that created the gift, the original access link recovers it (sender preview and sharing controls) after refresh, closing Safari or reopening the link. It never creates a second gift.
+- A forwarded creation link opened in any other browser shows only "This gift has already been created." It never reveals the gift link or the sender's letters.
 - Share and creator text supplied by the buyer is rendered as plain text, never as HTML.
 - No web-app manifest is added until it can preserve the gift token safely.
 
@@ -74,7 +75,7 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - An entitlement becomes `used` only after its gift exists. A crashed or interrupted save is recovered automatically after the claim expires; paid access is never consumed without a gift.
 - The gift save is bounded by the claim and uses `allowOverwrite: false` as a secondary guard.
 - Used, invalid, copied, replayed, revoked or concurrently submitted access links cannot authorize another gift.
-- Possession of the original access link is the buyer's recovery credential: a used link reveals only its own gift ID, the same content the recipient link already shows.
+- Buyer recovery is device-bound: the access check gives the browser a random recovery key in an `HttpOnly; Secure; SameSite=Strict; Path=/api` cookie, the entitlement stores only its SHA-256 hash when the gift is created, and a used link reveals its gift ID only when that key is presented. Lost-device recovery goes through the owner history.
 - Gift recipient links remain independent of creator access tokens and continue to load by opaque gift ID through the unchanged `GET /api/gifts?id=` API.
 - The current page checks access with `POST /api/access` (token in the request body, not the URL). `GET /api/access?token=` keeps its old contract for pages loaded before this release.
 - Pages send no referrer to third parties (`Referrer-Policy: no-referrer`; the owner page uses `same-origin` so its own form posts keep a valid Origin).

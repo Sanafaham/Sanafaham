@@ -521,11 +521,16 @@ function showSaving(){
   clearTimeout(savingTimer);
   savingTimer=setTimeout(()=>checkAccess().catch(()=>{ saveStatus.textContent='Please refresh this page in a minute to see your gift.'; }),5000);
 }
+// A used link opened anywhere other than the browser that created it: no gift content.
+function showCreatedElsewhere(){
+  document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>This gift has already been created.</h1><p>For privacy, it can only be reopened in the browser where it was made. If you made it and cannot find it, reply to the message your link came in.</p></main>';
+}
 async function checkAccess(){
   const r=await fetch('/api/access',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:accessToken})});
   const data=await r.json().catch(()=>({}));
   if(r.ok&&data.state==='created'&&data.giftId){ await recoverGift(data.giftId); return; }
   if(r.ok&&data.state==='saving'){ showSaving(); return; }
+  if(r.ok&&data.state==='created-elsewhere'){ showCreatedElsewhere(); return; }
   if(r.ok&&data.state==='unused'){ setup.classList.remove('recovered'); saveStatus.classList.remove('show'); applyEdition(); return; }
   throw new Error(data.error||'This access link is not available.');
 }
@@ -545,6 +550,7 @@ makeLink.onclick=async()=>{
       const data=await r.json().catch(()=>({}));
       if(data.state==='created'&&data.id){ await recoverGift(data.id); return; }
       if(data.state==='saving'){ showSaving(); return; }
+      if(data.state==='created-elsewhere'){ showCreatedElsewhere(); return; }
       throw new Error('save failed');
     }
     const saved=await r.json();

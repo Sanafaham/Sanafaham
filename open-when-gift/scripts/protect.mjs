@@ -109,7 +109,10 @@ const checks = [
   [entLib, "await finalize(store, ePath, attempt, now())", 'finalize after the gift exists'],
   [entLib, 'AbortSignal.timeout(remaining - 5_000)', 'gift save bounded by the lease'],
   [entLib, "crypto.createHash('sha256')", 'only token hashes are stored'],
-  [accessApi, 'accessState(store, raw, now())', 'access check reports unused/created/saving/revoked'],
+  [accessApi, 'accessState(store, raw, now(), recoveryKey)', 'access check reports unused/created/saving/revoked'],
+  [entLib, 'return recoveryMatches(rec, recoveryKey) ? { state: \'created\', giftId: id } : { state: \'created-elsewhere\' };', 'recovery bound to the creating browser'],
+  [entLib, 'recoveryHash: tokenHash(ownKey)', 'only the recovery key hash is stored'],
+  [read('lib/http.js'), 'Path=/api; HttpOnly; Secure; SameSite=Strict', 'recovery cookie flags'],
   [accessApi, "(await readBody(req)).token", 'access token accepted in POST body'],
   // Owner issuance
   [adminAccessApi, 'process.env.OPEN_WHEN_ADMIN_SECRET', 'protected access issuer'],

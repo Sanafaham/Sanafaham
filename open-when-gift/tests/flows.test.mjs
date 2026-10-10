@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import {
   issueEntitlement, accessState, createGift, revokeEntitlement, entitlementHistory,
-  entitlementPath, giftPath, tokenHash, LEASE_MS
+  entitlementPath, giftPath, tokenHash, LEASE_MS, newRecoveryKey
 } from '../lib/entitlements.js';
 import { memoryStore, faultyStore, seededRandom, giftPayload, giftKeys } from './helpers.mjs';
 
@@ -43,16 +43,28 @@ test('the gift record never contains the access token or its hash', async () => 
   assert.deepEqual(Object.keys(JSON.parse(body)).sort(), ['createdAt', 'edition', 'id', 'messages', 'recipient', 'sender', 'version']);
 });
 
-test('a used link recovers its gift ID but can never create a second gift', async () => {
+test('the creating browser recovers its gift; a forwarded link alone gets no gift ID; never a second gift', async () => {
   const store = memoryStore();
   const { rawToken, rec } = await issued(store);
-  await createGift(store, { rawToken, gift: giftPayload() });
-  assert.deepEqual(await accessState(store, rawToken), { state: 'created', giftId: rec.giftId });
+  const key = newRecoveryKey(); // issued to the buyer's browser at the access check
+  const made = await createGift(store, { rawToken, gift: giftPayload(), recoveryKey: key });
+  assert.equal(made.recoveryKey, key);
+  assert.deepEqual(await accessState(store, rawToken, Date.now(), key), { state: 'created', giftId: rec.giftId });
+  assert.deepEqual(await accessState(store, rawToken), { state: 'created-elsewhere' });
+  assert.deepEqual(await accessState(store, rawToken, Date.now(), newRecoveryKey()), { state: 'created-elsewhere' });
 
-  const again = await createGift(store, { rawToken, gift: giftPayload({ recipient: 'Someone else' }) });
+  const forwarded = await createGift(store, { rawToken, gift: giftPayload({ recipient: 'Mallory' }) });
+  assert.equal(forwarded.status, 409);
+  assert.equal(forwarded.body.state, 'created-elsewhere');
+  assert.equal(forwarded.body.id, undefined);
+  assert.equal(forwarded.recoveryKey, undefined);
+
+  const again = await createGift(store, { rawToken, gift: giftPayload({ recipient: 'Someone else' }), recoveryKey: key });
   assert.equal(again.status, 409);
   assert.equal(again.body.state, 'created');
   assert.equal(again.body.id, rec.giftId);
+  const stored = (await recordOf(store, rawToken));
+  assert.ok(!JSON.stringify(stored).includes(key), 'only the hash of the recovery key is stored');
   assert.equal(giftKeys(store).length, 1);
   assert.equal(JSON.parse(store.map.get(giftPath(rec.giftId)).body).recipient, 'Lou');
 });
@@ -78,7 +90,7 @@ test('20 concurrent creates on one link produce exactly one gift (100 interleavi
     assert.ok(ok.length >= 1, 'seed ' + seed + ': someone must succeed');
     for (const r of results) {
       if (r.status === 201) assert.equal(r.body.id, rec.giftId);
-      else { assert.equal(r.status, 409); assert.ok(['created', 'saving'].includes(r.body.state)); }
+      else { assert.equal(r.status, 409); assert.ok(['created', 'created-elsewhere', 'saving'].includes(r.body.state)); assert.equal(r.body.state === 'created-elsewhere' ? r.body.id : undefined, undefined); }
     }
     const stored = JSON.parse(store.map.get(giftPath(rec.giftId)).body);
     // Exactly one writer: all 201 responses describe the same saved gift.
@@ -114,12 +126,15 @@ test('crash right after claiming: shows saving, then a retry after the lease sav
 test('crash after the gift is saved but before marking used: recovered immediately, never duplicated', async () => {
   const base = memoryStore();
   const { rawToken, rec } = await issued(base);
+  const key = newRecoveryKey();
   const crashed = faultyStore(base, { dieAfterWrites: 2 }); // claim + gift save, then dead
-  await createGift(crashed, { rawToken, gift: giftPayload() }).catch(() => {});
+  await createGift(crashed, { rawToken, gift: giftPayload(), recoveryKey: key }).catch(() => {});
   assert.equal((await recordOf(base, rawToken)).status, 'creating');
-  assert.deepEqual(await accessState(base, rawToken), { state: 'created', giftId: rec.giftId });
+  // The buyer's browser already holds its key from the access check, so the crash cannot lock it out.
+  assert.deepEqual(await accessState(base, rawToken, Date.now(), key), { state: 'created', giftId: rec.giftId });
+  assert.deepEqual(await accessState(base, rawToken), { state: 'created-elsewhere' });
 
-  const retry = await createGift(base, { rawToken, gift: giftPayload({ recipient: 'Other' }) });
+  const retry = await createGift(base, { rawToken, gift: giftPayload({ recipient: 'Other' }), recoveryKey: key });
   assert.equal(retry.status, 409);
   assert.equal(retry.body.state, 'created');
   assert.equal(giftKeys(base).length, 1);
@@ -157,7 +172,7 @@ test('lost responses on every finalize attempt: buyer still sees created, a late
   assert.equal(r.status, 201);
   assert.equal(claims, 1);
   assert.equal((await recordOf(base, rawToken)).status, 'creating');
-  assert.deepEqual(await accessState(base, rawToken), { state: 'created', giftId: rec.giftId });
+  assert.deepEqual(await accessState(base, rawToken, Date.now(), r.recoveryKey), { state: 'created', giftId: rec.giftId });
   const later = await createGift(base, { rawToken, gift: giftPayload() });
   assert.equal(later.status, 409);
   assert.equal((await recordOf(base, rawToken)).status, 'used');
@@ -273,8 +288,11 @@ test('legacy used record whose gift exists recovers as created', async () => {
   const giftId = crypto.randomUUID();
   await store.create(entitlementPath(hash), { version: 1, tokenHash: hash, status: 'used', createdAt: '2026-10-07T12:00:00.000Z', usedAt: '2026-10-07T12:05:00.000Z', giftId });
   await store.create(giftPath(giftId), { version: 1, edition: 'son', id: giftId, recipient: 'A', sender: 'B', messages: Array(24).fill('x'), createdAt: '2026-10-07T12:05:00.000Z' });
-  assert.deepEqual(await accessState(store, rawToken), { state: 'created', giftId });
-  assert.equal((await createGift(store, { rawToken, gift: giftPayload() })).status, 409);
+  // Created before device-bound recovery existed: no recovery key, so the link alone reveals nothing.
+  assert.deepEqual(await accessState(store, rawToken), { state: 'created-elsewhere' });
+  const r = await createGift(store, { rawToken, gift: giftPayload() });
+  assert.equal(r.status, 409);
+  assert.equal(r.body.id, undefined);
 });
 
 test('owner history: statuses, references, gift links, and no tokens or letters', async () => {
@@ -295,4 +313,17 @@ test('owner history: statuses, references, gift links, and no tokens or letters'
   const json = JSON.stringify(rows);
   for (const t of [a.rawToken, b.rawToken, c.rawToken]) assert.ok(!json.includes(t));
   assert.ok(!json.includes('Letter 1'));
+});
+
+test('one browser double-submitting (shared recovery key): exactly one gift and both see it', async () => {
+  for (let seed = 1; seed <= 50; seed++) {
+    const store = memoryStore({ random: seededRandom(seed), maxDelayMs: 4 });
+    const { rawToken, rec } = await issued(store);
+    const key = newRecoveryKey();
+    const results = await Promise.all([1, 2, 3].map(() => createGift(store, { rawToken, gift: giftPayload(), recoveryKey: key })));
+    assert.equal(giftKeys(store).length, 1);
+    assert.equal(results.filter((r) => r.status === 201).length, 1);
+    for (const r of results) if (r.status === 409 && r.body.state === 'created') assert.equal(r.body.id, rec.giftId);
+    assert.deepEqual(await accessState(store, rawToken, Date.now(), key), { state: 'created', giftId: rec.giftId });
+  }
 });

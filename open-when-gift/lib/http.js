@@ -24,3 +24,18 @@ export function baseHeaders(res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Referrer-Policy', 'no-referrer');
 }
+
+// Device-bound buyer recovery key. HttpOnly so page scripts never see it; sent only to /api.
+export const RECOVERY_COOKIE = 'ow_recovery';
+const RECOVERY_MAX_AGE_S = 365 * 24 * 60 * 60;
+export function recoveryCookie(value) {
+  return `${RECOVERY_COOKIE}=${value}; Path=/api; HttpOnly; Secure; SameSite=Strict; Max-Age=${RECOVERY_MAX_AGE_S}`;
+}
+export function readCookie(req, name) {
+  const header = String((req.headers && req.headers.cookie) || '');
+  for (const part of header.split(';')) {
+    const i = part.indexOf('=');
+    if (i > 0 && part.slice(0, i).trim() === name) return part.slice(i + 1).trim();
+  }
+  return '';
+}

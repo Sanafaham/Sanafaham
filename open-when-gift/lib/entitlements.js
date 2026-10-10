@@ -11,6 +11,11 @@
 //     unused -> creating may save the gift. Losers report "saving" and later see "created".
 //     allowOverwrite:false on the gift save is a secondary guard only.
 //
+// Buyer recovery is bound to the browser that created the gift: the claim stores the SHA-256 of a
+// random recovery key, and the key is returned to that browser only as an HttpOnly cookie. A used
+// access link reveals the gift ID only when that recovery key is presented, so a forwarded creation
+// link alone never exposes the sender's private letters.
+//
 // A "creating" claim expires after LEASE_MS. A claimant never starts its gift save once its own
 // lease is close to expiry, and the save is aborted at lease expiry, so a takeover after expiry
 // cannot overlap a live save. A crashed attempt is recovered by the next request after expiry.
@@ -41,6 +46,18 @@ export function cleanReference(value) {
 export const entitlementPath = (hash) => 'entitlements/' + hash + '.json';
 export const giftPath = (id) => 'gifts/' + id + '.json';
 
+export function newRecoveryKey() { return crypto.randomBytes(32).toString('base64url'); }
+export function cleanRecoveryKey(value) {
+  const key = typeof value === 'string' ? value.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 100) : '';
+  return key.length >= 32 ? key : '';
+}
+function recoveryMatches(rec, recoveryKey) {
+  const key = cleanRecoveryKey(recoveryKey);
+  if (!key || typeof rec.recoveryHash !== 'string' || rec.recoveryHash.length !== 64) return false;
+  const a = Buffer.from(tokenHash(key), 'hex'), b = Buffer.from(rec.recoveryHash, 'hex');
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
 function validRecord(rec, hash) {
   return rec && rec.version === 1 && rec.tokenHash === hash && cleanId(rec.giftId);
 }
@@ -62,10 +79,9 @@ export async function issueEntitlement(store, { rawToken, reference = '', now = 
 }
 
 // ----- buyer access state -----------------------------------------------------------------
-// Returns { state: 'unused' | 'created' | 'saving' | 'revoked' | 'invalid', giftId? }.
-// Possession of the original access link is the recovery credential: a used link reveals its
-// own gift ID (and therefore the same content the recipient link shows) but never creates.
-export async function accessState(store, rawToken, now = Date.now()) {
+// Returns { state: 'unused' | 'created' | 'created-elsewhere' | 'saving' | 'revoked' | 'invalid', giftId? }.
+// A used link reveals its gift ID only to the browser holding the matching recovery key.
+export async function accessState(store, rawToken, now = Date.now(), recoveryKey = '') {
   const token = cleanAccessToken(rawToken);
   if (!token) return { state: 'invalid' };
   const hash = tokenHash(token);
@@ -77,7 +93,9 @@ export async function accessState(store, rawToken, now = Date.now()) {
   if (rec.status === 'unused') return { state: 'unused' };
   if (rec.status === 'revoked') return { state: 'revoked' };
   if (rec.status === 'used' || rec.status === 'creating') {
-    if (await store.exists(giftPath(id))) return { state: 'created', giftId: id };
+    if (await store.exists(giftPath(id))) {
+      return recoveryMatches(rec, recoveryKey) ? { state: 'created', giftId: id } : { state: 'created-elsewhere' };
+    }
     if (rec.status === 'creating' && Date.parse(rec.leaseUntil) > now) return { state: 'saving' };
     if (rec.status === 'used' && !legacyUsedRecoverable(rec, now)) return { state: 'saving' };
     // Expired claim, or a legacy record marked used before its gift was saved: the buyer may
@@ -96,7 +114,9 @@ function legacyUsedRecoverable(rec, now) {
 
 // ----- gift creation ----------------------------------------------------------------------
 // Returns { status, body }. Never creates more than one gift per entitlement.
-export async function createGift(store, { rawToken, gift, now = () => Date.now(), attempt = crypto.randomUUID() }) {
+export async function createGift(store, { rawToken, gift, now = () => Date.now(), attempt = crypto.randomUUID(), recoveryKey = '' }) {
+  // Bind the browser's existing recovery key (issued at the access check) or a fresh one.
+  const ownKey = cleanRecoveryKey(recoveryKey) || newRecoveryKey();
   const token = cleanAccessToken(rawToken);
   if (!token) return { status: 400, body: { error: 'Invalid gift data.' } };
   const hash = tokenHash(token);
@@ -118,7 +138,8 @@ export async function createGift(store, { rawToken, gift, now = () => Date.now()
     if (rec.status === 'used' || rec.status === 'creating') {
       if (await store.exists(giftPath(id))) {
         if (rec.status === 'creating') await finalize(store, ePath, null, t).catch(() => {});
-        return { status: 409, body: { error: 'This access link has already been used.', state: 'created', id } };
+        if (recoveryMatches(rec, recoveryKey)) return { status: 409, body: { error: 'This access link has already been used.', state: 'created', id } };
+        return { status: 409, body: { error: 'This gift has already been created.', state: 'created-elsewhere' } };
       }
       const takeable = rec.status === 'creating' ? Date.parse(rec.leaseUntil) <= t : legacyUsedRecoverable(rec, t);
       if (!takeable) return { status: 409, body: { error: 'Your gift is still being saved.', state: 'saving' } };
@@ -126,7 +147,7 @@ export async function createGift(store, { rawToken, gift, now = () => Date.now()
       return { status: 403, body: { error: 'This access link is not valid.' } };
     }
 
-    const next = { ...rec, status: 'creating', attempt, leaseUntil: new Date(t + LEASE_MS).toISOString() };
+    const next = { ...rec, status: 'creating', attempt, leaseUntil: new Date(t + LEASE_MS).toISOString(), recoveryHash: tokenHash(ownKey) };
     try {
       const w = await store.replace(ePath, next, r.etag);
       claimed = { rec: next, etag: w.etag };
@@ -163,7 +184,7 @@ export async function createGift(store, { rawToken, gift, now = () => Date.now()
 
   // Phase 3: mark used. Only reached once the gift exists (invariant 2).
   await finalize(store, ePath, attempt, now()).catch(() => {});
-  return { status: 201, body: { ok: true, id } };
+  return { status: 201, body: { ok: true, id }, recoveryKey: ownKey };
 }
 
 // Move creating -> used once the gift exists. Retries on version conflicts; tolerant of lost

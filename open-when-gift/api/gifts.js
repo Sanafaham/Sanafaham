@@ -1,7 +1,7 @@
 import { get } from '@vercel/blob';
 import { storeFromEnv } from '../lib/store.js';
 import { createGift, cleanAccessToken } from '../lib/entitlements.js';
-import { readBody, baseHeaders } from '../lib/http.js';
+import { readBody, baseHeaders, readCookie, recoveryCookie, RECOVERY_COOKIE } from '../lib/http.js';
 
 const MAX_TEXT = 4000;
 const MAX_NAME = 40;
@@ -47,7 +47,8 @@ export function makeGiftsHandler({ getStore = storeFromEnv, readGift = readPriva
         }
 
         // One gift per access entitlement; the gift ID comes from the entitlement, never the browser.
-        const result = await createGift(store, { rawToken: accessToken, gift: { edition, recipient, sender, messages }, now });
+        const result = await createGift(store, { rawToken: accessToken, gift: { edition, recipient, sender, messages }, now, recoveryKey: readCookie(req, RECOVERY_COOKIE) });
+        if (result.recoveryKey) res.setHeader('Set-Cookie', recoveryCookie(result.recoveryKey));
         return res.status(result.status).json(result.body);
       } catch (error) {
         console.error('gift-save-failed', error && error.name);
