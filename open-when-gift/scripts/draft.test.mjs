@@ -114,7 +114,14 @@ function creator(fetch) {
   const status = {};
   const resumeLink = { hidden: true };
   const controls = new Map([['draftStatus', status], ['draftResumeLink', resumeLink]]);
-  const input = value => ({ value, addEventListener() {} });
+  const scheduled = new Map();
+  let nextTimer = 0;
+  const input = value => ({
+    value,
+    addEventListener(event, callback) {
+      if (event === 'input') this.edit = callback;
+    }
+  });
   const context = {
     AbortSignal, accessToken, fetch,
     els(id) {
@@ -123,12 +130,17 @@ function creator(fetch) {
     },
     window: { addEventListener() {} },
     edition: 'daughter', recipientInput: input('Lina'), senderInput: input('Mum'), customMessages: draft.messages,
-    setTimeout() {}, clearTimeout() {},
+    setTimeout(callback, delay) {
+      const timer = ++nextTimer;
+      scheduled.set(timer, { callback, delay });
+      return timer;
+    },
+    clearTimeout(timer) { scheduled.delete(timer); },
     editionDaughter: {}, editionSon: {}, makeLink: {}, personalize: {},
     sonLetters: [], daughterLetters: [], applyEdition() {}, renderPersonalizer() {}
   };
   runInNewContext(client + '\ndraftEnabled=true; globalThis.save=finishLater.onclick; globalThis.restore=restoreDraft; globalThis.change=draftChanged; globalThis.autosave=saveDraft;', context);
-  return { status, resumeLink, save: context.save, restore: context.restore, context };
+  return { status, resumeLink, scheduled, save: context.save, restore: context.restore, context };
 }
 
 test('Save and finish later waits for confirmation and allows retry after failure', async () => {
@@ -212,4 +224,30 @@ test('compressed Blob reads cannot break repeated draft updates with both names 
     revision = resumed.body.revision;
   }
   assert.equal((await call('PUT', { draft: unfinished, revision: 'W/' + initial.body.revision })).code, 409);
+});
+
+test('rapid name edits schedule a single autosave with the latest unfinished fields', async () => {
+  const requests = [];
+  const page = creator(async (url, options) => {
+    requests.push({ url, method: options.method, body: JSON.parse(options.body) });
+    return Response.json({ revision: '"1"' });
+  });
+  page.context.recipientInput.value = 'First';
+  page.context.recipientInput.edit();
+  page.context.recipientInput.value = 'Latest';
+  page.context.recipientInput.edit();
+  page.context.senderInput.value = '';
+  page.context.senderInput.edit();
+  assert.equal(requests.length, 0);
+  assert.equal(page.scheduled.size, 1);
+  const [{ callback, delay }] = page.scheduled.values();
+  assert.ok(delay > 0);
+  await callback();
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].url, '/api/draft');
+  assert.equal(requests[0].method, 'PUT');
+  assert.deepEqual(requests[0].body.draft, {
+    edition: 'daughter', recipient: 'Latest', sender: '', messages: draft.messages
+  });
+  assert.equal(page.status.textContent, 'Draft saved.');
 });

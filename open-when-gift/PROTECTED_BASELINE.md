@@ -86,3 +86,19 @@ Before any future OPEN WHEN feature is treated as complete:
 6. Re-test the touched journey without changing unrelated settled behavior.
 
 The automated guard lives at `open-when-gift/scripts/protect.mjs` and the GitHub workflow is `.github/workflows/open-when-protect.yml`.
+
+## Verified commercial production baseline
+
+The owner verified production at [`da9f7ffff88ec94a3e9cfba250c0296721d07acf`](https://github.com/Sanafaham/Sanafaham/commit/da9f7ffff88ec94a3e9cfba250c0296721d07acf) after [PR #7](https://github.com/Sanafaham/Sanafaham/pull/7). The protected baseline and all 33 tests passed. The owner confirmed that a draft could be saved, resumed, edited, and saved again in production. The authenticated owner result is separate from the automated tests and public smoke checks.
+
+The production failure was a Blob conditional-write precondition failure. A Brotli-compressed private draft response returned a weak ETag, which Blob rejected on the subsequent conditional write. A small preview fixture had missed compression. PR #7 requests identity encoding for draft reads, uses a strong ETag for conditional writes, and accepts the equivalent legacy weak revision from already-open tabs. Stale revisions still fail. Keep the full-size compression regression, including repeated saves with both names empty and rejection of an old revision.
+
+The following customer journeys are release requirements.
+
+- Validate the Gumroad license server-side for the configured product. Reject invalid, refunded, chargebacked, disputed, and unauthorized licenses. A verified purchase creates exactly one completed gift.
+- Allow unlimited automatic and manual draft saves while the entitlement is unused, including empty or partially filled names and letters. Restore the selected edition, names, and edits on another device when the buyer returns with the same license.
+- Preserve repeated save, resume, edit and save cycles. Serialize creator saves and reject stale or concurrent writes that would replace newer work. Only report a save after the server acknowledges that version. Give clear failure and retry feedback.
+- Keep recipient links private and independent of creator credentials. Recover only the original existing completed gift when the buyer re-enters the same license. Preserve older gifts, drafts, entitlements, and manual access links.
+- Preserve both editions, all 48 approved letters, optional personalization, the approved design, and the recipient experience.
+
+The permanent engineering instructions are in [AGENTS.md](AGENTS.md). The protected check must pass on the PR head before merge and during the Git-connected Vercel build before release.

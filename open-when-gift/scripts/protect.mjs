@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -123,6 +124,18 @@ for (const [name, needle] of [
 ]) {
   if (!redeemApi.includes(needle)) {
     console.error('MISSING:', name);
+    failed = true;
+  }
+}
+
+for (const [edition, approvedHash] of [
+  ['daughterLetters', 'a2460153d7118a1571f098c02f4054741bce20ae0cc25f171001067f97bd7908'],
+  ['sonLetters', '259231f31441f08a1418b482b50fe27ca6d29c5701903d41c3de0b2daab72456'],
+]) {
+  // Pin the approved letter source from the owner-verified production commit.
+  const letters = html.match(new RegExp('const ' + edition + ' = \\[([\\s\\S]*?)\\n\\];'))?.[1];
+  if (!letters || createHash('sha256').update(letters).digest('hex') !== approvedHash) {
+    console.error('CHANGED: approved letter copy for', edition);
     failed = true;
   }
 }
