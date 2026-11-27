@@ -522,9 +522,12 @@ async function saveDraft(finish=false){
   draftStatus.textContent='Saving your draft…';
   draftRequest=(async()=>{
     let saved=false;
+    let failureCode='connection';
     try{
       const response=await draftCall('PUT',{draft,revision:draftRevision});
+      failureCode='http-'+response.status;
       const result=await response.json();
+      if(['entitlement-read','draft-create','draft-update','draft-revision-missing','invalid-draft'].includes(result.code)) failureCode=result.code;
       if(response.status===409){
         draftConflict=true;
         draftStatus.textContent=result.conflict
@@ -539,8 +542,9 @@ async function saveDraft(finish=false){
       if(version!==draftChanges) draftStatus.textContent='Unsaved changes…';
       else if(finish) showDraftSavedForLater();
       else draftStatus.textContent='Draft saved.';
-    }catch{
-      draftStatus.textContent='Draft could not be saved. Keep this page open and select Save and finish later to retry.';
+    }catch(error){
+      if(error.name==='TimeoutError') failureCode='timeout';
+      draftStatus.textContent='Draft could not be saved. Keep this page open and select Save and finish later to retry. (Code: '+failureCode+')';
     }finally{
       draftRequest=null;
       if(saved&&version!==draftChanges&&draftEnabled) draftTimer=setTimeout(()=>saveDraft(finish),650);
