@@ -3,11 +3,11 @@ name: Protect OPEN WHEN
 on:
   push:
     branches: [main]
-    paths:
-      - 'open-when-gift/**'
   pull_request:
-    paths:
-      - 'open-when-gift/**'
+  merge_group:
+
+permissions:
+  contents: read
 
 jobs:
   protected-behaviors:

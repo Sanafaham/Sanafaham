@@ -1,0 +1,4 @@
+{
+  "buildCommand": "npm test && mkdir -p public && cp index.html dragonfly-reference.svg dragonfly-transparent.webp manifest.webmanifest open-when-icon.png open-when-icon.svg public/",
+  "outputDirectory": "public"
+}

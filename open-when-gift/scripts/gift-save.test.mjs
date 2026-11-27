@@ -11,11 +11,14 @@ const mockUrl = 'data:text/javascript,' + encodeURIComponent(
 const store = new Map();
 let failure;
 globalThis.openWhenTestBlob = {
-  async get(path) {
+  async get(path, options) {
+    assert.equal(options.access, 'private');
+    assert.equal(options.useCache, false);
     if (!store.has(path)) return null;
     return { statusCode: 200, stream: new Blob([store.get(path)]).stream() };
   },
   async put(path, data, options) {
+    assert.equal(options.access, 'private');
     if (options.allowOverwrite === false && store.has(path)) throw new Error('Already exists');
     const mode = failure?.(path, JSON.parse(path.endsWith('.lock') ? 'null' : data));
     if (mode === 'before') throw new Error('Write failed');
@@ -55,7 +58,7 @@ function setup() {
 }
 
 async function call(handler, req) {
-  const response = { setHeader() {} };
+  const response = { headers: {}, setHeader(name, value) { this.headers[name] = value; } };
   response.status = code => { response.code = code; return response; };
   response.json = body => { response.body = body; return response; };
   await handler(req, response);
@@ -96,4 +99,23 @@ test('a lost gift write response preserves the completed gift', async () => {
   assert.equal((await create()).code, 201);
   assert.equal((await create('Replay')).code, 409);
   assert.equal(JSON.parse(store.get(giftPath)).recipient, 'Recipient');
+});
+
+test('a private recipient link returns the saved gift independently of the consumed creator link', async () => {
+  setup();
+  const messages = Array(24).fill('Original');
+  messages[21] = 'A personalized letter for the recipient';
+  const saved = await call(save, {
+    method: 'POST',
+    body: { id: 'ignored-client-id', recipient: 'Recipient', sender: 'Sender', edition: 'son', messages, accessToken: token }
+  });
+  assert.equal(saved.code, 201);
+  assert.equal((await call(access, { method: 'GET', query: { token } })).code, 409);
+  const recipientView = await call(save, { method: 'GET', query: { id: saved.body.id } });
+  assert.equal(recipientView.code, 200);
+  assert.equal(recipientView.headers['Cache-Control'], 'no-store');
+  assert.equal(recipientView.body.edition, 'son');
+  assert.deepEqual(recipientView.body.messages, messages);
+  assert.equal(recipientView.body.accessToken, undefined);
+  assert.equal((await call(save, { method: 'GET', query: { id: 'missing' } })).code, 404);
 });
