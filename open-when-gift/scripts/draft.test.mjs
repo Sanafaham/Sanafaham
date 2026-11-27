@@ -140,7 +140,7 @@ test('Save and finish later waits for confirmation and allows retry after failur
   const retry = page.save();
   complete(Response.json({ revision: '"1"' }));
   await retry;
-  assert.match(page.status.textContent, /You can close this page/);
+  assert.match(page.status.textContent, /Save your Gumroad license key or keep your receipt.*enter the same key/);
   assert.equal(page.resumeLink.hidden, false);
   assert.match(html, /id="draftResumeLink" href="\/"[^>]*>Resume your Open When gift<\/a>/);
   page.context.change();
