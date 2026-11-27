@@ -15,7 +15,7 @@ const draft = { edition: 'son', recipient: '', sender: ' Mum ', messages: Array(
 draft.messages[8] = 'A personal note.\n';
 const entitlement = { version: 1, status: 'unused', source: 'gumroad', tokenHash: hash };
 
-function fixture(record = entitlement) {
+function fixture(record = entitlement, { compressDraftReads = false } = {}) {
   const store = new Map([[entitlementPath, { data: JSON.stringify(record), etag: '"0"' }]]);
   let counter = 0;
   const blob = {
@@ -23,7 +23,10 @@ function fixture(record = entitlement) {
       assert.equal(options.access, 'private');
       assert.equal(options.useCache, false);
       const item = store.get(path);
-      return item && { statusCode: 200, blob: { etag: item.etag }, stream: new Response(item.data).body };
+      if (!item) return null;
+      const compressed = compressDraftReads && path === draftPath && options.headers?.['Accept-Encoding'] !== 'identity';
+      const etag = compressed ? 'W/' + item.etag : item.etag;
+      return { statusCode: 200, blob: { etag }, stream: new Response(item.data).body };
     },
     async put(path, data, options) {
       assert.equal(options.access, 'private');
@@ -190,4 +193,23 @@ test('the same unfinished entitlement supports repeated save, resume, edit and s
     assert.deepEqual((await call('POST')).body.draft, next);
   }
   assert.equal(JSON.parse(store.get(entitlementPath).data).status, 'unused');
+});
+
+test('compressed Blob reads cannot break repeated draft updates with both names empty', async () => {
+  const { call } = fixture(entitlement, { compressDraftReads: true });
+  const unfinished = { ...draft, recipient: '', sender: '', messages: Array(24).fill('A personalized letter. '.repeat(30)) };
+  const initial = await call('PUT', { draft: unfinished, revision: null });
+  assert.equal(initial.code, 200);
+
+  let revision = 'W/' + initial.body.revision; // An already-open tab may still hold the old wire revision.
+  for (let edit = 1; edit <= 3; edit++) {
+    unfinished.messages[0] = 'Edit ' + edit;
+    const updated = await call('PUT', { draft: unfinished, revision });
+    assert.equal(updated.code, 200);
+    const resumed = await call('POST');
+    assert.deepEqual(resumed.body.draft, unfinished);
+    assert.equal(resumed.body.revision, updated.body.revision);
+    revision = resumed.body.revision;
+  }
+  assert.equal((await call('PUT', { draft: unfinished, revision: 'W/' + initial.body.revision })).code, 409);
 });

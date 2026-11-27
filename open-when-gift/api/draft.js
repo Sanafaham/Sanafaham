@@ -29,7 +29,9 @@ export function createDraftHandler({ blob, env }) {
     const pathname = 'drafts/' + hash + '.json';
     const options = { access: 'private', token };
     const read = async path => {
-      const result = await blob.get(path, { ...options, useCache: false });
+      // Compressed Blob responses carry weak ETags, which conditional writes reject.
+      const headers = path === pathname ? { 'Accept-Encoding': 'identity' } : undefined;
+      const result = await blob.get(path, { ...options, useCache: false, headers });
       if (!result) return null;
       if (result.statusCode !== 200) throw new Error('Private blob read failed');
       return result;
@@ -60,6 +62,8 @@ export function createDraftHandler({ blob, env }) {
         return res.status(400).json({ error: 'Invalid draft data.', code: 'invalid-draft' });
       }
 
+      // Older tabs may still hold the compressed response's weak form of this tag.
+      const writeRevision = typeof revision === 'string' ? revision.replace(/^W\/(?="[^"]+"$)/, '') : null;
       const { edition, recipient, sender, messages } = draft;
       stage = revision === null ? 'draft-create' : 'draft-update';
       try {
@@ -67,7 +71,7 @@ export function createDraftHandler({ blob, env }) {
           ...options,
           contentType: 'application/json',
           addRandomSuffix: false,
-          ...(revision === null ? { allowOverwrite: false } : { ifMatch: revision })
+          ...(revision === null ? { allowOverwrite: false } : { ifMatch: writeRevision })
         });
         if (!saved.etag) {
           stage = 'draft-revision-missing';
@@ -78,7 +82,7 @@ export function createDraftHandler({ blob, env }) {
         const current = await read(pathname);
         const currentRevision = current?.blob.etag ?? null;
         await current?.stream.cancel();
-        if (currentRevision !== revision) {
+        if (currentRevision !== writeRevision) {
           return res.status(409).json({ conflict: true });
         }
         throw error;
