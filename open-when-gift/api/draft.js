@@ -35,6 +35,7 @@ export function createDraftHandler({ blob, env }) {
       return result;
     };
 
+    let stage = 'entitlement-read';
     try {
       const entitlementBlob = await read('entitlements/' + hash + '.json');
       const entitlement = entitlementBlob && await new Response(entitlementBlob.stream).json();
@@ -46,6 +47,7 @@ export function createDraftHandler({ blob, env }) {
       }
 
       if (req.method === 'POST') {
+        stage = 'draft-read';
         const existing = await read(pathname);
         if (!existing) return res.status(200).json({ draft: null, revision: null });
         const saved = await new Response(existing.stream).json();
@@ -55,10 +57,11 @@ export function createDraftHandler({ blob, env }) {
       }
 
       if (!validDraft(draft) || !(revision === null || (typeof revision === 'string' && revision.length > 0 && revision.length <= 256 && !/[*,\r\n]/.test(revision)))) {
-        return res.status(400).json({ error: 'Invalid draft data.' });
+        return res.status(400).json({ error: 'Invalid draft data.', code: 'invalid-draft' });
       }
 
       const { edition, recipient, sender, messages } = draft;
+      stage = revision === null ? 'draft-create' : 'draft-update';
       try {
         const saved = await blob.put(pathname, JSON.stringify({ version: 1, edition, recipient, sender, messages }), {
           ...options,
@@ -66,7 +69,10 @@ export function createDraftHandler({ blob, env }) {
           addRandomSuffix: false,
           ...(revision === null ? { allowOverwrite: false } : { ifMatch: revision })
         });
-        if (!saved.etag) throw new Error('Draft revision missing');
+        if (!saved.etag) {
+          stage = 'draft-revision-missing';
+          throw new Error('Draft revision missing');
+        }
         return res.status(200).json({ revision: saved.etag });
       } catch (error) {
         const current = await read(pathname);
@@ -77,8 +83,9 @@ export function createDraftHandler({ blob, env }) {
         }
         throw error;
       }
-    } catch {
-      return res.status(500).json({ error: 'Your draft could not be accessed. Please try again.' });
+    } catch (error) {
+      console.error('open-when-draft-failure', stage, error?.constructor?.name);
+      return res.status(500).json({ error: 'Your draft could not be accessed. Please try again.', code: stage });
     }
   };
 }

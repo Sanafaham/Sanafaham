@@ -133,9 +133,9 @@ test('Save and finish later waits for confirmation and allows retry after failur
   const page = creator(() => new Promise(resolve => { complete = resolve; }));
   const pending = page.save();
   assert.match(page.status.textContent, /Saving your draft/);
-  complete(new Response('{}', { status: 500 }));
+  complete(Response.json({ code: 'draft-update' }, { status: 500 }));
   await pending;
-  assert.match(page.status.textContent, /could not be saved/);
+  assert.match(page.status.textContent, /could not be saved.*Code: draft-update/);
   assert.equal(page.resumeLink.hidden, true);
   const retry = page.save();
   complete(Response.json({ revision: '"1"' }));
@@ -175,4 +175,19 @@ test('an autosave acknowledgment never describes newer edits as saved', async ()
   complete(Response.json({ revision: '"2"' }));
   await latest;
   assert.equal(page.status.textContent, 'Draft saved.');
+});
+
+test('the same unfinished entitlement supports repeated save, resume, edit and save', async () => {
+  const { call, store } = fixture();
+  for (let edit = 0; edit < 5; edit++) {
+    const loaded = await call('POST');
+    assert.equal(loaded.code, 200);
+    if (edit > 0) assert.equal(loaded.body.draft.messages[0], 'Revision ' + (edit - 1));
+    const next = structuredClone(loaded.body.draft ?? draft);
+    next.messages[0] = 'Revision ' + edit;
+    const saved = await call('PUT', { draft: next, revision: loaded.body.revision });
+    assert.equal(saved.code, 200);
+    assert.deepEqual((await call('POST')).body.draft, next);
+  }
+  assert.equal(JSON.parse(store.get(entitlementPath).data).status, 'unused');
 });
