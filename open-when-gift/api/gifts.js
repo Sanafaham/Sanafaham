@@ -101,28 +101,33 @@ export default async function handler(req, res) {
        * gives this token one stable record. A second request sees status=used and is rejected.
        */
       const usedAt = new Date().toISOString();
-      await put(entitlementPath, JSON.stringify({
-        ...entitlement,
-        status: 'used',
-        usedAt,
-        giftId: id
-      }), {
-        access: 'private',
-        contentType: 'application/json',
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        token
-      });
-
       try {
+        await put(entitlementPath, JSON.stringify({
+          ...entitlement,
+          status: 'used',
+          usedAt,
+          giftId: id
+        }), {
+          access: 'private',
+          contentType: 'application/json',
+          addRandomSuffix: false,
+          allowOverwrite: true,
+          token
+        });
+
         await put(giftPath, JSON.stringify(gift), {
           access: 'private',
           contentType: 'application/json',
           addRandomSuffix: false,
+          allowOverwrite: false,
           token
         });
       } catch (error) {
-        // Restore the entitlement if gift persistence fails so a paid buyer is not stranded.
+        // A write can succeed even when its response fails. Preserve a saved gift.
+        if (await readPrivateJson(giftPath, token)) {
+          return res.status(201).json({ ok: true, id });
+        }
+        // Restore unused state and release the lock only after confirming no gift exists.
         await put(entitlementPath, JSON.stringify({
           ...entitlement,
           status: 'unused',
