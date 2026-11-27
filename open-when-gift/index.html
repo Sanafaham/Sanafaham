@@ -224,6 +224,7 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
       <p class="setup-sub">To continue on any device, return to Open When and enter the same license key from your Gumroad receipt.</p>
       <button class="done-personalizing" id="finishLater" type="button">Save and finish later</button>
       <div class="save-status show" id="draftStatus" role="status"></div>
+      <a id="draftResumeLink" href="/" target="_blank" rel="noopener noreferrer" hidden>Resume your Open When gift</a>
     </div>
     <div class="save-status" id="saveStatus"></div>
     <div class="share" id="share"></div>
@@ -472,6 +473,7 @@ els('closeLast').onclick=()=>{
 };
 
 const draftControls=els('draftControls'), draftStatus=els('draftStatus'), finishLater=els('finishLater');
+const draftResumeLink=els('draftResumeLink');
 let draftEnabled=false, draftRevision=null, draftTimer, draftRequest;
 let draftChanges=0, savedDraftChanges=0, draftConflict=false, giftSaving=false;
 
@@ -487,6 +489,7 @@ function draftCall(method, fields={}){
 function draftChanged(){
   if(!draftEnabled) return;
   draftChanges++;
+  draftResumeLink.hidden=true;
   if(draftConflict) return;
   draftStatus.textContent='Unsaved changes…';
   clearTimeout(draftTimer);
@@ -495,6 +498,11 @@ function draftChanged(){
 recipientInput.addEventListener('input',draftChanged);
 senderInput.addEventListener('input',draftChanged);
 
+function showDraftSavedForLater(){
+  draftStatus.textContent='Draft saved. You can close this page and return with the same license key.';
+  draftResumeLink.hidden=false;
+}
+
 async function saveDraft(finish=false){
   clearTimeout(draftTimer);
   if(!draftEnabled||draftConflict||giftSaving) return;
@@ -502,7 +510,7 @@ async function saveDraft(finish=false){
     if(finish){
       await draftRequest;
       if(draftChanges!==savedDraftChanges || draftRevision===null) return saveDraft(true);
-      if(!draftConflict && draftEnabled) draftStatus.textContent='Draft saved. You can close this page and return with the same license key.';
+      if(!draftConflict && draftEnabled) showDraftSavedForLater();
     }
     return;
   }
@@ -510,6 +518,7 @@ async function saveDraft(finish=false){
 
   const version=draftChanges;
   const draft={edition,recipient:recipientInput.value,sender:senderInput.value,messages:customMessages.slice()};
+  draftResumeLink.hidden=true;
   draftStatus.textContent='Saving your draft…';
   draftRequest=(async()=>{
     let saved=false;
@@ -527,9 +536,9 @@ async function saveDraft(finish=false){
       draftRevision=result.revision;
       savedDraftChanges=version;
       saved=true;
-      draftStatus.textContent=version!==draftChanges ? 'Unsaved changes…' : finish
-        ? 'Draft saved. You can close this page and return with the same license key.'
-        : 'Draft saved.';
+      if(version!==draftChanges) draftStatus.textContent='Unsaved changes…';
+      else if(finish) showDraftSavedForLater();
+      else draftStatus.textContent='Draft saved.';
     }catch{
       draftStatus.textContent='Draft could not be saved. Keep this page open and select Save and finish later to retry.';
     }finally{

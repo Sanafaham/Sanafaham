@@ -109,7 +109,8 @@ const client = html.slice(html.indexOf('const draftControls='), html.indexOf('ma
 
 function creator(fetch) {
   const status = {};
-  const controls = new Map([['draftStatus', status]]);
+  const resumeLink = { hidden: true };
+  const controls = new Map([['draftStatus', status], ['draftResumeLink', resumeLink]]);
   const input = value => ({ value, addEventListener() {} });
   const context = {
     AbortSignal, accessToken, fetch,
@@ -124,7 +125,7 @@ function creator(fetch) {
     sonLetters: [], daughterLetters: [], applyEdition() {}, renderPersonalizer() {}
   };
   runInNewContext(client + '\ndraftEnabled=true; globalThis.save=finishLater.onclick; globalThis.restore=restoreDraft; globalThis.change=draftChanged; globalThis.autosave=saveDraft;', context);
-  return { status, save: context.save, restore: context.restore, context };
+  return { status, resumeLink, save: context.save, restore: context.restore, context };
 }
 
 test('Save and finish later waits for confirmation and allows retry after failure', async () => {
@@ -135,10 +136,15 @@ test('Save and finish later waits for confirmation and allows retry after failur
   complete(new Response('{}', { status: 500 }));
   await pending;
   assert.match(page.status.textContent, /could not be saved/);
+  assert.equal(page.resumeLink.hidden, true);
   const retry = page.save();
   complete(Response.json({ revision: '"1"' }));
   await retry;
   assert.match(page.status.textContent, /You can close this page/);
+  assert.equal(page.resumeLink.hidden, false);
+  assert.match(html, /id="draftResumeLink" href="\/"[^>]*>Resume your Open When gift<\/a>/);
+  page.context.change();
+  assert.equal(page.resumeLink.hidden, true);
 });
 
 test('load failure keeps editing locked and a successful restore fills the fields', async () => {
