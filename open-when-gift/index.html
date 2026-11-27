@@ -220,6 +220,11 @@ html,body,.paper,.setup,.keep-card,.letter-sheet,.envelope-card,.personalize,.sh
         <div id="personalizeList"></div>
       </div>
     </details>
+    <div id="draftControls" hidden>
+      <p class="setup-sub">To continue on any device, return to Open When and enter the same license key from your Gumroad receipt.</p>
+      <button class="done-personalizing" id="finishLater" type="button">Save and finish later</button>
+      <div class="save-status show" id="draftStatus" role="status"></div>
+    </div>
     <div class="save-status" id="saveStatus"></div>
     <div class="share" id="share"></div>
   </section>
@@ -385,6 +390,7 @@ function switchEdition(next){
   personalize.open=false;
   applyEdition();
   renderPersonalizer();
+  draftChanged();
 }
 editionDaughter.onclick=()=>switchEdition('daughter');
 editionSon.onclick=()=>switchEdition('son');
@@ -399,8 +405,8 @@ function renderPersonalizer(){
     ta.value=customMessages[i];
     const sync=()=>{ status.textContent=ta.value===letters[i][1]?'Original':'Personalized'; status.style.fontWeight=ta.value===letters[i][1]?'400':'600'; };
     toggle.onclick=()=>{ const open=!wrap.classList.contains('open'); personalizeList.querySelectorAll('.edit-letter.open').forEach(n=>n.classList.remove('open')); if(open) wrap.classList.add('open'); };
-    ta.oninput=()=>{ customMessages[i]=ta.value; sync(); };
-    reset.onclick=()=>{ customMessages[i]=letters[i][1]; ta.value=letters[i][1]; sync(); };
+    ta.oninput=()=>{ customMessages[i]=ta.value; sync(); draftChanged(); };
+    reset.onclick=()=>{ customMessages[i]=letters[i][1]; ta.value=letters[i][1]; sync(); draftChanged(); };
     sync(); personalizeList.appendChild(wrap);
   });
 }
@@ -465,6 +471,115 @@ els('closeLast').onclick=()=>{
   requestAnimationFrame(()=>window.scrollTo({top:cardsScrollY,behavior:'auto'}));
 };
 
+const draftControls=els('draftControls'), draftStatus=els('draftStatus'), finishLater=els('finishLater');
+let draftEnabled=false, draftRevision=null, draftTimer, draftRequest;
+let draftChanges=0, savedDraftChanges=0, draftConflict=false, giftSaving=false;
+
+function draftCall(method, fields={}){
+  return fetch('/api/draft',{
+    method, cache:'no-store',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({accessToken,...fields}),
+    signal:AbortSignal.timeout(12000)
+  });
+}
+
+function draftChanged(){
+  if(!draftEnabled) return;
+  draftChanges++;
+  if(draftConflict) return;
+  draftStatus.textContent='Unsaved changes…';
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(()=>saveDraft(),650);
+}
+recipientInput.addEventListener('input',draftChanged);
+senderInput.addEventListener('input',draftChanged);
+
+async function saveDraft(finish=false){
+  clearTimeout(draftTimer);
+  if(!draftEnabled||draftConflict||giftSaving) return;
+  if(draftRequest){
+    if(finish){
+      await draftRequest;
+      if(draftChanges!==savedDraftChanges || draftRevision===null) return saveDraft(true);
+      if(!draftConflict && draftEnabled) draftStatus.textContent='Draft saved. You can close this page and return with the same license key.';
+    }
+    return;
+  }
+  if(!finish&&draftChanges===savedDraftChanges) return;
+
+  const version=draftChanges;
+  const draft={edition,recipient:recipientInput.value,sender:senderInput.value,messages:customMessages.slice()};
+  draftStatus.textContent='Saving your draft…';
+  draftRequest=(async()=>{
+    let saved=false;
+    try{
+      const response=await draftCall('PUT',{draft,revision:draftRevision});
+      const result=await response.json();
+      if(response.status===409){
+        draftConflict=true;
+        draftStatus.textContent=result.conflict
+          ? 'A newer draft is saved elsewhere. Your changes here were not saved. Copy any edits you want to keep, then reload to open the newer draft.'
+          : 'This gift can no longer be edited. Enter your license key again to reopen it.';
+        return;
+      }
+      if(!response.ok||typeof result.revision!=='string'||!result.revision) throw new Error('Draft save failed');
+      draftRevision=result.revision;
+      savedDraftChanges=version;
+      saved=true;
+      draftStatus.textContent=version!==draftChanges ? 'Unsaved changes…' : finish
+        ? 'Draft saved. You can close this page and return with the same license key.'
+        : 'Draft saved.';
+    }catch{
+      draftStatus.textContent='Draft could not be saved. Keep this page open and select Save and finish later to retry.';
+    }finally{
+      draftRequest=null;
+      if(saved&&version!==draftChanges&&draftEnabled) draftTimer=setTimeout(()=>saveDraft(finish),650);
+    }
+  })();
+  await draftRequest;
+}
+
+finishLater.onclick=async()=>{
+  finishLater.disabled=true;
+  try{ await saveDraft(true); }
+  finally{ finishLater.disabled=false; }
+};
+
+window.addEventListener('beforeunload',event=>{
+  if(draftEnabled&&(draftRequest||draftChanges!==savedDraftChanges)){
+    event.preventDefault();
+    event.returnValue='';
+  }
+});
+
+async function restoreDraft(){
+  draftControls.hidden=false;
+  const inputs=[editionDaughter,editionSon,recipientInput,senderInput,makeLink,personalize,finishLater];
+  inputs.forEach(input=>input.inert=true);
+  draftStatus.textContent='Loading your draft…';
+  try{
+    const response=await draftCall('POST');
+    if(!response.ok) throw new Error('Draft load failed');
+    const {draft,revision}=await response.json();
+    draftRevision=revision;
+    if(draft){
+      edition=draft.edition;
+      letters=edition==='son'?sonLetters:daughterLetters;
+      customMessages=draft.messages;
+      recipientInput.value=draft.recipient;
+      senderInput.value=draft.sender;
+      applyEdition();
+      renderPersonalizer();
+    }
+    draftEnabled=true;
+    draftStatus.textContent=draft?'Saved draft restored.':'';
+    inputs.forEach(input=>input.inert=false);
+  }catch{
+    draftStatus.textContent='Your draft could not be loaded. Reload this page to try again.';
+  }
+}
+
 makeLink.onclick=async()=>{
   recipient=(recipientInput.value||'').trim();
   sender=(senderInput.value||'').trim();
@@ -472,6 +587,8 @@ makeLink.onclick=async()=>{
   if(!sender){senderInput.focus();return}
   if(customMessages.some(m=>!m||!m.trim())){ saveStatus.textContent='Each letter needs a message.'; saveStatus.classList.add('show'); return; }
 
+  giftSaving=true;
+  clearTimeout(draftTimer);
   makeLink.disabled=true; saveStatus.textContent='Saving your gift…'; saveStatus.classList.add('show');
   giftId=(crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
   try{
@@ -479,12 +596,16 @@ makeLink.onclick=async()=>{
     if(!r.ok) throw new Error('save failed');
     const saved=await r.json();
     giftId=saved.id;
+    draftEnabled=false;
+    draftControls.hidden=true;
     storageKey='openwhen:gift:'+giftId; opened=new Set();
     const url=new URL(location.href); url.search=''; url.searchParams.set('gift',giftId);
     const giftUrl=url.toString();
     const msg='I made something for you, '+recipient+' ❤️\nOpen it when you’re ready.';
     share.classList.add('show');
-    share.innerHTML='<div class="share-title">Your gift is ready</div><div class="share-sub">Check it once, then send it however you normally talk to '+recipient+'.</div><div class="share-actions"><a class="primary-link" href="'+giftUrl+'" target="_blank" rel="noopener">Open gift</a><a href="https://wa.me/?text='+encodeURIComponent(msg+'\n'+giftUrl)+'">WhatsApp</a><a href="sms:&body='+encodeURIComponent(msg+'\n'+giftUrl)+'">Messages</a><a href="mailto:?subject='+encodeURIComponent('A little gift for you')+'&body='+encodeURIComponent(msg+'\n\n'+giftUrl)+'">Email</a><button id="nativeShare" type="button">Share…</button></div><div class="share-foot">'+recipient+' will see only the finished gift, including any letters you personalized.</div>';
+    share.innerHTML='<div class="share-title">Your gift is ready</div><div class="share-sub">Check it once, then send it however you normally talk to <span id="shareRecipient"></span>.</div><div class="share-actions"><a class="primary-link" href="'+giftUrl+'" target="_blank" rel="noopener">Open gift</a><a href="https://wa.me/?text='+encodeURIComponent(msg+'\n'+giftUrl)+'">WhatsApp</a><a href="sms:&body='+encodeURIComponent(msg+'\n'+giftUrl)+'">Messages</a><a href="mailto:?subject='+encodeURIComponent('A little gift for you')+'&body='+encodeURIComponent(msg+'\n\n'+giftUrl)+'">Email</a><button id="nativeShare" type="button">Share…</button></div><div class="share-foot"><span id="shareFootRecipient"></span> will see only the finished gift, including any letters you personalized.</div>';
+    els('shareRecipient').textContent=recipient;
+    els('shareFootRecipient').textContent=recipient;
     const n=els('nativeShare'); if(n) n.onclick=async()=>{ if(navigator.share){try{await navigator.share({title:'OPEN WHEN…',text:msg,url:giftUrl})}catch(e){}}else window.open(giftUrl,'_blank'); };
     els('kicker').textContent='From '+sender+', for '+recipient;
     els('forLine').textContent='A little gift to keep close';
@@ -497,7 +618,9 @@ makeLink.onclick=async()=>{
   }catch(e){
     saveStatus.textContent='I could not save this gift yet. Please try again.';
   }finally{
+    giftSaving=false;
     makeLink.disabled=false;
+    if(draftEnabled&&!draftConflict&&draftChanges!==savedDraftChanges) draftTimer=setTimeout(()=>saveDraft(),650);
   }
 };
 
@@ -586,6 +709,8 @@ async function boot(){
       throw new Error(data.error||'This access link is not available.');
     }
     applyEdition();
+    const access=await r.json();
+    if(access.canSaveDraft) await restoreDraft();
   }catch(e){
     document.body.innerHTML='<main style="max-width:640px;margin:80px auto;padding:24px;font-family:Georgia,serif"><h1>This access link cannot be used.</h1><p>'+(e.message||'Please ask for a fresh link.')+'</p></main>';
   }

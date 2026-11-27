@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       return res.status(409).json({ valid: false, error: 'This access link has already been used.' });
     }
 
-    return res.status(200).json({ valid: true });
+    return res.status(200).json({ valid: true, ...(entitlement.source === 'gumroad' ? { canSaveDraft: true } : {}) });
   } catch (error) {
     console.error('access-check-failed', error);
     return res.status(500).json({ error: 'Could not verify this access link.' });

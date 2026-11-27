@@ -1,0 +1,172 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
+import { createDraftHandler } from '../api/draft.js';
+import { deriveAccessToken } from '../api/redeem.js';
+
+const accessToken = deriveAccessToken('test-secret', 'sale');
+const otherToken = deriveAccessToken('test-secret', 'other-sale');
+const hash = createHash('sha256').update(accessToken).digest('hex');
+const entitlementPath = 'entitlements/' + hash + '.json';
+const draftPath = 'drafts/' + hash + '.json';
+const draft = { edition: 'son', recipient: '', sender: ' Mum ', messages: Array(24).fill('') };
+draft.messages[8] = 'A personal note.\n';
+const entitlement = { version: 1, status: 'unused', source: 'gumroad', tokenHash: hash };
+
+function fixture(record = entitlement) {
+  const store = new Map([[entitlementPath, { data: JSON.stringify(record), etag: '"0"' }]]);
+  let counter = 0;
+  const blob = {
+    async get(path, options) {
+      assert.equal(options.access, 'private');
+      assert.equal(options.useCache, false);
+      const item = store.get(path);
+      return item && { statusCode: 200, blob: { etag: item.etag }, stream: new Response(item.data).body };
+    },
+    async put(path, data, options) {
+      assert.equal(options.access, 'private');
+      assert.equal(options.addRandomSuffix, false);
+      assert.ok(!data.includes(accessToken));
+      const current = store.get(path);
+      if (current ? options.ifMatch !== current.etag : options.allowOverwrite !== false) {
+        throw new Error('Conditional write failed');
+      }
+      const result = { data, etag: '"' + ++counter + '"' };
+      store.set(path, result);
+      return result;
+    }
+  };
+  const handler = createDraftHandler({ blob, env: { BLOB_READ_WRITE_TOKEN: 'mock' } });
+  async function call(method, fields = {}, token = accessToken) {
+    const res = { setHeader(name, value) { if (name === 'Cache-Control') this.cache = value; } };
+    res.status = code => { res.code = code; return res; };
+    res.json = body => { res.body = body; };
+    await handler({ method, body: { accessToken: token, ...fields } }, res);
+    assert.equal(res.cache, 'no-store');
+    return res;
+  }
+  return { blob, store, call };
+}
+
+test('a second device restores the exact unfinished edition, names and letters', async () => {
+  const { call, store } = fixture();
+  assert.deepEqual((await call('POST')).body, { draft: null, revision: null });
+  const saved = await call('PUT', { draft, revision: null });
+  assert.equal(saved.code, 200);
+  assert.deepEqual((await call('POST')).body, { draft, revision: saved.body.revision });
+  assert.equal(store.size, 2);
+  assert.equal(JSON.parse(store.get(entitlementPath).data).status, 'unused');
+});
+
+test('another buyer, missing token, manual links and completed gifts cannot load or save drafts', async () => {
+  const { call } = fixture();
+  for (const method of ['POST', 'PUT']) {
+    assert.equal((await call(method, { draft, revision: null }, otherToken)).code, 403);
+    assert.equal((await call(method, { draft, revision: null }, '')).code, 403);
+    const manual = fixture({ ...entitlement, source: undefined });
+    assert.equal((await manual.call(method, { draft, revision: null })).code, 403);
+    const completed = fixture({ ...entitlement, status: 'used' });
+    assert.equal((await completed.call(method, { draft, revision: null })).code, 409);
+  }
+  assert.equal((await call('GET')).code, 405);
+});
+
+test('malformed or oversized drafts cannot be written', async () => {
+  const { call, store } = fixture();
+  for (const invalid of [{ edition: 'either' }, { sender: 'a'.repeat(41) }, { messages: [] }, { messages: Array(24).fill('a'.repeat(4001)) }]) {
+    assert.equal((await call('PUT', { draft: { ...draft, ...invalid }, revision: null })).code, 400);
+  }
+  assert.equal(store.has(draftPath), false);
+});
+
+test('simultaneous first saves and stale updates never overwrite a newer draft', async () => {
+  const { call } = fixture();
+  const first = await Promise.all([call('PUT', { draft, revision: null }), call('PUT', { draft, revision: null })]);
+  assert.deepEqual(first.map(item => item.code).sort(), [200, 409]);
+  const { revision } = (await call('POST')).body;
+  const newer = { ...draft, recipient: 'New name' };
+  assert.equal((await call('PUT', { draft: newer, revision })).code, 200);
+  const stale = await call('PUT', { draft, revision });
+  assert.deepEqual(stale.body, { conflict: true });
+  assert.equal(stale.code, 409);
+  assert.deepEqual((await call('POST')).body.draft, newer);
+});
+
+test('read or write failure returns 500 and retains the last saved draft', async () => {
+  const { call, blob } = fixture();
+  const { revision } = (await call('PUT', { draft, revision: null })).body;
+  blob.put = async () => { throw new Error('offline'); };
+  assert.equal((await call('PUT', { draft: { ...draft, recipient: 'New' }, revision })).code, 500);
+  assert.deepEqual((await call('POST')).body.draft, draft);
+  blob.get = async () => { throw new Error('offline'); };
+  assert.equal((await call('POST')).code, 500);
+});
+
+const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const client = html.slice(html.indexOf('const draftControls='), html.indexOf('makeLink.onclick=async()=>'));
+
+function creator(fetch) {
+  const status = {};
+  const controls = new Map([['draftStatus', status]]);
+  const input = value => ({ value, addEventListener() {} });
+  const context = {
+    AbortSignal, accessToken, fetch,
+    els(id) {
+      if (!controls.has(id)) controls.set(id, {});
+      return controls.get(id);
+    },
+    window: { addEventListener() {} },
+    edition: 'daughter', recipientInput: input('Lina'), senderInput: input('Mum'), customMessages: draft.messages,
+    setTimeout() {}, clearTimeout() {},
+    editionDaughter: {}, editionSon: {}, makeLink: {}, personalize: {},
+    sonLetters: [], daughterLetters: [], applyEdition() {}, renderPersonalizer() {}
+  };
+  runInNewContext(client + '\ndraftEnabled=true; globalThis.save=finishLater.onclick; globalThis.restore=restoreDraft; globalThis.change=draftChanged; globalThis.autosave=saveDraft;', context);
+  return { status, save: context.save, restore: context.restore, context };
+}
+
+test('Save and finish later waits for confirmation and allows retry after failure', async () => {
+  let complete;
+  const page = creator(() => new Promise(resolve => { complete = resolve; }));
+  const pending = page.save();
+  assert.match(page.status.textContent, /Saving your draft/);
+  complete(new Response('{}', { status: 500 }));
+  await pending;
+  assert.match(page.status.textContent, /could not be saved/);
+  const retry = page.save();
+  complete(Response.json({ revision: '"1"' }));
+  await retry;
+  assert.match(page.status.textContent, /You can close this page/);
+});
+
+test('load failure keeps editing locked and a successful restore fills the fields', async () => {
+  const failed = creator(async () => new Response('{}', { status: 500 }));
+  await failed.restore();
+  assert.equal(failed.context.recipientInput.inert, true);
+  assert.match(failed.status.textContent, /could not be loaded/);
+
+  const page = creator(async () => Response.json({ draft, revision: '"1"' }));
+  await page.restore();
+  assert.equal(page.context.edition, 'son');
+  assert.equal(page.context.senderInput.value, draft.sender);
+  assert.deepEqual(page.context.customMessages, draft.messages);
+  assert.equal(page.context.recipientInput.inert, false);
+});
+
+test('an autosave acknowledgment never describes newer edits as saved', async () => {
+  let complete;
+  const page = creator(() => new Promise(resolve => { complete = resolve; }));
+  page.context.change();
+  const first = page.context.autosave();
+  page.context.recipientInput.value = 'New name';
+  page.context.change();
+  complete(Response.json({ revision: '"1"' }));
+  await first;
+  assert.equal(page.status.textContent, 'Unsaved changes…');
+  const latest = page.context.autosave();
+  complete(Response.json({ revision: '"2"' }));
+  await latest;
+  assert.equal(page.status.textContent, 'Draft saved.');
+});

@@ -71,6 +71,7 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Each valid access token authorizes exactly one gift creation and is marked used with its gift ID.
 - Used, invalid, copied, replayed, or concurrently submitted access links cannot authorize another gift.
 - Keep `OPEN_WHEN_REDEEM_SECRET` stable across production deployments. It binds each Gumroad sale to its existing entitlement. Changing it changes the purchase identity and can allow a previously redeemed purchase to create another gift.
+- Unfinished Gumroad drafts stay private and are available only through the matching unused entitlement. Stale revisions cannot overwrite more recent drafts.
 - Gift recipient links remain independent of creator access tokens and continue to load by opaque gift ID.
 
 ## Engineering rule
