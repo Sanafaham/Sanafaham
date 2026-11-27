@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node scripts/protect.mjs"
+    "test": "node scripts/protect.mjs && node --test scripts/redeem.test.mjs scripts/gift-save.test.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.6.1"

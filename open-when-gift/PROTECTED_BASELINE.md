@@ -14,6 +14,7 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Creator first chooses **My Daughter** or **My Son**, then enters recipient first name and sender name.
 - Switching editions changes the recipient label, original 24-letter set, and final relationship wording without changing the shared engine.
 - Each edition has exactly 24 built-in letters.
+- Daughter letter 22 is "You need me" and its text works for any parent (owner-approved change, 2026-11-27). No built-in letter names a specific parent.
 - The saved gift record persists the selected edition so recipient links cannot mix Daughter and Son content.
 - Sender name is required.
 - Personalization is optional.
@@ -69,6 +70,7 @@ This file defines the settled behavior that future OPEN WHEN work must preserve 
 - Raw access tokens are never stored; only SHA-256 token hashes are persisted privately.
 - Each valid access token authorizes exactly one gift creation and is marked used with its gift ID.
 - Used, invalid, copied, replayed, or concurrently submitted access links cannot authorize another gift.
+- Keep `OPEN_WHEN_REDEEM_SECRET` stable across production deployments. It binds each Gumroad sale to its existing entitlement. Changing it changes the purchase identity and can allow a previously redeemed purchase to create another gift.
 - Gift recipient links remain independent of creator access tokens and continue to load by opaque gift ID.
 
 ## Engineering rule

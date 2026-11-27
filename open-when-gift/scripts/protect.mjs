@@ -4,6 +4,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const api = fs.readFileSync(new URL('../api/gifts.js', import.meta.url), 'utf8');
 const accessApi = fs.readFileSync(new URL('../api/access.js', import.meta.url), 'utf8');
 const adminAccessApi = fs.readFileSync(new URL('../api/admin/access.js', import.meta.url), 'utf8');
+const redeemApi = fs.readFileSync(new URL('../api/redeem.js', import.meta.url), 'utf8');
 
 const required = [
   ['stable ivory paper', '--paper:#EFECE4'],
@@ -24,6 +25,7 @@ const required = [
   ['load endpoint', "fetch('/api/gifts?id="],
   ['creator access token', "qs.get('access')"],
   ['creator access validation', "fetch('/api/access?token="],
+  ['Gumroad license redeem', "fetch('/api/redeem'"],
   ['gift save sends access token', 'messages:customMessages,accessToken'],
   ['WhatsApp share', 'https://wa.me/'],
   ['email share', 'mailto:?subject='],
@@ -50,6 +52,8 @@ for (const [name, needle] of required) {
 }
 
 const forbidden = [
+  ['parent-specific letter 22', 'You need your mum'],
+  ['parent-specific letter body', 'I am still your mum'],
   ['embedded paper texture regression', '--paper-texture:url("data:image/'],
   ['old embedded dragonfly regression', '--dragonfly:url("data:image/'],
   ['old brown paper token', '--paper:#c9c3b8'],
@@ -106,6 +110,21 @@ if (!adminAccessApi.includes("process.env.OPEN_WHEN_ADMIN_SECRET")) {
 if (!adminAccessApi.includes("crypto.randomBytes(32)")) {
   console.error('MISSING: cryptographically random access token');
   failed = true;
+}
+
+for (const [name, needle] of [
+  ['redeem verifies with Gumroad', 'api.gumroad.com/v2/licenses/verify'],
+  ['redeem pins the product', 'GUMROAD_PRODUCT_ID'],
+  ['redeem does not count uses', "increment_uses_count: 'false'"],
+  ['redeem rejects refunds', 'purchase.refunded || purchase.chargebacked'],
+  ['redeem derives token with server secret', 'createHmac'],
+  ['redeem no-overwrite entitlement create', 'allowOverwrite: false'],
+  ['redeem reuses entitlement store', "'entitlements/' + hash + '.json'"],
+]) {
+  if (!redeemApi.includes(needle)) {
+    console.error('MISSING:', name);
+    failed = true;
+  }
 }
 
 if (failed) process.exit(1);
